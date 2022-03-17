@@ -26,7 +26,8 @@ CREATE TABLE IF NOT EXISTS partidas_acabadas(
 CREATE TABLE IF NOT EXISTS ha_jugado(
 			usuario UUID NOT NULL,
 			partida UUID NOT NULL,
-			posicion INT NOT NULL,
+			usrs_debajo INT NOT NULL,
+			ha_ganado BOOLEAN NOT NULL,
 			FOREIGN KEY(usuario) REFERENCES usuarios(id) ON DELETE CASCADE,
 			FOREIGN KEY(partida) REFERENCES partidas_acabadas(id) ON DELETE CASCADE,
 			PRIMARY KEY(usuario, partida));

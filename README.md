@@ -12,6 +12,7 @@ propuestas (se puede debatir):
 -las salas en pausa en bd no es necesario que tengan las reglas, pues estarán implícitas en el binario
 -para permitir que el historial de partidas se pueda recortar, se guardarán las estadísticas calculadas
 -las estadísticas se fusionan en la tabla usuarios para evitar joins
+-más sencillo para los triggers guardar el nº de jugadores por debajo en el historial, y si ha ganado o no
 
 FALTA:
 - decidir cómo se codifica el modo de juego
