@@ -71,6 +71,4 @@ public class UsuarioVO {
 	public UUID getId() {
 		return id;
 	}	
-	
-	
 }

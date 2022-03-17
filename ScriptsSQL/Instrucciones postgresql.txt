@@ -1,3 +1,4 @@
 sudo service postgresql start
 sudo -i -u postgres
 psql
+cd '/mnt/c/Users/rauli/Documents/Uno for all/Repositorios/Backend/ScriptsSQL'

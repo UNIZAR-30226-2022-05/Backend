@@ -1,3 +1,3 @@
-DROP SCHEMA sisinf;
-DROP DATABASE sisinf_grupo_v2e;
+DROP SCHEMA uno_for_all;
+DROP DATABASE uno_for_all_db;
 

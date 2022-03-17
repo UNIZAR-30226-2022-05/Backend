@@ -1,7 +1,10 @@
 CREATE INDEX usuarios_correo_index ON usuarios(correo);
-CREATE INDEX usuarios_es_admin_index ON usuarios(es_admin);
+CREATE INDEX usuarios_nombre_index ON usuarios(nombre);
 
-CREATE INDEX notas_g_proyecto_index ON notas_g(proyecto);
-CREATE INDEX notas_g_usuario_index ON notas_g(usuario);
+CREATE INDEX partidas_fecha_index ON partidas_acabadas(fecha_inicio_partida);
 
-CREATE INDEX subtareas_tarea_index ON subtareas(tarea);
+CREATE INDEX amigo_emisor_index ON amigo_de(emisor);
+CREATE INDEX amigo_receptor_index ON amigo_de(receptor);
+
+CREATE INDEX miembro_usuario_index ON es_miembro(usuario);
+CREATE INDEX miembro_sala_index ON es_miembro(sala);

@@ -1,69 +1,62 @@
 CREATE TABLE IF NOT EXISTS usuarios(
-			id_usuario UUID PRIMARY KEY,
+			id UUID PRIMARY KEY,
 			correo VARCHAR(200) UNIQUE NOT NULL,
+			contrasenna VARCHAR(200) NOT NULL,
 			nombre VARCHAR(200) NOT NULL,
-			password VARCHAR(200) NOT NULL,
-			es_admin BOOL NOT NULL,
-			es_premium BOOL NOT NULL);
+			puntos INT NOT NULL,
+			total_partidas INT NOT NULL,
+			num_victorias INT NOT NULL);
 
-CREATE TABLE IF NOT EXISTS proyectos(
-			id_proyecto UUID PRIMARY KEY,
-			titulo VARCHAR(100) NOT NULL,
-			descripcion VARCHAR(200),
-			color CHAR(6) NOT NULL,
-			tamagno BIGINT,
-			fecha_mod BIGINT);
+CREATE TABLE IF NOT EXISTS amigo_de(
+			emisor UUID NOT NULL,
+			receptor UUID NOT NULL,
+			aceptada BOOLEAN NOT NULL,
+			FOREIGN KEY(emisor) REFERENCES usuarios(id) ON DELETE CASCADE,
+			FOREIGN KEY(receptor) REFERENCES usuarios(id) ON DELETE CASCADE,
+			PRIMARY KEY(emisor, receptor));
 
-CREATE TABLE IF NOT EXISTS notas_g(
-			id_nota UUID PRIMARY KEY,
-			titulo VARCHAR(100) NOT NULL,
-			color CHAR(6) NOT NULL,
-			proyecto UUID NOT NULL,
-			usuario UUID,
-			tamagno BIGINT,
-			fecha_mod BIGINT,
-			FOREIGN KEY(proyecto) references proyectos(id_proyecto) ON DELETE CASCADE,
-			FOREIGN KEY(usuario) references usuarios(id_usuario) ON DELETE SET NULL);
+	
+CREATE TABLE IF NOT EXISTS partidas_acabadas(
+			id UUID PRIMARY KEY,
+			fecha_inicio_partida DATE NOT NULL,
+			fecha_fin_partida DATE NOT NULL,
+			num_ias INT NOT NULL,
+			modo_juego INT NOT NULL);
 
-CREATE TABLE IF NOT EXISTS notas(
-			id_nota UUID PRIMARY KEY,
-			texto TEXT NOT NULL,
-			FOREIGN KEY(id_nota) REFERENCES notas_g(id_nota) ON DELETE CASCADE);
+CREATE TABLE IF NOT EXISTS ha_jugado(
+			usuario UUID NOT NULL,
+			partida UUID NOT NULL,
+			posicion INT NOT NULL,
+			FOREIGN KEY(usuario) REFERENCES usuarios(id) ON DELETE CASCADE,
+			FOREIGN KEY(partida) REFERENCES partidas_acabadas(id) ON DELETE CASCADE,
+			PRIMARY KEY(usuario, partida));
 
-CREATE TABLE IF NOT EXISTS tareas(
-			id_nota UUID PRIMARY KEY,
-			fecha_limite DATE,
-			completada BOOL NOT NULL,
-			FOREIGN KEY(id_nota) REFERENCES notas_g(id_nota) ON DELETE CASCADE);
 
-CREATE TABLE IF NOT EXISTS alertas(
-			tarea UUID,usuario UUID,
-			fecha DATE NOT NULL,
-			FOREIGN KEY(tarea) REFERENCES tareas(id_nota) ON DELETE CASCADE,
-			FOREIGN KEY(usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
-			PRIMARY KEY(tarea, usuario));
-
+CREATE TABLE IF NOT EXISTS salas (
+			id UUID PRIMARY KEY,
+			max_participantes INT NOT NULL,
+			partida BYTEA NOT NULL);
+			
 CREATE TABLE IF NOT EXISTS es_miembro(
-			proyecto UUID,
-			usuario UUID,
-			es_coordinador BOOL NOT NULL,
-			FOREIGN KEY(proyecto) REFERENCES proyectos(id_proyecto) ON DELETE CASCADE,
-			FOREIGN KEY(usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
-			PRIMARY KEY(proyecto, usuario));
-
-CREATE TABLE IF NOT EXISTS subtareas(
-			id_subtarea UUID PRIMARY KEY,
-			texto TEXT NOT NULL,
-			completada BOOL NOT NULL,
-			tarea UUID,
-			FOREIGN KEY(tarea) REFERENCES tareas(id_nota) ON DELETE CASCADE);
+			usuario UUID NOT NULL,
+			sala UUID NOT NULL,
+			FOREIGN KEY(usuario) REFERENCES usuarios(id) ON DELETE CASCADE,
+			FOREIGN KEY(sala) REFERENCES salas(id) ON DELETE CASCADE,
+			PRIMARY KEY(usuario, sala));
 
 
 
+/* CREATE TABLE IF NOT EXISTS reglas(
+			id UUID PRIMARY KEY,
+			modo INT NOT NULL,	-- 1, 2, 3
+			penaliza_al_negro BOOLEAN NOT NULL,
+			acumular_robo BOOLEAN NOT NULL,
+			reflejo_robo BOOLEAN NOT NULL,
+			jugadas_combinadas BOOLEAN NOT NULL,
+			cartas_especiales BOOLEAN NOT NULL); */
 
-CREATE TABLE IF NOT EXISTS accesos(
-			fecha DATE PRIMARY KEY,
-			num_accesos INT);
-
-
-INSERT INTO usuarios VALUES('4c2a49ed-48be-4970-9010-edb1faf918f1', 'ideanote.info@gmail.com', 'IdeaNote Admin', 'sisinf2020', true, true);
+/* CREATE TABLE IF NOT EXISTS iconos(
+			id UUID PRIMARY KEY,
+			imagen BYTEA NOT NULL,	
+			coste INT NOT NULL); */
+-- FALTA DESBLOQUEADO
