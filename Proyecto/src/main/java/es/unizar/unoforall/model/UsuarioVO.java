@@ -12,10 +12,10 @@ public class UsuarioVO {
 	private String correo;
 	private String nombre;
 	private String contrasenna;
-	private boolean puntos;
+	private int puntos;
 	
 	
-	public UsuarioVO(UUID id, String correo, String nombre, String contrasenna, boolean puntos) {
+	public UsuarioVO(UUID id, String correo, String nombre, String contrasenna, int puntos) {
 		super();
 		if(id == null) {
 			id = UUID.randomUUID();
@@ -58,12 +58,12 @@ public class UsuarioVO {
 	}
 
 
-	public boolean isPuntos() {
+	public int getPuntos() {
 		return puntos;
 	}
 
 
-	public void setPuntos(boolean puntos) {
+	public void setPuntos(int puntos) {
 		this.puntos = puntos;
 	}
 
