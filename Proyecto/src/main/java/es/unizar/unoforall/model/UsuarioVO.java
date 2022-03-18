@@ -13,9 +13,11 @@ public class UsuarioVO {
 	private String nombre;
 	private String contrasenna;
 	private int puntos;
+	private int totalPartidas;
+	private int numVictorias;
 	
 	
-	public UsuarioVO(UUID id, String correo, String nombre, String contrasenna, int puntos) {
+	public UsuarioVO(UUID id, String correo, String nombre, String contrasenna, int puntos, int totalPartidas, int numVictorias) {
 		super();
 		if(id == null) {
 			id = UUID.randomUUID();
@@ -25,6 +27,8 @@ public class UsuarioVO {
 		this.nombre = nombre;
 		this.contrasenna = contrasenna;
 		this.puntos = puntos;
+		this.totalPartidas = totalPartidas;
+		this.numVictorias = numVictorias;
 	}
 
 
@@ -70,5 +74,25 @@ public class UsuarioVO {
 
 	public UUID getId() {
 		return id;
-	}	
+	}
+
+
+	public int getTotalPartidas() {
+		return totalPartidas;
+	}
+
+
+	public void setTotalPartidas(int totalPartidas) {
+		this.totalPartidas = totalPartidas;
+	}
+
+
+	public int getNumVictorias() {
+		return numVictorias;
+	}
+
+
+	public void setNumVictorias(int numVictorias) {
+		this.numVictorias = numVictorias;
+	}
 }

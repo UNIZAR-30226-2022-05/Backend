@@ -14,7 +14,7 @@ public class ConnectionManager {
 	
 	// Credenciales de la Base de Datos
 	private static final String USER = "postgres";
-	private static final String PASS = "sisinf2020";
+	private static final String PASS = "unoforall";
 	
 	/**
 	 * Devuelve una nueva conexión a la base de datos

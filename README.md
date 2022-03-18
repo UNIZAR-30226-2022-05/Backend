@@ -16,3 +16,15 @@ propuestas (se puede debatir):
 
 FALTA:
 - decidir cómo se codifica el modo de juego
+
+
+
+
+spring.datasource.driver-class-name=org.postgresql.Driver
+spring.datasource.url=jdbc:postgresql://localhost:5432/uno_for_all_db?currentSchema=uno_for_all
+spring.datasource.username=postgresql
+spring.datasource.password=unoforall
+
+spring.jpa.hibernate.dll-auto=update
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.show-sql=true
