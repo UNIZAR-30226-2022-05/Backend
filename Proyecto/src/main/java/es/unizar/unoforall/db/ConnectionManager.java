@@ -10,7 +10,7 @@ import java.sql.*;
 public class ConnectionManager {
 	// JDBC nombred el driver y URL de BD 
 	private static final String JDBC_DRIVER = "org.postgresql.Driver";
-	private static final String DB_URL = "jdbc:postgresql://sisinf-database:5432/uno_for_all_db?currentSchema=uno_for_all";
+	private static final String DB_URL = "jdbc:postgresql://localhost:5432/uno_for_all_db?currentSchema=uno_for_all";
 	
 	// Credenciales de la Base de Datos
 	private static final String USER = "postgres";
