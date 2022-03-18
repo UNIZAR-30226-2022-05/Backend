@@ -15,7 +15,7 @@ public class PoolConnectionManager {
 			Context envCtx = (Context) initCtx.lookup("java:comp/env");
 
 			System.out.println(envCtx.toString());
-			DataSource ds = (DataSource) envCtx.lookup("jdbc/accessDB");
+			DataSource ds = (DataSource) envCtx.lookup("jdbc/unoDB");
 			System.out.println(ds.toString());
 
 			Connection conn = ds.getConnection();

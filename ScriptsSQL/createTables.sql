@@ -33,10 +33,10 @@ CREATE TABLE IF NOT EXISTS ha_jugado(
 			PRIMARY KEY(usuario, partida));
 
 
-CREATE TABLE IF NOT EXISTS salas (
+CREATE TABLE IF NOT EXISTS salas_pausadas (
 			id UUID PRIMARY KEY,
 			max_participantes INT NOT NULL,
-			partida BYTEA NOT NULL);
+			sala BYTEA NOT NULL);
 			
 CREATE TABLE IF NOT EXISTS es_miembro(
 			usuario UUID NOT NULL,
