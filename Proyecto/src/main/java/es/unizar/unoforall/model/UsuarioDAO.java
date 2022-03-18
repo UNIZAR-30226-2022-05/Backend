@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import es.unizar.unoforall.db.ConnectionManager;
 import es.unizar.unoforall.db.PoolConnectionManager;
+import es.unizar.unoforall.db.PoolConnectionManager2;
 
 public class UsuarioDAO {
 /******************************* Gestión de usuarios *******************************/
@@ -21,7 +22,7 @@ public class UsuarioDAO {
 		Connection conn = null;
 		
 		try {
-			conn = PoolConnectionManager.getConnection();
+			conn = PoolConnectionManager2.getConnection();
 			
 			UUID idUsuario = usuario.getId();
 			String correo = usuario.getCorreo();
@@ -51,7 +52,7 @@ public class UsuarioDAO {
 		}catch(Exception ex) {
 			ex.printStackTrace();
 		}finally {
-			ConnectionManager.releaseConnection(conn);
+			PoolConnectionManager2.releaseConnection(conn);
 		}
 		
 		return result;
@@ -67,7 +68,7 @@ public class UsuarioDAO {
 		Connection conn = null;
 		
 		try {
-			conn = PoolConnectionManager.getConnection();
+			conn = PoolConnectionManager2.getConnection();
 			
 			UUID idUsuario = usuario.getId();
 			String correo = usuario.getCorreo();
@@ -99,7 +100,7 @@ public class UsuarioDAO {
 		}catch(Exception ex) {
 			ex.printStackTrace();
 		}finally {
-			ConnectionManager.releaseConnection(conn);
+			PoolConnectionManager2.releaseConnection(conn);
 		}
 		
 		
@@ -131,7 +132,7 @@ public class UsuarioDAO {
 		Connection conn = null;
 		
 		try {
-			conn = PoolConnectionManager.getConnection();
+			conn = PoolConnectionManager2.getConnection();
 			
 			PreparedStatement selectUser = conn.prepareStatement("SELECT * FROM usuarios WHERE id = ?;");
 			selectUser.setObject(1, idUsuario);
@@ -150,7 +151,7 @@ public class UsuarioDAO {
 		}catch(Exception ex) {
 			ex.printStackTrace();
 		}finally {
-			ConnectionManager.releaseConnection(conn);
+			PoolConnectionManager2.releaseConnection(conn);
 		}
 		
 		return result;
@@ -166,7 +167,7 @@ public class UsuarioDAO {
 		Connection conn = null;
 		
 		try {
-			conn = PoolConnectionManager.getConnection();
+			conn = PoolConnectionManager2.getConnection();
 			
 			PreparedStatement selectUser = conn.prepareStatement("SELECT * FROM usuarios WHERE correo = ?;");
 			selectUser.setString(1, correo);
@@ -185,7 +186,7 @@ public class UsuarioDAO {
 		}catch(Exception ex) {
 			ex.printStackTrace();
 		}finally {
-			ConnectionManager.releaseConnection(conn);
+			PoolConnectionManager2.releaseConnection(conn);
 		}
 		
 		return result;
@@ -202,7 +203,7 @@ public class UsuarioDAO {
 		Connection conn = null;
 		
 		try {
-			conn = PoolConnectionManager.getConnection();
+			conn = PoolConnectionManager2.getConnection();
 			
 			UUID idUsuario = usuario.getId();
 			PreparedStatement delUser = conn.prepareStatement("DELETE FROM usuarios WHERE id_usuario=?;");
@@ -213,7 +214,7 @@ public class UsuarioDAO {
 		}catch(Exception ex) {
 			ex.printStackTrace();
 		}finally {
-			ConnectionManager.releaseConnection(conn);
+			PoolConnectionManager2.releaseConnection(conn);
 		}
 		
 		

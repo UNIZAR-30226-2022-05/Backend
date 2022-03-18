@@ -16,8 +16,8 @@ import javax.mail.internet.MimeMessage;
 public class Mail {
 	
 	//Usuario y contraseña para enviar correos electrónicos
-    private static final String username = "ideanote.info@gmail.com";
-    private static final String password = "sisinf2020";
+    private static final String username = "unoforall.info@gmail.com";
+    private static final String password = "unoforall";
 	
     /**
      * Método para enviar un correo electrónico a un determinado destinatario con un asunto y un cuerpo
