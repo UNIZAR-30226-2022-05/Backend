@@ -1,5 +1,8 @@
 package es.unizar.unoforall.apirest;
 
-public class ApiRestFunctions {
+import java.util.UUID;
 
+public class ApiRestFunctions {
+	
+	
 }

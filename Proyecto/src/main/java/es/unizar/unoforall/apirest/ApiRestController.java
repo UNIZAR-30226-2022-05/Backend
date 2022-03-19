@@ -24,16 +24,32 @@ import es.unizar.unoforall.utils.Mail;
 
 //Indiciamos que es un controlador rest
 @RestController
-@RequestMapping("/api") //esta sera la raiz de la url, es decir http://127.0.0.1:8080/api/
+@RequestMapping("/api")
 public class ApiRestController {
-	
-
-	
-    //http://127.0.0.1/api/login  
+	 
 	@PostMapping("/login")
-	public String getUser(@RequestParam String correo, @RequestParam String contrasenna){
-        //retornará todos los usuarios
-        return "has escrito ";
+	public LoginResponse logUser(@RequestParam String correo, @RequestParam String contrasenna){
+		UsuarioVO usuario = UsuarioDAO.getUsuario(correo);
+		
+		if (usuario == null) {
+			return new LoginResponse(false, "Usuario no registrado");
+		} else if (!usuario.getContrasenna().equals(contrasenna))  {
+			return new LoginResponse(false, "Contraseña incorrecta");
+		} else {
+			return new LoginResponse(true, "");
+		}
+    }
+	
+	@PostMapping("/register")
+	public LoginResponse registerUser(@RequestParam UsuarioVO usuario){
+		UsuarioDAO.registrarUsuario(usuario);
+		
+		if (usuario == null) {
+			return new LoginResponse(false, "Usuario no registrado. El correo o contraseña introducidos son incorrectos.");
+		} else {
+			
+			return new LoginResponse(true, "");
+		}
     }
 	
 	

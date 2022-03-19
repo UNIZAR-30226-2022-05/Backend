@@ -32,3 +32,7 @@ buscar amigos por nombre o por correo
 
 SESIÓN
 al hacer login, se envía correo y contraseña (hash), y se devuelve el id de sesión si hay éxito, o null si no 
+
+
+curl -X POST localhost/api/login -H 'Content-type:application/json' -d '{"correo": "prueba.info@gmail.com", "contrasenna": "asdfasdf"}'
+curl -X POST localhost/api/login -H 'Content-Type: application/x-www-form-urlencoded' -d "correo=prueba.info@gmail.com&contrasenna=asdfasdf"
