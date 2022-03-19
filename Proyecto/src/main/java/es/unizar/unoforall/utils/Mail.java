@@ -1,5 +1,8 @@
 package es.unizar.unoforall.utils;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Properties;
 
 import javax.mail.Message;
@@ -16,9 +19,24 @@ import javax.mail.internet.MimeMessage;
 public class Mail {
 	
 	//Usuario y contraseña para enviar correos electrónicos
-    private static final String username = "unoforall.info@gmail.com";
-    private static final String password = "unoforall";
+    private static final String username;
+    private static String password;
 	
+    static {
+    	Properties propiedades = new Properties();
+    	try {
+			propiedades.load(new FileReader("credenciales.properties"));
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	username = propiedades.getProperty("mail");
+    	password = propiedades.getProperty("clave_mail");
+    }
+    
     /**
      * Método para enviar un correo electrónico a un determinado destinatario con un asunto y un cuerpo
      * @param destinatario El destinatario del mensaje. Debe ser una dirección válida

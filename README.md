@@ -23,3 +23,7 @@ en:   	C:\Program Files\Java\jdk-17.0.2\conf\security
 		/usr/lib/jvm/java-11-openjdk-amd64/conf/security/java.security
 comentar: jdk.tls.disabledAlgorithms ...
 https://stackoverflow.com/questions/67899129/postfix-and-openjdk-11-no-appropriate-protocol-protocol-is-disabled-or-cipher
+
+
+DECIDIR
+buscar amigos por nombre o por correo
