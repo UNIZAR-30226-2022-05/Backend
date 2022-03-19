@@ -7,12 +7,12 @@ import java.util.UUID;
 
 //import javax.swing.Timer;
 
-public class SesionAlarms implements ActionListener {
+public class SesionAlarm implements ActionListener {
 	
 	private UUID miSesion;
 	private Map<UUID,Sesion> listaGlobal;
 	
-	public SesionAlarms(UUID sesion, Map<UUID,Sesion> lista) {
+	public SesionAlarm(UUID sesion, Map<UUID,Sesion> lista) {
 		miSesion = sesion;
 		listaGlobal = lista;
 	}
