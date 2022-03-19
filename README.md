@@ -18,13 +18,12 @@ FALTA:
 - decidir cómo se codifica el modo de juego
 
 
+PERMITIR ENVÍO DE CORREOS
+en:   	C:\Program Files\Java\jdk-17.0.2\conf\security
+		/usr/lib/jvm/java-11-openjdk-amd64/conf/security/java.security
+comentar: jdk.tls.disabledAlgorithms ...
+https://stackoverflow.com/questions/67899129/postfix-and-openjdk-11-no-appropriate-protocol-protocol-is-disabled-or-cipher
 
 
-spring.datasource.driver-class-name=org.postgresql.Driver
-spring.datasource.url=jdbc:postgresql://localhost:5432/uno_for_all_db?currentSchema=uno_for_all
-spring.datasource.username=postgresql
-spring.datasource.password=unoforall
-
-spring.jpa.hibernate.dll-auto=update
-spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
-spring.jpa.show-sql=true
+DECIDIR
+buscar amigos por nombre o por correo

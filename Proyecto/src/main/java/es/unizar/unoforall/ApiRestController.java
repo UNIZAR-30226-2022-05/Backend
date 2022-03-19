@@ -17,7 +17,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import es.unizar.unoforall.db.PoolConnectionManager2;
 import es.unizar.unoforall.model.*;
+import es.unizar.unoforall.utils.Mail;
 
 
 //Indiciamos que es un controlador rest
@@ -36,7 +38,20 @@ public class ApiRestController {
 	
 	@GetMapping("/usuario")
 	public UsuarioVO getEmpleados(@RequestParam String correo){
+		Mail.sendMail("801397@unizar.es", "pruebita", "adiós españa\n holi");
 		return UsuarioDAO.getUsuario(correo);
+		
+    }
+	
+	//PARA DEBUG
+	@GetMapping("/close")
+	public String closeConnections(@RequestParam String clave){
+		if (clave.equals("unoforall")) {
+			PoolConnectionManager2.close();
+			return "OK, reinicia el servidor";
+		} else {
+			return "Contraseña incorrecta";
+		}
     }
 
     /*Este método se hará cuando por una petición GET (como indica la anotación) se llame a la url + el id de un usuario
