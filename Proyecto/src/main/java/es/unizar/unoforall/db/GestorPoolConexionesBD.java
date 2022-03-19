@@ -5,7 +5,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PoolConnectionManager2 {
+public class GestorPoolConexionesBD {
 	private static final Object LOCK;
 	private static final Map<Connection, Boolean> conexiones;
 	private static final int MAX_CONEXIONES = 20;
@@ -16,7 +16,7 @@ public class PoolConnectionManager2 {
 	    conexiones = new HashMap<>();
 	    for(int i=0;i<MAX_CONEXIONES;i++){
 	        try{
-	            Connection conexion = ConnectionManager.getConnection();
+	            Connection conexion = GestorConexionesBD.getConnection();
 	            conexiones.put(conexion, true);
 	        }catch(Exception ex){
 	            System.err.println("Error al inicializar el PoolConnectionManager:");
@@ -63,7 +63,7 @@ public class PoolConnectionManager2 {
 
 	public static void close(){
 	    synchronized(LOCK){
-	        conexiones.forEach((conexion, disponible) -> ConnectionManager.releaseConnection(conexion));
+	        conexiones.forEach((conexion, disponible) -> GestorConexionesBD.releaseConnection(conexion));
 	    }
 	}
 }

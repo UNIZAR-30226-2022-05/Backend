@@ -1,8 +1,5 @@
 package es.unizar.unoforall.model;
 
-import java.util.UUID;
-
-
 public class SalasPausadasVO {
 //	private final UUID id;
 //	private int maxParticipantes;

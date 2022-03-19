@@ -1,16 +1,15 @@
-package es.unizar.unoforall.model;
+package es.unizar.unoforall.apirest;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.UUID;
 
-import es.unizar.unoforall.db.ConnectionManager;
-import es.unizar.unoforall.db.PoolConnectionManager;
-import es.unizar.unoforall.db.PoolConnectionManager2;
+import es.unizar.unoforall.db.GestorPoolConexionesBD;
+import es.unizar.unoforall.model.UsuarioVO;
 
 public class UsuarioDAO {
-/******************************* Gestión de usuarios *******************************/
+/**************************** Gestión de usuarios *****************************/
     
 	/**
 	 * Método para registrar un usuario
@@ -22,7 +21,7 @@ public class UsuarioDAO {
 		Connection conn = null;
 		
 		try {
-			conn = PoolConnectionManager2.getConnection();
+			conn = GestorPoolConexionesBD.getConnection();
 			
 			UUID idUsuario = usuario.getId();
 			String correo = usuario.getCorreo();
@@ -31,14 +30,15 @@ public class UsuarioDAO {
 			int puntos = usuario.getPuntos();
 			int totalPartidas = usuario.getTotalPartidas();
 			int numVictorias = usuario.getNumVictorias();
-			PreparedStatement addUser = conn.prepareStatement("INSERT INTO usuarios VALUES(?, ?, ?, ?, ?, ?, ?)"
-															+ "ON CONFLICT(id) DO UPDATE "
-															+ "SET	correo=EXCLUDED.correo,"
-															+ "		contrasenna=EXCLUDED.contrasenna,"
-															+ "		nombre=EXCLUDED.nombre,"
-															+ "		puntos=EXCLUDED.puntos,"
-															+ "		total_partidas=EXCLUDED.total_partidas,"
-															+ "		num_victorias=EXCLUDED.num_victorias;");
+			PreparedStatement addUser = 
+					conn.prepareStatement("INSERT INTO usuarios VALUES(?, ?, ?, ?, ?, ?, ?)"
+											+ "ON CONFLICT(id) DO UPDATE "
+											+ "SET	correo=EXCLUDED.correo,"
+											+ "		contrasenna=EXCLUDED.contrasenna,"
+											+ "		nombre=EXCLUDED.nombre,"
+											+ "		puntos=EXCLUDED.puntos,"
+											+ "		total_partidas=EXCLUDED.total_partidas,"
+											+ "		num_victorias=EXCLUDED.num_victorias;");
 			addUser.setObject(1, idUsuario);
 			addUser.setString(2, correo);
 			addUser.setString(3, password);
@@ -52,7 +52,7 @@ public class UsuarioDAO {
 		}catch(Exception ex) {
 			ex.printStackTrace();
 		}finally {
-			PoolConnectionManager2.releaseConnection(conn);
+			GestorPoolConexionesBD.releaseConnection(conn);
 		}
 		
 		return result;
@@ -68,7 +68,7 @@ public class UsuarioDAO {
 		Connection conn = null;
 		
 		try {
-			conn = PoolConnectionManager2.getConnection();
+			conn = GestorPoolConexionesBD.getConnection();
 			
 			UUID idUsuario = usuario.getId();
 			String correo = usuario.getCorreo();
@@ -78,14 +78,15 @@ public class UsuarioDAO {
 			int totalPartidas = usuario.getTotalPartidas();
 			int numVictorias = usuario.getNumVictorias();
 			
-			PreparedStatement updateUser = conn.prepareStatement("UPDATE usuarios SET "
-																	+ "nombre=?, "
-																	+ "correo=?, "
-																	+ "contrasenna=?, "
-																	+ "puntos=?, "
-																	+ "total_partidas=? "
-																	+ "num_victorias=? "
-																	+ "WHERE id=?;");
+			PreparedStatement updateUser = 
+					conn.prepareStatement("UPDATE usuarios SET "
+											+ "nombre=?, "
+											+ "correo=?, "
+											+ "contrasenna=?, "
+											+ "puntos=?, "
+											+ "total_partidas=? "
+											+ "num_victorias=? "
+											+ "WHERE id=?;");
 			
 			updateUser.setString(1, nombre);
 			updateUser.setString(2, correo);
@@ -100,27 +101,13 @@ public class UsuarioDAO {
 		}catch(Exception ex) {
 			ex.printStackTrace();
 		}finally {
-			PoolConnectionManager2.releaseConnection(conn);
+			GestorPoolConexionesBD.releaseConnection(conn);
 		}
 		
 		
 		return result;
 	}
 	
-	/**
-	 * Método para que un usuario inicie sesión
-	 * @param correo
-	 * @param password
-	 * @return El usuario correspondiente o null si ha habido algún error
-	 */
-	public static UsuarioVO loguearUsuario(String correo, String password) {
-		UsuarioVO user = getUsuario(correo);
-		if(user != null && user.getContrasenna().equals(password)) {
-			return user;
-		}else {
-			return null;
-		}
-	}
 	
 	/**
 	 * Método para obtener un usuario por su ID
@@ -132,9 +119,10 @@ public class UsuarioDAO {
 		Connection conn = null;
 		
 		try {
-			conn = PoolConnectionManager2.getConnection();
+			conn = GestorPoolConexionesBD.getConnection();
 			
-			PreparedStatement selectUser = conn.prepareStatement("SELECT * FROM usuarios WHERE id = ?;");
+			PreparedStatement selectUser = 
+					conn.prepareStatement("SELECT * FROM usuarios WHERE id = ?;");
 			selectUser.setObject(1, idUsuario);
 			
 			ResultSet rs = selectUser.executeQuery();
@@ -146,12 +134,13 @@ public class UsuarioDAO {
 				int totalPartidas = rs.getInt("total_partidas");
 				int numVictorias = rs.getInt("num_victorias");
 				
-				result = new UsuarioVO(idUsuario, correo, nombre, password, puntos, totalPartidas, numVictorias);
+				result = new UsuarioVO(idUsuario, correo, nombre, 
+						password, puntos, totalPartidas, numVictorias);
 			}
 		}catch(Exception ex) {
 			ex.printStackTrace();
 		}finally {
-			PoolConnectionManager2.releaseConnection(conn);
+			GestorPoolConexionesBD.releaseConnection(conn);
 		}
 		
 		return result;
@@ -167,9 +156,10 @@ public class UsuarioDAO {
 		Connection conn = null;
 		
 		try {
-			conn = PoolConnectionManager2.getConnection();
+			conn = GestorPoolConexionesBD.getConnection();
 			
-			PreparedStatement selectUser = conn.prepareStatement("SELECT * FROM usuarios WHERE correo = ?;");
+			PreparedStatement selectUser = 
+					conn.prepareStatement("SELECT * FROM usuarios WHERE correo = ?;");
 			selectUser.setString(1, correo);
 			
 			ResultSet rs = selectUser.executeQuery();
@@ -181,12 +171,13 @@ public class UsuarioDAO {
 				int totalPartidas = rs.getInt("total_partidas");
 				int numVictorias = rs.getInt("num_victorias");
 				
-				result = new UsuarioVO(idUsuario, correo, nombre, password, puntos, totalPartidas, numVictorias);
+				result = new UsuarioVO(idUsuario, correo, nombre, password, 
+						puntos, totalPartidas, numVictorias);
 			}
 		}catch(Exception ex) {
 			ex.printStackTrace();
 		}finally {
-			PoolConnectionManager2.releaseConnection(conn);
+			GestorPoolConexionesBD.releaseConnection(conn);
 		}
 		
 		return result;
@@ -203,10 +194,11 @@ public class UsuarioDAO {
 		Connection conn = null;
 		
 		try {
-			conn = PoolConnectionManager2.getConnection();
+			conn = GestorPoolConexionesBD.getConnection();
 			
 			UUID idUsuario = usuario.getId();
-			PreparedStatement delUser = conn.prepareStatement("DELETE FROM usuarios WHERE id_usuario=?;");
+			PreparedStatement delUser = 
+					conn.prepareStatement("DELETE FROM usuarios WHERE id_usuario=?;");
 			delUser.setObject(1, idUsuario);
 			delUser.execute();
 			
@@ -214,7 +206,7 @@ public class UsuarioDAO {
 		}catch(Exception ex) {
 			ex.printStackTrace();
 		}finally {
-			PoolConnectionManager2.releaseConnection(conn);
+			GestorPoolConexionesBD.releaseConnection(conn);
 		}
 		
 		

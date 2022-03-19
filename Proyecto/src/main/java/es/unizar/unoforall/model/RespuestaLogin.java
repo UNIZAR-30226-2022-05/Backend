@@ -2,16 +2,16 @@ package es.unizar.unoforall.model;
 
 import java.util.UUID;
 
-public class LoginResponse {
+public class RespuestaLogin {
 	private boolean exito;
 	private String errorInfo;
-	private UUID sessionID;
+	private UUID sesionID;
 	
-	public LoginResponse(boolean exito, String errorInfo, UUID sessionID) {
+	public RespuestaLogin(boolean exito, String errorInfo, UUID sessionID) {
 		super();
 		this.exito = exito;
 		this.errorInfo = errorInfo;
-		this.sessionID = sessionID;
+		this.sesionID = sessionID;
 	}
 
 	public boolean isExito() {
@@ -30,12 +30,12 @@ public class LoginResponse {
 		this.errorInfo = errorInfo;
 	}
 
-	public UUID getSessionID() {
-		return sessionID;
+	public UUID getSesionID() {
+		return sesionID;
 	}
 
-	public void setSessionID(UUID sessionID) {
-		this.sessionID = sessionID;
+	public void setSesionID(UUID sessionID) {
+		this.sesionID = sessionID;
 	}
 	
 	

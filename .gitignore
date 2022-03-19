@@ -25,3 +25,6 @@ hs_err_pid*
 
 # Archivos de configuración
 *.properties
+
+# Notas internas
+NOTAS.md

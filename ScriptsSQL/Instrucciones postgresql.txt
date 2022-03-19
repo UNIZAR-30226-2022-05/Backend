@@ -2,7 +2,9 @@ sudo service postgresql start
 sudo -i -u postgres
 cd '/mnt/c/Users/rauli/Documents/Uno for all/Repositorios/Backend/ScriptsSQL'
 psql -U postgres -W -h localhost -p 5432 -d uno_for_all_db
-CREATE SCHEMA uno_for_all;
+
+-- solo la primera vez: CREATE SCHEMA uno_for_all; 
+
 set search_path to uno_for_all;
 
 --Ejecutar los scripts "createTables.sql", "createTriggers.sql", "createIndex.sql"

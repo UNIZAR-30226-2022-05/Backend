@@ -6,13 +6,13 @@ import java.util.Map;
 
 import javax.swing.Timer;
 
-import es.unizar.unoforall.model.UsuarioDAO;
 import es.unizar.unoforall.model.UsuarioVO;
 
 
 
 public class GestorRegistros {
-	private final static int EXPIRACION_REGISTRO = 300000;
+	//El registro temporal exipirará en 5 min
+	private final static int EXPIRACION_REGISTRO = 300000;  
 	private final static int MAX = 999999;
 	private final static int MIN = 100000;
 	
@@ -40,6 +40,13 @@ public class GestorRegistros {
 		return codigo;
 	}
 	
+	
+	/**
+	 * 
+	 * @param correo
+	 * @param codigo
+	 * @return
+	 */
 	public static String confirmarRegistro(String correo, Integer codigo) {
 		String error = "NO";
 		if (usuariosPendientes.containsKey(correo)) {
