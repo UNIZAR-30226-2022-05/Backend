@@ -1,5 +1,6 @@
 package es.unizar.unoforall.apirest;
 
+import java.util.HashMap;
 import java.util.Map;
 
 
@@ -14,7 +15,12 @@ public class GestorRegistros {
 	private final static int EXPIRACION_REGISTRO = 300000;
 	private final static int MAX = 999999;
 	private final static int MIN = 100000;
+	
 	static Map<String,RegistroTemporal> usuariosPendientes;
+	
+	static {
+		usuariosPendientes = new HashMap<>();
+	}
 	
 	/**
 	 * Añade al Map el usuario <<user>> si no hay uno que ya tenga el mismo correo
@@ -39,6 +45,7 @@ public class GestorRegistros {
 		if (usuariosPendientes.containsKey(correo)) {
 			if (usuariosPendientes.get(correo).getCodigo()==codigo) {
 				UsuarioDAO.registrarUsuario(usuariosPendientes.get(correo).getUsuario());
+				usuariosPendientes.get(correo).getTimer().stop();
 				usuariosPendientes.remove(correo);
 			} else {
 				error = "Código incorrecto";

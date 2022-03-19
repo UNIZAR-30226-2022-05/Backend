@@ -34,15 +34,15 @@ public class UsuarioDAO {
 			PreparedStatement addUser = conn.prepareStatement("INSERT INTO usuarios VALUES(?, ?, ?, ?, ?, ?, ?)"
 															+ "ON CONFLICT(id) DO UPDATE "
 															+ "SET	correo=EXCLUDED.correo,"
-															+ "		nombre=EXCLUDED.nombre,"
 															+ "		contrasenna=EXCLUDED.contrasenna,"
+															+ "		nombre=EXCLUDED.nombre,"
 															+ "		puntos=EXCLUDED.puntos,"
 															+ "		total_partidas=EXCLUDED.total_partidas,"
 															+ "		num_victorias=EXCLUDED.num_victorias;");
 			addUser.setObject(1, idUsuario);
 			addUser.setString(2, correo);
-			addUser.setString(3, nombre);
-			addUser.setString(4, password);
+			addUser.setString(3, password);
+			addUser.setString(4, nombre);
 			addUser.setInt(5, puntos);
 			addUser.setInt(6, totalPartidas);
 			addUser.setInt(7, numVictorias);

@@ -28,7 +28,6 @@ import es.unizar.unoforall.utils.Mail;
 @RequestMapping("/api")
 public class ApiRestController {
 	 
-	
 	@PostMapping("/login")
 	public LoginResponse logUser(@RequestParam String correo, @RequestParam String contrasenna){
 		UsuarioVO usuario = UsuarioDAO.getUsuario(correo);
@@ -55,7 +54,9 @@ public class ApiRestController {
 	@GetMapping("/users")
 	public String getUser(@RequestParam String userId){
         //retornará todos los usuarios
+		UsuarioDAO.registrarUsuario(new UsuarioVO("correo", "nombre", "contrasennaa"));
         return "has escrito " + userId;
+        
     }
 	
 	@GetMapping("/usuario")
@@ -94,7 +95,7 @@ public class ApiRestController {
 	public String getUser(@RequestParam String correo, @RequestParam String contrasenna, @RequestParam String nombre){
         //retornará todos los usuarios
 		UsuarioVO user = UsuarioDAO.getUsuario(correo);
-		String error = null;
+		String error = "correcto";
 		if (user==null) {
 			user = new UsuarioVO(correo,nombre,contrasenna);
 			Integer codigo = GestorRegistros.anadirUsuario(user);
