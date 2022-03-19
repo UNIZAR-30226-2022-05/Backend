@@ -1,4 +1,4 @@
-package es.unizar.unoforall;
+package es.unizar.unoforall.apirest;
 
 
 import java.util.ArrayList;
@@ -27,7 +27,16 @@ import es.unizar.unoforall.utils.Mail;
 @RequestMapping("/api") //esta sera la raiz de la url, es decir http://127.0.0.1:8080/api/
 public class ApiRestController {
 	
-		
+
+	
+    //http://127.0.0.1/api/login  
+	@PostMapping("/login")
+	public String getUser(@RequestParam String correo, @RequestParam String contrasenna){
+        //retornará todos los usuarios
+        return "has escrito ";
+    }
+	
+	
     /*Este método se hará cuando por una petición GET (como indica la anotación) se llame a la url 
     http://127.0.0.1:8080/api/users*/
 	@GetMapping("/users")
@@ -43,7 +52,7 @@ public class ApiRestController {
 		
     }
 	
-	//PARA DEBUG
+	//PARA PRODUCCIÓN
 	@GetMapping("/close")
 	public String closeConnections(@RequestParam String clave){
 		if (clave.equals("unoforall")) {

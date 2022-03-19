@@ -27,3 +27,8 @@ https://stackoverflow.com/questions/67899129/postfix-and-openjdk-11-no-appropria
 
 DECIDIR
 buscar amigos por nombre o por correo
+	MEJOR POR CORREO
+
+
+SESIÓN
+al hacer login, se envía correo y contraseña (hash), y se devuelve el id de sesión si hay éxito, o null si no 
