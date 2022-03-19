@@ -3,6 +3,7 @@ package es.unizar.unoforall.apirest;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -27,31 +28,27 @@ import es.unizar.unoforall.utils.Mail;
 @RequestMapping("/api")
 public class ApiRestController {
 	 
+	
 	@PostMapping("/login")
 	public LoginResponse logUser(@RequestParam String correo, @RequestParam String contrasenna){
 		UsuarioVO usuario = UsuarioDAO.getUsuario(correo);
 		
 		if (usuario == null) {
-			return new LoginResponse(false, "Usuario no registrado");
+			return new LoginResponse(false, "Usuario no registrado", null);
 		} else if (!usuario.getContrasenna().equals(contrasenna))  {
-			return new LoginResponse(false, "Contraseña incorrecta");
+			return new LoginResponse(false, "Contraseña incorrecta", null);
 		} else {
-			return new LoginResponse(true, "");
+			UUID sessionID = GestorSesiones.nuevaSesion(usuario);	
+			return new LoginResponse(true, "", sessionID);
 		}
     }
 	
-	@PostMapping("/register")
-	public LoginResponse registerUser(@RequestParam UsuarioVO usuario){
-		UsuarioDAO.registrarUsuario(usuario);
-		
-		if (usuario == null) {
-			return new LoginResponse(false, "Usuario no registrado. El correo o contraseña introducidos son incorrectos.");
-		} else {
-			
-			return new LoginResponse(true, "");
-		}
-    }
 	
+//	@PostMapping("/register")
+//	public LoginResponse registerUser(@RequestParam UsuarioVO usuario){
+//		UsuarioDAO.registrarUsuario(usuario);
+//    }
+//	
 	
     /*Este método se hará cuando por una petición GET (como indica la anotación) se llame a la url 
     http://127.0.0.1:8080/api/users*/

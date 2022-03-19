@@ -6,27 +6,27 @@ import es.unizar.unoforall.model.UsuarioVO;
 
 public class Sesion {
 	
-	private UsuarioVO miUsuario;
-	private Timer miTimer;
+	private UsuarioVO usuario;
+	private Timer timer;
 	
 	public Sesion(UsuarioVO usuario, Timer timer) {
-		miUsuario=usuario;
-		miTimer=timer;
+		this.usuario=usuario;
+		this.timer=timer;
 	}
 
 	public UsuarioVO getMiUsuario() {
-		return miUsuario;
+		return usuario;
 	}
 
 	public void setMiUsuario(UsuarioVO miUsuario) {
-		this.miUsuario = miUsuario;
+		this.usuario = miUsuario;
 	}
 
 	public Timer getMiTimer() {
-		return miTimer;
+		return timer;
 	}
 
 	public void setMiTimer(Timer miTimer) {
-		this.miTimer = miTimer;
+		this.timer = miTimer;
 	}
 }
