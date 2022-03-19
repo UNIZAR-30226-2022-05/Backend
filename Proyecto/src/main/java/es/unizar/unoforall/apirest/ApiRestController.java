@@ -3,6 +3,7 @@ package es.unizar.unoforall.apirest;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -91,5 +92,34 @@ public class ApiRestController {
 //        //retornará al usuario con id pasado en la url
 //        return user;
 //    }
+	
+	//http://127.0.0.1/api/login  
+	@PostMapping("/registerStepOne")
+	public String getUser(@RequestParam String correo, @RequestParam String contrasenna, @RequestParam String nombre){
+        //retornará todos los usuarios
+		UsuarioVO user = UsuarioDAO.getUsuario(correo);
+		String error = null;
+		if (user==null) {
+			user = new UsuarioVO(correo,nombre,contrasenna);
+			Integer codigo = GestorRegistros.anadirUsuario(user);
+			if(codigo!=null) {
+				Mail.sendMail(user.getCorreo(), "Verificación de la cuenta en UNOForAll", "Su código de verificación es: "+Integer.toString(codigo)+".\nRecuerde que si tarda más de 5 minutos tendrá que volver a registrarse (podrá usar el mismo correo)");
+			} else {
+				error = "El correo ya está vinculado a una petición de registro.";
+			}
+		} else {
+			error = "El correo ya está asociado a una cuenta.";
+		}
+			
+        return error;
+    }
 
+	
+	//http://127.0.0.1/api/login  
+	@PostMapping("/registerStepTwo")
+	public String getUser(@RequestParam String correo, @RequestParam Integer codigo){
+        //retornará todos los usuarios
+		String error = GestorRegistros.confirmarRegistro(correo,codigo);	
+        return error;
+    }
 }
