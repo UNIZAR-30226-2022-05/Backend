@@ -13,7 +13,6 @@ import es.unizar.unoforall.db.GestorPoolConexionesBD;
 import es.unizar.unoforall.model.RespuestaLogin;
 import es.unizar.unoforall.model.UsuarioVO;
 import es.unizar.unoforall.utils.CaracteresInvalidos;
-import es.unizar.unoforall.utils.Mail;
 
 
 /**
