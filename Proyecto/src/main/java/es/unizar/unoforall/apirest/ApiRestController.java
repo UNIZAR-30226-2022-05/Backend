@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import es.unizar.unoforall.db.GestorPoolConexionesBD;
 import es.unizar.unoforall.model.RespuestaLogin;
 import es.unizar.unoforall.model.UsuarioVO;
+import es.unizar.unoforall.utils.CaracteresInvalidos;
 import es.unizar.unoforall.utils.Mail;
 
 
@@ -50,8 +51,9 @@ public class ApiRestController {
     }
 	
 	
+	
 	/**
-	 * 
+	 * Método para registrar un usuario
 	 * @param correo
 	 * @param contrasenna
 	 * @param nombre
@@ -64,15 +66,23 @@ public class ApiRestController {
 		UsuarioVO user = UsuarioDAO.getUsuario(correo);
 		String error = null;
 		if (user==null) {
-			user = new UsuarioVO(correo,nombre,contrasenna);
-			Integer codigo = GestorRegistros.anadirUsuario(user);
-			if(codigo!=null) {
-				Mail.sendMail(user.getCorreo(), "Verificación de la cuenta en UNOForAll", 
-					"Su código de verificación es: " + Integer.toString(codigo) +
-					".\nRecuerde que si tarda más de 5 minutos tendrá que volver a registrarse "
-					+ "(podrá usar el mismo correo)");
+			if (CaracteresInvalidos.comprobarCaracteresString(correo)
+				&& CaracteresInvalidos.comprobarCaracteresString(contrasenna)
+				&& CaracteresInvalidos.comprobarCaracteresString(nombre)) {
+				
+				user = new UsuarioVO(correo,nombre,contrasenna);
+				Integer codigo = GestorRegistros.anadirUsuario(user);
+				
+				if(codigo!=null) {
+					Mail.sendMail(user.getCorreo(), "Verificación de la cuenta en UNOForAll", 
+						"Su código de verificación es: " + Integer.toString(codigo) +
+						".\nRecuerde que si tarda más de 5 minutos tendrá que volver a registrarse "
+						+ "(podrá usar el mismo correo)");
+				} else {
+					error = "El correo ya está vinculado a una petición de registro.";
+				}
 			} else {
-				error = "El correo ya está vinculado a una petición de registro.";
+				error = "Los campos introducidos contienen caracteres inválidos.";
 			}
 		} else {
 			error = "El correo ya está asociado a una cuenta.";
