@@ -48,7 +48,7 @@ public class GestorRegistros {
 	 * @return
 	 */
 	public static String confirmarRegistro(String correo, Integer codigo) {
-		String error = "NO";
+		String error = null;
 		if (usuariosPendientes.containsKey(correo)) {
 			if (usuariosPendientes.get(correo).getCodigo()==codigo) {
 				UsuarioDAO.registrarUsuario(usuariosPendientes.get(correo).getUsuario());
