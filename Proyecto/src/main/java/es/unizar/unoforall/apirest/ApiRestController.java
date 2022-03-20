@@ -71,16 +71,7 @@ public class ApiRestController {
 				&& CaracteresInvalidos.comprobarCaracteresString(nombre)) {
 				
 				user = new UsuarioVO(correo,nombre,contrasenna);
-				Integer codigo = GestorRegistros.anadirUsuario(user);
-				
-				if(codigo!=null) {
-					Mail.sendMail(user.getCorreo(), "Verificación de la cuenta en UNOForAll", 
-						"Su código de verificación es: " + Integer.toString(codigo) +
-						".\nRecuerde que si tarda más de 5 minutos tendrá que volver a registrarse "
-						+ "(podrá usar el mismo correo)");
-				} else {
-					error = "El correo ya está vinculado a una petición de registro.";
-				}
+				error = GestorRegistros.anadirUsuario(user);
 			} else {
 				error = "Los campos introducidos contienen caracteres inválidos.";
 			}
@@ -97,6 +88,8 @@ public class ApiRestController {
 		String error = GestorRegistros.confirmarRegistro(correo,codigo);	
         return error;
     }
+	
+	
 	
 	/**
 	 * SOLO PRODUCCIÓN

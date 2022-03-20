@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.swing.Timer;
 
 import es.unizar.unoforall.model.UsuarioVO;
+import es.unizar.unoforall.utils.Mail;
 
 
 
@@ -24,20 +25,31 @@ public class GestorRegistros {
 	
 	/**
 	 * Añade al Map el usuario <<user>> si no hay uno que ya tenga el mismo correo
-	 * @param user Contiene el correo, nombre y contraseña (hash) a introducir en la base de datos
-	 * @return el código si se ha podido añadir el usuario, null en caso contrario
+	 * @param user 	Contiene el correo, nombre y contraseña (hash) a introducir 
+	 * 				en la base de datos.
+	 * @return 		null si no se ha producido ningún error, y el motivo del 
+	 * 				error en caso contrario
 	 */
-	public static Integer anadirUsuario(UsuarioVO user) {
-		Integer codigo = null;
+	public static String anadirUsuario(UsuarioVO user) {
+		String error = null;
 		if (!usuariosPendientes.containsKey(user.getCorreo())) {
-			codigo = (int) ((Math.random() * (MAX - MIN)) + MIN);;
+			int codigo = (int) ((Math.random() * (MAX - MIN)) + MIN);
+			
+			Mail.sendMail(user.getCorreo(), 
+				"Verificación de la cuenta en UNOForAll", 
+				"Su código de verificación es: " + Integer.toString(codigo) +
+				".\nRecuerde que si tarda más de 5 minutos tendrá que volver a "
+				+ "registrarse (podrá usar el mismo correo)");
+			
 			AlarmaRegistro alarm = new AlarmaRegistro(user.getCorreo());
 			Timer t = new Timer(EXPIRACION_REGISTRO,alarm);
 			RegistroTemporal rt = new RegistroTemporal(user,t,codigo);
 			usuariosPendientes.put(user.getCorreo(),rt);
 			t.start();
+		} else {
+			error = "El correo ya está vinculado a una petición de registro.";
 		}
-		return codigo;
+		return error;
 	}
 	
 	
