@@ -35,7 +35,7 @@ public class GestorConexionesBD {
 			ex.printStackTrace();
 			return null; 
 		} 
-	}
+	} 
 	
 	/**
 	 * Libera una conexión abierta

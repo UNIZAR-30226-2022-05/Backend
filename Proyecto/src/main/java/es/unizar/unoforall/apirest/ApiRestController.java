@@ -34,7 +34,7 @@ public class ApiRestController {
 	 * 							RespuestaLogin.errorInfo especifica el motivo del error
 	 */
 	@PostMapping("/login")
-	public RespuestaLogin logUser(@RequestParam String correo, 
+	public RespuestaLogin login(@RequestParam String correo, 
 									@RequestParam String contrasenna){
 		
 		UsuarioVO usuario = UsuarioDAO.getUsuario(correo);
@@ -52,14 +52,15 @@ public class ApiRestController {
 	
 	
 	/**
-	 * Método para registrar un usuario
-	 * @param correo
-	 * @param contrasenna
-	 * @param nombre
-	 * @return
+	 * Método para registrar un usuario - PASO 1: rellenar información
+	 * @param correo		correo del usuario
+	 * @param contrasenna	hash de la contraseña del usuario
+	 * @param nombre		nombre del usuario
+	 * @return				null si no ha habido ningún error
+	 * 						mensaje de error si se ha producido alguno
 	 */
 	@PostMapping("/registerStepOne")
-	public String getUser(@RequestParam String correo, 
+	public String registerStepOne(@RequestParam String correo, 
 				@RequestParam String contrasenna, @RequestParam String nombre){
 		
 		UsuarioVO user = UsuarioDAO.getUsuario(correo);
@@ -82,8 +83,23 @@ public class ApiRestController {
     }
 	
 	
+	//FALTA HACERLOOOO
+	@PostMapping("/registerCancel")
+	public Boolean registerCancel(@RequestParam String correo){
+		//TODO
+        return true;
+    }
+	
+	/**
+	 * Método para registrar un usuario - PASO 2: confirmar el correo 
+	 * introduciendo el código enviado a este
+	 * @param correo	correo del usuario
+	 * @param codigo	código enviado al correo
+	 * @return			null si no ha habido ningún error
+	 * 					mensaje de error si se ha producido alguno
+	 */
 	@PostMapping("/registerStepTwo")
-	public String getUser(@RequestParam String correo, @RequestParam Integer codigo){
+	public String registerStepTwo(@RequestParam String correo, @RequestParam Integer codigo){
 		String error = GestorRegistros.confirmarRegistro(correo,codigo);	
         return error;
     }

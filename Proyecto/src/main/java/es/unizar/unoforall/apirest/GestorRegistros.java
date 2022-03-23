@@ -13,9 +13,10 @@ import es.unizar.unoforall.utils.Mail;
 
 public class GestorRegistros {
 	//El registro temporal exipirará en 5 min
-	private final static int EXPIRACION_REGISTRO = 300000;  
-	private final static int MAX = 999999;
-	private final static int MIN = 100000;
+	private final static int EXPIRACION_REGISTRO = 5*60000;  
+	
+	private final static int MAX_CODIGO = 999999;
+	private final static int MIN_CODIGO = 100000;
 	
 	static Map<String,RegistroTemporal> usuariosPendientes;
 	
@@ -33,7 +34,7 @@ public class GestorRegistros {
 	public static String anadirUsuario(UsuarioVO user) {
 		String error = null;
 		if (!usuariosPendientes.containsKey(user.getCorreo())) {
-			int codigo = (int) ((Math.random() * (MAX - MIN)) + MIN);
+			int codigo = (int) ((Math.random() * (MAX_CODIGO - MIN_CODIGO)) + MIN_CODIGO);
 			
 			Mail.sendMail(user.getCorreo(), 
 				"Verificación de la cuenta en UNOForAll", 
@@ -54,10 +55,11 @@ public class GestorRegistros {
 	
 	
 	/**
-	 * 
-	 * @param correo
-	 * @param codigo
-	 * @return
+	 * Verifica que el código es el que está asociado al correo del map
+	 * @param correo	correo del usuario
+	 * @param codigo	código recibido
+	 * @return			null si no se ha producido ningún error, y el motivo del 
+	 * 					error en caso contrario
 	 */
 	public static String confirmarRegistro(String correo, Integer codigo) {
 		String error = null;

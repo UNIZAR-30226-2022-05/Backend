@@ -9,7 +9,7 @@ import es.unizar.unoforall.model.UsuarioVO;
 public class GestorSesiones {
 	
 	private static HashMap<UUID,Sesion> sesiones;
-	private final static int TIEMPO_EXPIRACION_SESION = 1000;
+	private final static int TIEMPO_EXPIRACION_SESION = 5*60000;  //5 minutos
 	
 	static {
 		sesiones = new HashMap<>();
