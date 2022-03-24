@@ -10,7 +10,7 @@ if ! which psql &>/dev/null
 then
     echo "PostgreSQL no está instalado. Instalando..."
     sudo apt update
-    sudo apt install postgresql -y
+    sudo apt install "postgresql-$version" -y
     if [ $? != 0 ]
     then
         echo 1>&2 "No se ha podido instalar PostgreSQL"
@@ -19,6 +19,37 @@ then
     
     echo "PostgreSQL ha sido instalado correctamente"
 fi
+
+# Si no está instalado zip, lo instala
+if ! which zip &>/dev/null
+then
+    echo "zip no está instalado. Instalando..."
+    sudo apt update
+    sudo apt install "zip" -y
+    if [ $? != 0 ]
+    then
+        echo 1>&2 "No se ha podido instalar zip"
+        exit 1
+    fi
+    
+    echo "zip ha sido instalado correctamente"
+fi
+
+# Si no está instalado unzip, lo instala
+if ! which unzip &>/dev/null
+then
+    echo "unzip no está instalado. Instalando..."
+    sudo apt update
+    sudo apt install "unzip" -y
+    if [ $? != 0 ]
+    then
+        echo 1>&2 "No se ha podido instalar unzip"
+        exit 1
+    fi
+    
+    echo "unzip ha sido instalado correctamente"
+fi
+
 
 echo "===== IMPORTADOR DE POSTGRESQL ====="
 echo "Advertencia: Esto reemplazará la base de datos de PostgreSQL"
@@ -52,7 +83,8 @@ sudo rm -r "$directorioPostgreSQL/$carpetaDB"
 # Copiar la carpeta main local a PostgreSQL
 echo "Importando datos de PostgreSQL..."
 sudo cp -r "$carpetaDB" "$directorioPostgreSQL"
-sudo chown -R postgres "$directorioPostgreSQL"
+sudo chown -R postgres:postgres "$directorioPostgreSQL"
+sudo chmod "0700" "$directorioPostgreSQL/$carpetaDB"
 rm -r "$carpetaDB"
 
 
