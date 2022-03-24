@@ -32,6 +32,7 @@ public class GestorSesiones {
 	}
 	
 	public static void eliminarSesion(UUID sessionID) {
+		GestorSesiones.obtenerSesion(sessionID).getMiTimer().stop(); //Para evitar que salte una alarma inexistente
 		sesiones.remove(sessionID);
 	}
 	

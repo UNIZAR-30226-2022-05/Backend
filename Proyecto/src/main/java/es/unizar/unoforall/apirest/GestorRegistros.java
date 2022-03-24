@@ -6,6 +6,7 @@ import java.util.Map;
 
 import javax.swing.Timer;
 
+import es.unizar.unoforall.model.UsuarioDAO;
 import es.unizar.unoforall.model.UsuarioVO;
 import es.unizar.unoforall.utils.Mail;
 
@@ -73,6 +74,25 @@ public class GestorRegistros {
 			}
 		} else {
 			error = "Su petición de registro ha expirado, vuelva a realizarla.";
+		}
+		
+		return error;
+	}
+	
+	/**
+	 * Verifica que el código es el que está asociado al correo del map
+	 * @param correo	correo del usuario
+	 * @param codigo	código recibido
+	 * @return			null si no se ha producido ningún error, y el motivo del 
+	 * 					error en caso contrario
+	 */
+	public static String cancelarRegistro(String correo) {
+		String error = null;
+		if (usuariosPendientes.containsKey(correo)) {
+			GestorRegistros.usuariosPendientes.get(correo).getTimer().stop();
+			usuariosPendientes.remove(correo);
+		} else {
+			error = "No hay una petición de registro con este correo. Puede que ya esté registrado o que su petición haya expirado.";
 		}
 		
 		return error;
