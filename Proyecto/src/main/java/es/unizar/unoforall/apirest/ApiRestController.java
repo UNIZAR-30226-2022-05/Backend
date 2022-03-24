@@ -140,7 +140,6 @@ public class ApiRestController {
 	@PostMapping("/reestablecerContrasenyaStepOne")
 	public String reestablecerContrasenyaStepOne(@RequestParam String correo){
 		if (CaracteresInvalidos.comprobarCaracteresString(correo)) { //Esto cuando esté definida la clase CaracteresInvalidos
-			
 			UsuarioVO user = UsuarioDAO.getUsuario(correo);
 			String error = null;
 			if (user!=null) {
