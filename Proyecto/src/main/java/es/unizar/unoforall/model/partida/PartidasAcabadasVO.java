@@ -1,4 +1,4 @@
-package es.unizar.unoforall.model;
+package es.unizar.unoforall.model.partida;
 
 import java.sql.Date;
 import java.util.UUID;
