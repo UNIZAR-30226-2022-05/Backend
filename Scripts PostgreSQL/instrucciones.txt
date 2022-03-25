@@ -1,0 +1,10 @@
+PRIMERA VEZ
+1. descargar de 'Drive > Despliegue Backend' el fichero 'import_postgreSQL_database.sh' (verificar que está en formato UNIX) y 'main.zip'
+2. ejecutar 'import_postgreSQL_database.sh'
+3. copiar el fichero 'credenciales.properties' que está en 'Drive > Despliegue Backend' dentro de la carpeta 'Backend > Proyecto'
+4. Compilar el backend con  'Backend > Proyecto > compilar.bat'
+5. Ejecutar el backend en cmd con  'java -jar target/backend.....'
+		SI NO SE TIENE LA VARIABLE DE SISTEMA JAVA_HOME: añadirla en panel de control poniendo el directorio de java 17
+
+SIGUIENTES VECES
+1. Asegurarse de iniciar la BD con  'sudo service postgresql start'
