@@ -16,9 +16,21 @@ ignorar/
 *.war
 *.nar
 *.ear
-*.zip
+#*.zip
 *.tar.gz
 *.rar
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+
+# Archivos de configuración
+*.properties
+
+# Notas internas
+NOTAS.md
+
+Scripts PostgreSQL/export_postgreSQL_database.sh
+
+Scripts PostgreSQL/import_postgreSQL_database.sh
+
+Scripts PostgreSQL/unistall_postgreSQL.sh

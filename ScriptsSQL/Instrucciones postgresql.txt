@@ -1,0 +1,11 @@
+Ejecutar:
+./startDatabase.sh
+psql -U postgres -W -h localhost -p 5432 -d uno_for_all_db
+	contraseña: unoforall
+
+-- si es la primera vez: CREATE SCHEMA uno_for_all; 
+
+set search_path to uno_for_all;
+
+--Ejecutar los scripts "createTables.sql", "createTriggers.sql", "createIndex.sql" ...
+
