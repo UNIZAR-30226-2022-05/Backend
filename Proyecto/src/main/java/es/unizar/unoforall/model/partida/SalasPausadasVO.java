@@ -2,6 +2,8 @@ package es.unizar.unoforall.model.partida;
 
 import java.util.UUID;
 
+import es.unizar.unoforall.apirest.partida.Sala;
+
 public class SalasPausadasVO {
 	private final UUID id;
 	private int maxParticipantes;

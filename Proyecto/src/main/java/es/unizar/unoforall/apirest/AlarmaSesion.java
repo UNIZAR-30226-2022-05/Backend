@@ -17,7 +17,7 @@ public class AlarmaSesion implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		System.out.println("Sesion " + sesionID + " caducada");
-		GestorSesiones.obtenerSesion(sesionID).getMiTimer().stop();
+		GestorSesiones.obtenerSesion(sesionID).getTimer().stop();
 		GestorSesiones.eliminarSesion(sesionID);
 	}
 }
