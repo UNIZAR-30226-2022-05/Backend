@@ -50,6 +50,13 @@ public class GestorSesiones {
 		sesionesWS.remove(wsSesionID);
 	}
 	
+	public static void desvincularSesionWSyExit(String wsSesionID) {
+		UUID sesionID = sesionesWS.get(wsSesionID);
+		eliminarSesion(sesionID);
+		
+		desvincularSesionWS(wsSesionID);
+	}
+	
 	public static boolean haySesionWS(UUID sesionID) {
 		return sesionesWS.containsValue(sesionID);
 	}

@@ -52,4 +52,10 @@ public class Sala {
 	public HashMap<UsuarioVO, Boolean> getParticipantes() {
 		return participantes;
 	}
+
+	@Override
+	public String toString() {
+		return "Sala [configuracion=" + configuracion + ", enPartida=" + enPartida + ", participantes=" + participantes
+				+ "]";
+	}
 }

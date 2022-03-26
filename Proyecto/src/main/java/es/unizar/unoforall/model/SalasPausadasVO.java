@@ -35,4 +35,11 @@ public class SalasPausadasVO {
 	public UUID getId() {
 		return id;
 	}
+
+	@Override
+	public String toString() {
+		return "SalasPausadasVO [id=" + id + ", maxParticipantes=" + maxParticipantes + ", sala=" + sala + "]";
+	}
+	
+	
 }

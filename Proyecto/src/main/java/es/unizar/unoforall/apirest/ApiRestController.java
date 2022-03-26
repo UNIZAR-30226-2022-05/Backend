@@ -403,8 +403,9 @@ public class ApiRestController {
 		ConfigSala _configuracion = Deserializar.deserializar(configuracion, ConfigSala.class);
 		
 		UUID salaID;
-		Sesion s = GestorSesiones.obtenerSesion(_sesionID);
-		if (s!=null) {
+		Sesion sesion = GestorSesiones.obtenerSesion(_sesionID);
+		if (sesion!=null) {
+			sesion.getTimer().restart();
 			salaID = GestorSalas.nuevaSala(_configuracion);
 		} else {
 			return null;

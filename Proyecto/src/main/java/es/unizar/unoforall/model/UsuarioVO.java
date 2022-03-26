@@ -104,4 +104,10 @@ public class UsuarioVO {
 	public void setNumVictorias(int numVictorias) {
 		this.numVictorias = numVictorias;
 	}
+
+	@Override
+	public String toString() {
+		return "UsuarioVO [id=" + id + ", correo=" + correo + ", nombre=" + nombre + ", contrasenna=" + contrasenna
+				+ ", puntos=" + puntos + ", totalPartidas=" + totalPartidas + ", numVictorias=" + numVictorias + "]";
+	}
 }

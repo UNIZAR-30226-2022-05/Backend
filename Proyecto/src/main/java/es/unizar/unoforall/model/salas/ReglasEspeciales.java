@@ -49,4 +49,14 @@ public class ReglasEspeciales {
 	public boolean isCartaX2() {
 		return cartaX2;
 	}
+
+	@Override
+	public String toString() {
+		return "ReglasEspeciales [encadenarRoboCartas=" + encadenarRoboCartas + ", redirigirRoboCartas="
+				+ redirigirRoboCartas + ", jugarVariasCartas=" + jugarVariasCartas + ", evitarEspecialFinal="
+				+ evitarEspecialFinal + ", cartaRayosX=" + cartaRayosX + ", cartaIntercambio=" + cartaIntercambio
+				+ ", cartaX2=" + cartaX2 + "]";
+	}
+	
+	
 }

@@ -46,7 +46,7 @@ public class SocketController {
 	@EventListener
 	public void onDisconnectEvent(SessionDisconnectEvent event) {
 		String wsSesionId = event.getSessionId();
-		GestorSesiones.desvincularSesionWS(wsSesionId);
+		GestorSesiones.desvincularSesionWSyExit(wsSesionId);
 		System.err.println("Client disconnected with session id:" + wsSesionId);
 	}
 }

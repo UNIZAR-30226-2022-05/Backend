@@ -46,4 +46,12 @@ public class PartidasAcabadasVO {
 	public UUID getId() {
 		return id;
 	}
+
+	@Override
+	public String toString() {
+		return "PartidasAcabadasVO [id=" + id + ", fechaInicioPartida=" + fechaInicioPartida + ", fechaFinPartida="
+				+ fechaFinPartida + ", numIas=" + numIas + ", modoJuego=" + modoJuego + "]";
+	}
+	
+	
 }

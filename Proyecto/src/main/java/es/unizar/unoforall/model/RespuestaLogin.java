@@ -37,6 +37,11 @@ public class RespuestaLogin {
 	public void setSesionID(UUID sessionID) {
 		this.sesionID = sessionID;
 	}
+
+	@Override
+	public String toString() {
+		return "RespuestaLogin [exito=" + exito + ", errorInfo=" + errorInfo + ", sesionID=" + sesionID + "]";
+	}
 	
 	
 }

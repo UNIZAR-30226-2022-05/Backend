@@ -33,4 +33,12 @@ public class ConfigSala {
 	public boolean isEsPublica() {
 		return esPublica;
 	}
+
+	@Override
+	public String toString() {
+		return "ConfigSala [modoJuego=" + modoJuego + ", reglas=" + reglas + ", maxParticipantes=" + maxParticipantes
+				+ ", esPublica=" + esPublica + "]";
+	}
+	
+	
 }
