@@ -79,9 +79,9 @@ public class ApiRestController {
 	public String registerStepOne(@RequestParam String correo, 
 				@RequestParam String contrasenna, @RequestParam String nombre){
 		String error = null;
-		if (CaracteresInvalidos.comprobarCaracteresString(correo)
-				&& CaracteresInvalidos.comprobarCaracteresString(contrasenna)
-				&& CaracteresInvalidos.comprobarCaracteresString(nombre)) {
+		if (!CaracteresInvalidos.hayCaracteresInvalidos(correo)
+				&& !CaracteresInvalidos.hayCaracteresInvalidos(contrasenna)
+				&& !CaracteresInvalidos.hayCaracteresInvalidos(nombre)) {
 			UsuarioVO user = UsuarioDAO.getUsuario(correo);
 			if (user==null) {
 					user = new UsuarioVO(correo,nombre,contrasenna);
@@ -142,10 +142,10 @@ public class ApiRestController {
 	public String actualizarCuentaStepOne(@RequestParam String correoViejo,
 								String correoNuevo, String nombre, String contrasenya){
 		String error = null;
-		if (CaracteresInvalidos.comprobarCaracteresString(correoViejo) &&
-					CaracteresInvalidos.comprobarCaracteresString(correoNuevo) &&
-					CaracteresInvalidos.comprobarCaracteresString(nombre) &&
-					CaracteresInvalidos.comprobarCaracteresString(contrasenya)) { 
+		if (!CaracteresInvalidos.hayCaracteresInvalidos(correoViejo) &&
+					!CaracteresInvalidos.hayCaracteresInvalidos(correoNuevo) &&
+					!CaracteresInvalidos.hayCaracteresInvalidos(nombre) &&
+					!CaracteresInvalidos.hayCaracteresInvalidos(contrasenya)) { 
 			
 			UsuarioVO user = UsuarioDAO.getUsuario(correoViejo);
 			if (user!=null) {
@@ -201,7 +201,7 @@ public class ApiRestController {
 	@PostMapping("/reestablecerContrasenyaStepOne")
 	public String reestablecerContrasenyaStepOne(@RequestParam String correo){
 		String error = null;
-		if (CaracteresInvalidos.comprobarCaracteresString(correo)) { //Esto cuando esté definida la clase CaracteresInvalidos
+		if (!CaracteresInvalidos.hayCaracteresInvalidos(correo)) { //Esto cuando esté definida la clase CaracteresInvalidos
 			UsuarioVO user = UsuarioDAO.getUsuario(correo);
 			
 			if (user!=null) {
