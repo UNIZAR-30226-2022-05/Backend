@@ -9,9 +9,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import es.unizar.unoforall.apirest.partida.GestorSalas;
 import es.unizar.unoforall.db.GestorPoolConexionesBD;
 import es.unizar.unoforall.model.RespuestaLogin;
 import es.unizar.unoforall.model.UsuarioVO;
+import es.unizar.unoforall.model.partida.ConfigSala;
 import es.unizar.unoforall.utils.CaracteresInvalidos;
 
 
@@ -51,21 +53,42 @@ public class ApiRestController {
 	
 	
 	/**
-	 * Función a la que llamar cuando se cierre la sesión por parte del usuario, ya sea saliendo con la
-	 * opción de salir de la app o cerrándola abruptamente.
+	 * Método para cerrar la sesión por parte del usuario
 	 * @param 	sessionID contiene el id de la sesión
 	 * @return 	true en caso de que se haya cerrado la sesión.
 	 * 		   	false en caso de que no exista dicha sesión.
 	 */
 	@PostMapping("/cerrarSesion")
-	public Boolean login(@RequestParam UUID sessionID) {
+	public Boolean cerrarSesion(@RequestParam UUID sessionID) {
 		boolean exito = false;
 		Sesion s = GestorSesiones.obtenerSesion(sessionID);
 		if (s!=null) {
+			exito = true;
 			GestorSesiones.eliminarSesion(sessionID);
 		}
 		return exito;
 	}
+	
+	
+	/**
+	 * Método para comprobar si el id de sesión es válido todavía
+	 * @param 	sessionID contiene el id de la sesión
+	 * @return 	true en caso de que la sesión siga activa.
+	 * 		   	false en caso de que no exista dicha sesión.
+	 */
+	@PostMapping("/comprobarSesion")
+	public Boolean comprobarSesion(@RequestParam UUID sessionID) {
+		Sesion s = GestorSesiones.obtenerSesion(sessionID);
+		if (s!=null) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	
+	
+	
 	
 	/**
 	 * Método para registrar un usuario - PASO 1: rellenar información
@@ -255,6 +278,30 @@ public class ApiRestController {
 	
 	
 	
+	
+	
+	
+	
+	
+	/**
+	 * Método para crear una sala con la configuración especificada, y a la que
+	 * comenzará a pertenecer el usuario
+	 * @param sessionID			id de seisón del usuario
+	 * @param configuracion		configuración de la sala
+	 * @return					null si no ha habido ningún error
+	 * 		   					mensaje de error si se ha producido
+	 */
+	@PostMapping("/crearSala")
+	public String crearSala(@RequestParam UUID sessionID, @RequestParam ConfigSala configuracion){		
+		String error = null;
+		Sesion s = GestorSesiones.obtenerSesion(sessionID);
+		if (s!=null) {
+			GestorSalas.nuevaSala(configuracion, GestorSesiones.obtenerSesion(sessionID).getUsuario());
+		} else {
+			error = "La sesión ha caducado";
+		}
+		return error;
+    }
 	
 	
 	

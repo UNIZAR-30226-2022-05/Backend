@@ -14,19 +14,19 @@ public class Sesion {
 		this.timer=timer;
 	}
 
-	public UsuarioVO getMiUsuario() {
+	public UsuarioVO getUsuario() {
 		return usuario;
 	}
 
-	public void setMiUsuario(UsuarioVO miUsuario) {
+	public void setUsuario(UsuarioVO miUsuario) {
 		this.usuario = miUsuario;
 	}
 
-	public Timer getMiTimer() {
+	public Timer getTimer() {
 		return timer;
 	}
 
-	public void setMiTimer(Timer miTimer) {
+	public void setTimer(Timer miTimer) {
 		this.timer = miTimer;
 	}
 }

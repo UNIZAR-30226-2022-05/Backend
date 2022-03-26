@@ -1,19 +1,21 @@
 package es.unizar.unoforall.model.partida;
 
 
-public class ConfigPartida {
+public class ConfigSala {
 	public enum ModoJuego{Original, Attack, Parejas};
 	
 	private ModoJuego modoJuego;
 	private ReglasEspeciales reglas;
 	private int maxParticipantes;
+	private boolean esPublica;
 	
-	public ConfigPartida(ModoJuego modoJuego, ReglasEspeciales reglas, 
-			int maxParticipantes) {
+	public ConfigSala(ModoJuego modoJuego, ReglasEspeciales reglas, 
+			int maxParticipantes, boolean esPublica) {
 		super();
 		this.modoJuego = modoJuego;
 		this.reglas = reglas;
 		this.maxParticipantes = maxParticipantes;
+		this.esPublica = esPublica;
 	}
 
 	public ModoJuego getModoJuego() {
@@ -27,6 +29,8 @@ public class ConfigPartida {
 	public int getMaxParticipantes() {
 		return maxParticipantes;
 	}
-	
-	
+
+	public boolean isEsPublica() {
+		return esPublica;
+	}
 }

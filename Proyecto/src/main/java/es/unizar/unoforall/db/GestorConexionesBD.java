@@ -20,21 +20,17 @@ public class GestorConexionesBD {
 	 * Devuelve una nueva conexión a la base de datos
 	 * @return La nueva conexión
 	 * @throws SQLException
+	 * @throws ClassNotFoundException 
 	 */
-	public final static Connection getConnection() throws SQLException {
+	public final static Connection getConnection() throws SQLException, ClassNotFoundException {
 		Connection conn = null;
 
-		try{
-			//STEP 1: Register JDBC driver
-			Class.forName(JDBC_DRIVER);
-			//STEP 2: Open a connection
-			//System.out.println("Connecting to database...");
-			conn = DriverManager.getConnection(DB_URL, USER, PASS);
-			return conn; 
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			return null; 
-		} 
+		//STEP 1: Register JDBC driver
+		Class.forName(JDBC_DRIVER);
+		//STEP 2: Open a connection
+		//System.out.println("Connecting to database...");
+		conn = DriverManager.getConnection(DB_URL, USER, PASS);
+		return conn; 
 	} 
 	
 	/**
