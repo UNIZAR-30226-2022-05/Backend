@@ -6,7 +6,7 @@ import java.util.Map;
 
 import javax.swing.Timer;
 
-//import es.unizar.unoforall.model.UsuarioDAO;
+import es.unizar.unoforall.apirest.UsuarioDAO;
 import es.unizar.unoforall.model.UsuarioVO;
 import es.unizar.unoforall.utils.Mail;
 
@@ -38,17 +38,23 @@ public class GestorRegistros {
 				!GestorActualizaCuentas.peticiones.containsKey(user.getCorreo())) {
 			int codigo = (int) ((Math.random() * (MAX_CODIGO - MIN_CODIGO)) + MIN_CODIGO);
 			
-			Mail.sendMail(user.getCorreo(), 
+			
+			boolean exitoMail = Mail.sendMail(user.getCorreo(), 
 				"Verificación de la cuenta en UNOForAll", 
 				"Su código de verificación es: " + Integer.toString(codigo) +
 				".\nRecuerde que si tarda más de 5 minutos tendrá que volver a "
 				+ "registrarse (podrá usar el mismo correo)");
 			
-			AlarmaRegistro alarm = new AlarmaRegistro(user.getCorreo());
-			Timer t = new Timer(EXPIRACION_REGISTRO,alarm);
-			RegistroTemporal rt = new RegistroTemporal(user,t,codigo);
-			usuariosPendientes.put(user.getCorreo(),rt);
-			t.start();
+			if (!exitoMail)	{
+				System.err.println("No se ha encontrado el archivo credenciales.properties");
+				error = "Fallo en el servidor: no se pudo enviar el correo";
+			} else {
+				AlarmaRegistro alarm = new AlarmaRegistro(user.getCorreo());
+				Timer t = new Timer(EXPIRACION_REGISTRO,alarm);
+				RegistroTemporal rt = new RegistroTemporal(user,t,codigo);
+				usuariosPendientes.put(user.getCorreo(),rt);
+				t.start();
+			}
 		} else {
 			error = "El correo ya está vinculado a una petición de registro o de actualización de cuenta.";
 		}

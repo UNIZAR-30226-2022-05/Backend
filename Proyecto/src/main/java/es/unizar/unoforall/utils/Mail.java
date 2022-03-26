@@ -21,14 +21,17 @@ public class Mail {
 	//Usuario y contraseña para enviar correos electrónicos
     private static final String username;
     private static String password;
+    
+    //true si no se ha encontrado el archivo de crendenciales
+    private static boolean faltanCredenciales; 
 	
     static {
+    	faltanCredenciales = false;
     	Properties propiedades = new Properties();
     	try {
 			propiedades.load(new FileReader("credenciales.properties"));
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			faltanCredenciales = true;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -40,11 +43,15 @@ public class Mail {
     /**
      * Método para enviar un correo electrónico a un determinado destinatario con un asunto y un cuerpo
      * @param destinatario El destinatario del mensaje. Debe ser una dirección válida
-     * @param asunto El asunto del mensaje
-     * @param cuerpo El cuerpo del mensaje
-     * @return Si el correo se envió correctamente
+     * @param asunto 	El asunto del mensaje
+     * @param cuerpo 	El cuerpo del mensaje
+     * @return 			True si el correo se envió correctamente
      */
 	public static boolean sendMail(String destinatario, String asunto, String cuerpo) {
+		if (faltanCredenciales) {
+			return false;
+		}
+		
 		Transport t = null;
 		try {
 			Properties prop = new Properties();

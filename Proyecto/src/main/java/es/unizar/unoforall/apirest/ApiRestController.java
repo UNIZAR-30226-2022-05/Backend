@@ -28,9 +28,9 @@ public class ApiRestController {
 	 * Método para loguear un usuario
 	 * @param correo		correo del usuario
 	 * @param contrasenna	hash de la contraseña del usuario
-	 * @return 				RespuestaLogin.exito = true si no ha habido errores
+	 * @return 				RespuestaLogin.isExito = true si no ha habido errores
 	 * 							RespuestaLogin.sesionID tiene el id de sesión
-	 * 						RespuestaLogin.exito = false en caso contrario
+	 * 						RespuestaLogin.isExito = false en caso contrario
 	 * 							RespuestaLogin.errorInfo especifica el motivo del error
 	 */
 	@PostMapping("/login")
@@ -53,9 +53,9 @@ public class ApiRestController {
 	/**
 	 * Función a la que llamar cuando se cierre la sesión por parte del usuario, ya sea saliendo con la
 	 * opción de salir de la app o cerrándola abruptamente.
-	 * @param sessionID contiene el id de la sesión
-	 * @return true en caso de que se haya cerrado la sesión.
-	 * 		   false en caso de que no exista dicha sesión.
+	 * @param 	sessionID contiene el id de la sesión
+	 * @return 	true en caso de que se haya cerrado la sesión.
+	 * 		   	false en caso de que no exista dicha sesión.
 	 */
 	@PostMapping("/cerrarSesion")
 	public Boolean login(@RequestParam UUID sessionID) {
@@ -194,9 +194,9 @@ public class ApiRestController {
 	/**
 	 * Función a la que llamar para solicitar reestablecer la contraseña. Manda
 	 * un código al correo, con el que se pasa al paso dos
-	 * @param correo correo de la cuenta a cambiar la contraseña
-	 * @return un String con un mensaje de error que es null si todo va bien.
-	 * 		   Si ocurre algo, la información estará contenida en el String.
+	 * @param correo 	correo de la cuenta a cambiar la contraseña
+	 * @return 			un String con un mensaje de error que es null si todo va bien.
+	 * 		   			Si ocurre algo, la información estará contenida en el String.
 	 */
 	@PostMapping("/reestablecerContrasenyaStepOne")
 	public String reestablecerContrasenyaStepOne(@RequestParam String correo){
@@ -220,25 +220,25 @@ public class ApiRestController {
 	 * Función a la que llamar para comprobar si el código introducido es correcto.
 	 * En caso de serlo, habrá que llamar a la función <reestablecerContrasenyaStepThree> 
 	 * acorde a su especificación.
-	 * @param correo contiene el correo de la cuenta a cambiar la contraseña.
-	 * @param codigo contiene el código introducido por el usuario.
-	 * @return un String null si todo va bien.
-	 * 		   Si ocurre algo, la información estará contenida en el String.
+	 * @param correo 	contiene el correo de la cuenta a cambiar la contraseña.
+	 * @param codigo 	contiene el código introducido por el usuario.
+	 * @return 			un String null si todo va bien.
+	 * 		   			Si ocurre algo, la información estará contenida en el String.
 	 */
-	@PostMapping("/reestablecerContrasenyaStepTwo")
-	public String reestablecerContrasenyaStepTwo(@RequestParam String correo,
-												 @RequestParam Integer codigo){		
-		String error = GestorContrasenyas.confirmarCodigo(correo, codigo);
-        return error;
-    }
+//	@PostMapping("/reestablecerContrasennaStepTwo")
+//	public String reestablecerContrasennaStepTwo(@RequestParam String correo,
+//												 @RequestParam Integer codigo){		
+//		String error = GestorContrasenyas.confirmarCodigo(correo, codigo);
+//        return error;
+//    }
 	
 	/**
 	 * Función a la que llamar para modificar la contrasenya asociada a la cuenta
 	 * especificada por el correo del usuario.
-	 * @param correo contiene el correo de la cuenta a cambiar la contraseña.
-	 * @param contrasenya contiene la nueva contrasenya de la cuenta (hash).
-	 * @return un String null si todo va bien.
-	 * 		   Si ocurre algo, la información estará contenida en el String.
+	 * @param correo 		contiene el correo de la cuenta a cambiar la contraseña.
+	 * @param contrasenya 	contiene la nueva contrasenya de la cuenta (hash).
+	 * @return 				un String null si todo va bien.
+	 * 		   				Si ocurre algo, la información estará contenida en el String.
 	 */
 	@PostMapping("/reestablecerContrasenyaStepThree")
 	public String reestablecerContrasenyaStepThree(@RequestParam String correo,
@@ -252,6 +252,16 @@ public class ApiRestController {
 		}
 		return error;
     }
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	/**
 	 * SOLO PRODUCCIÓN

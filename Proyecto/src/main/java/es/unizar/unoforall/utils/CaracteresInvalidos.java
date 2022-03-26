@@ -12,15 +12,15 @@ public class CaracteresInvalidos {
 	/**
 	 * Método para comprobar si una string contiene caracteres no válidos
 	 * @param str	cadena a comprobar
-	 * @return 		<b>true</b> si la cadena sólo contiene caracteres válidos y 
-	 * 				<b>false</b> en caso contrario
+	 * @return 		<b>false</b> si la cadena sólo contiene caracteres válidos y 
+	 * 				<b>true</b> en caso contrario
 	 */
-    public static boolean comprobarCaracteresString(String str) {
+    public static boolean hayCaracteresInvalidos(String str) {
     	for(int i=0;i<str.length();i++) {
 			if(invalidChars.contains(str.charAt(i) + "")) {
-				return false;
+				return true;
 			}
 		}
-    	return true;
+    	return false;
     }
 }

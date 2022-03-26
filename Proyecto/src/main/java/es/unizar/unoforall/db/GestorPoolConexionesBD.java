@@ -18,8 +18,8 @@ public class GestorPoolConexionesBD {
 	            Connection conexion = GestorConexionesBD.getConnection();
 	            conexiones.put(conexion, true);
 	        }catch(Exception ex){
-	            System.err.println("Error al inicializar el PoolConnectionManager:");
-	            ex.printStackTrace();
+	            System.err.println("Error al inicializar el PoolConnectionManager - Sugerencia: sudo service postgresql start");
+	            //ex.printStackTrace();
 	        }
 	    }
 	}
