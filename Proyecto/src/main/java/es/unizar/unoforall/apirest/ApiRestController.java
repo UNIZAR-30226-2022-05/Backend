@@ -171,12 +171,12 @@ public class ApiRestController {
 		String error = null;
 		Sesion sesion = GestorSesiones.obtenerSesion(idSesion);
 		if(sesion!=null) {
-			sesion.getMiTimer().restart();
+			sesion.getTimer().restart();
 			if (!CaracteresInvalidos.hayCaracteresInvalidos(correoNuevo) &&
 						!CaracteresInvalidos.hayCaracteresInvalidos(nombre) &&
 						!CaracteresInvalidos.hayCaracteresInvalidos(contrasenya)) { 
 				
-				UsuarioVO user = UsuarioDAO.getUsuario(sesion.getMiUsuario().getCorreo());
+				UsuarioVO user = UsuarioDAO.getUsuario(sesion.getUsuario().getCorreo());
 				if (user!=null) {
 					GestorActualizaCuentas.anyadirPeticion(user.getCorreo(), correoNuevo,
 																contrasenya, nombre);
@@ -207,8 +207,8 @@ public class ApiRestController {
 		String error = null;
 		Sesion sesion = GestorSesiones.obtenerSesion(idSesion);
 		if(sesion!=null) {
-			sesion.getMiTimer().restart();
-			error = GestorActualizaCuentas.confirmarCodigo(sesion.getMiUsuario().getCorreo(), codigo);
+			sesion.getTimer().restart();
+			error = GestorActualizaCuentas.confirmarCodigo(sesion.getUsuario().getCorreo(), codigo);
 		} else {
 			error = "SESION_EXPIRADA";
 		}
@@ -228,8 +228,8 @@ public class ApiRestController {
 		String error = null;
 		Sesion sesion = GestorSesiones.obtenerSesion(idSesion);
 		if(sesion!=null) {
-			sesion.getMiTimer().restart();
-			error = GestorActualizaCuentas.cancelarActualizacion(sesion.getMiUsuario().getCorreo());
+			sesion.getTimer().restart();
+			error = GestorActualizaCuentas.cancelarActualizacion(sesion.getUsuario().getCorreo());
 		} else {
 			error = "SESION_EXPIRADA";
 		}
@@ -311,8 +311,8 @@ public class ApiRestController {
 		Sesion sesion = GestorSesiones.obtenerSesion(idSesion);
 		ListaUsuarios lu = null;
 		if(sesion!=null) {
-			sesion.getMiTimer().restart();
-			lu = UsuarioDAO.sacarPeticionesEnviadas(sesion.getMiUsuario().getId());		
+			sesion.getTimer().restart();
+			lu = UsuarioDAO.sacarPeticionesEnviadas(sesion.getUsuario().getId());		
 		} else {
 			lu = new ListaUsuarios(true);
 		}
@@ -332,7 +332,7 @@ public class ApiRestController {
 		Sesion sesion = GestorSesiones.obtenerSesion(idSesion);
 		ListaUsuarios lu = null;
 		if(sesion!=null) {
-			sesion.getMiTimer().restart();
+			sesion.getTimer().restart();
 			//lu = UsuarioDAO.sacarPeticionesRecibidas(sesion.getMiUsuario().getId());		
 		} else {
 			lu = new ListaUsuarios(true);
@@ -352,7 +352,7 @@ public class ApiRestController {
 		Sesion sesion = GestorSesiones.obtenerSesion(idSesion);
 		ListaUsuarios lu = null;
 		if(sesion!=null) {
-			sesion.getMiTimer().restart();
+			sesion.getTimer().restart();
 			//lu = UsuarioDAO.sacarAmigos(sesion.getMiUsuario().getId());		
 		} else {
 			lu = new ListaUsuarios(true);
@@ -373,13 +373,16 @@ public class ApiRestController {
 		Sesion sesion = GestorSesiones.obtenerSesion(idSesion);
 		ListaUsuarios lu = null;
 		if(sesion!=null) {
-			sesion.getMiTimer().restart();
+			sesion.getTimer().restart();
 			//lu = UsuarioDAO.mandarPeticion(sesion.getMiUsuario().getId());		
 		} else {
 			lu = new ListaUsuarios(true);
 		}
 		return lu;
 	}
+	
+	
+	
 	
 	/**************************************************************************/
 	// Salas

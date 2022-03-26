@@ -26,6 +26,10 @@ public class SocketController {
 		
 		System.out.println(wsSesionId + " se ha vinculado a " + sesionID);
 		GestorSesiones.vincularSesionWS(sesionID, wsSesionId);
+		
+		GestorSalas.obtenerSala(salaID).
+			nuevoParticipante(GestorSesiones.obtenerSesion(sesionID).getUsuario());
+		
 		return GestorSalas.obtenerSala(salaID);
 	}
 	
