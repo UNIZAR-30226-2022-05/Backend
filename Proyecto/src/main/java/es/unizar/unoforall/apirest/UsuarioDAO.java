@@ -276,5 +276,37 @@ public class UsuarioDAO {
 		return result;
 	}
 	
+	/**
+	 * Dado el id del usuario, devuelve la lista de usuarios a los que ha solicitado amistad y que
+	 * no le han aceptado.
+	 * @param idUsuario	contiene el id de la cuenta del usuario
+	 * @return			devuelve una lista de usuarios indicando que la sesión no ha expirado y una lista con
+	 * 					los usuarios que ha sacado. Si ha habido un error, lo ha indicado en el atributo <error>
+	 * 					de la lista devuelta.
+	 */
+	public static ListaUsuarios sacarPeticionesEnviadas(UUID idUsuario) {
+		ListaUsuarios lu = new ListaUsuarios(false);
+		Connection conn = null;
+		
+		try {
+			conn = GestorPoolConexionesBD.getConnection();
+			PreparedStatement getRequests = 
+					conn.prepareStatement("SELECT receptor FROM amigo_de WHERE emisor = ? and aceptada=false");
+			getRequests.setObject(1,idUsuario);
+			ResultSet rs = getRequests.executeQuery();
+			while(rs.next()) {
+				UsuarioVO user = getUsuario((UUID) rs.getObject("id"));
+				user.setContrasenna(null); //No pasamos datos confidenciales
+				lu.getUsuarios().add(user);
+			}
+		} catch(Exception ex) {
+			ex.printStackTrace();
+			lu.setError("Ha surgido un problema con la base de datos.");
+		}finally {
+			GestorPoolConexionesBD.releaseConnection(conn);
+		}
+		return lu;
+	}
+	
 	
 }
