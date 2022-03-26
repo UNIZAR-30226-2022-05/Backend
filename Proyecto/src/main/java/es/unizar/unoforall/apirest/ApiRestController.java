@@ -78,23 +78,20 @@ public class ApiRestController {
 	@PostMapping("/registerStepOne")
 	public String registerStepOne(@RequestParam String correo, 
 				@RequestParam String contrasenna, @RequestParam String nombre){
-		
-		UsuarioVO user = UsuarioDAO.getUsuario(correo);
 		String error = null;
-		if (user==null) {
-			/*if (CaracteresInvalidos.comprobarCaracteresString(correo)
+		if (CaracteresInvalidos.comprobarCaracteresString(correo)
 				&& CaracteresInvalidos.comprobarCaracteresString(contrasenna)
-				&& CaracteresInvalidos.comprobarCaracteresString(nombre)) {*/ //Esto cuando esté definida la clase CaracteresInvalidos
-				
-				user = new UsuarioVO(correo,nombre,contrasenna);
-				error = GestorRegistros.anadirUsuario(user);
-			/*} else {
-				error = "Los campos introducidos contienen caracteres inválidos.";
-			}*/
+				&& CaracteresInvalidos.comprobarCaracteresString(nombre)) {
+			UsuarioVO user = UsuarioDAO.getUsuario(correo);
+			if (user==null) {
+					user = new UsuarioVO(correo,nombre,contrasenna);
+					error = GestorRegistros.anadirUsuario(user);
+			} else {
+				error = "El correo ya está asociado a una cuenta.";
+			}
 		} else {
-			error = "El correo ya está asociado a una cuenta.";
-		}
-			
+			error = "Los campos introducidos contienen caracteres inválidos.";
+		}	
         return error;
     }
 	
@@ -116,9 +113,9 @@ public class ApiRestController {
 	/**
 	 * Función a la que llamar cuando se cancela un registro. Para evitar boicoteos mejor que
 	 * solo se pueda llamar desde la ventana de confirmación de código.
-	 * @param correo contiene el correo con el que se ha inciado la solicitud de registro.
-	 * @return true en caso de que se haya podido cancelar la petición de registro.
-	 * 		   false en caso contrario (probablemente debido a que ya ha expirado).
+	 * @param correo 	contiene el correo con el que se ha inciado la solicitud de registro.
+	 * @return 			true en caso de que se haya podido cancelar la petición de registro.
+	 * 		   			false en caso contrario (probablemente debido a que ya ha expirado).
 	 */
 	@PostMapping("/registerCancel")
 	public Boolean registerCancel(@RequestParam String correo){
@@ -131,6 +128,70 @@ public class ApiRestController {
     }
 	
 	/**
+	 * Función a la que llamar para solicitar cambiar algún dato de la cuenta. Manda
+	 * un código al correo, con el que se pasa al paso dos.
+	 * @param correoViejo 	correo antiguo de la cuenta.
+	 * @param correoNuevo 	nuevo valor de correo para la cuenta, puede ser el mismo
+	 * 		 			  	que correoViejo.
+	 * @param nombre 		nuevo nombre para la cuenta
+	 * @param contrasenya 	nuevo valor para la contraseña de la cuenta. 
+	 * @return 				un String con un mensaje de error que es null si todo va bien.
+	 * 		   				Si ocurre algo, la información estará contenida en el String.
+	 */
+	@PostMapping("/actualizarCuentaStepOne")
+	public String actualizarCuentaStepOne(@RequestParam String correoViejo,
+								String correoNuevo, String nombre, String contrasenya){
+		String error = null;
+		if (CaracteresInvalidos.comprobarCaracteresString(correoViejo) &&
+					CaracteresInvalidos.comprobarCaracteresString(correoNuevo) &&
+					CaracteresInvalidos.comprobarCaracteresString(nombre) &&
+					CaracteresInvalidos.comprobarCaracteresString(contrasenya)) { 
+			
+			UsuarioVO user = UsuarioDAO.getUsuario(correoViejo);
+			if (user!=null) {
+				GestorActualizaCuentas.anyadirPeticion(correoViejo, correoNuevo,
+															contrasenya, nombre);
+			} else {
+				error = "La cuenta ya no existe.";
+			}
+		} else {
+			error = "Los campos introducidos contienen caracteres inválidos.";
+		}
+			
+        return error;
+    }
+	
+	/**
+	 * Función a la que llamar cuando se cancela una actualización. Para evitar boicoteos mejor que
+	 * solo se pueda llamar desde la ventana de confirmación de código.
+	 * @param correo 	contiene el nuevo correo que se había planteado para la actualización.
+	 * @return 			true en caso de que se haya podido cancelar la petición de registro.
+	 * 		   			false en caso contrario (probablemente debido a que ya ha expirado).
+	 */
+	@PostMapping("/actualizarCancel")
+	public Boolean actualizarCancel(@RequestParam String correo){
+        String error = GestorActualizaCuentas.cancelarActualizacion(correo);
+		return error == null;
+    }
+	
+	
+	/**
+	 * Función a la que llamar para confirmar el código y aplicar el cambio. 
+	 * @param correo	nuevo valor del correo del usuario.
+	 * @param codigo	código enviado al correo pasado por parámetro.
+	 * @return			null si no ha habido ningún error.
+	 * 					mensaje de error si se ha producido alguno.
+	 */
+	@PostMapping("/actualizarCuentaStepTwo")
+	public String actualizarCuentaStepTwo(@RequestParam String correo,
+												 @RequestParam Integer codigo){		
+		String error = GestorActualizaCuentas.confirmarCodigo(correo, codigo);
+        return error;
+    }
+	
+	
+	
+	/**
 	 * Función a la que llamar para solicitar reestablecer la contraseña. Manda
 	 * un código al correo, con el que se pasa al paso dos
 	 * @param correo correo de la cuenta a cambiar la contraseña
@@ -139,9 +200,10 @@ public class ApiRestController {
 	 */
 	@PostMapping("/reestablecerContrasenyaStepOne")
 	public String reestablecerContrasenyaStepOne(@RequestParam String correo){
+		String error = null;
 		if (CaracteresInvalidos.comprobarCaracteresString(correo)) { //Esto cuando esté definida la clase CaracteresInvalidos
 			UsuarioVO user = UsuarioDAO.getUsuario(correo);
-			String error = null;
+			
 			if (user!=null) {
 				GestorContrasenyas.anyadirPeticion(correo);
 			} else {
@@ -181,8 +243,14 @@ public class ApiRestController {
 	@PostMapping("/reestablecerContrasenyaStepThree")
 	public String reestablecerContrasenyaStepThree(@RequestParam String correo,
 												 @RequestParam String contrasenya){		
-		String error = UsuarioDAO.cambiarContrasenya(correo, contrasenya);
-        return error;
+		UsuarioVO user = UsuarioDAO.getUsuario(correo);
+		String error = null;
+		if (user!=null) {
+			error = UsuarioDAO.cambiarContrasenya(user.getId(), contrasenya);
+		} else {
+			error = "La cuenta que desea cambiar ya no existe.";
+		}
+		return error;
     }
 	
 	/**

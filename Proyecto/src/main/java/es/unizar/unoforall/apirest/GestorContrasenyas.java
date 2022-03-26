@@ -40,6 +40,7 @@ public class GestorContrasenyas {
 		Timer t = new Timer(EXPIRACION_REGISTRO,alarm);
 		SolicitudCambioContrasenya scc = new SolicitudCambioContrasenya(t,codigo);
 		peticiones.put(correo,scc);
+		t.start();
 	}
 	
 	public static String confirmarCodigo(String correo, Integer codigo) {

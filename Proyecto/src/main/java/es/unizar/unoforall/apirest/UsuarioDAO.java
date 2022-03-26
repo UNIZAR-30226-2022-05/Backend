@@ -147,6 +147,69 @@ public class UsuarioDAO {
 	}
 	
 	/**
+	 * Método para actualizar la contraseña de un usuario dado su identificador
+	 * @param idUsuario contiene el identificador de la cuenta en la base de datos.
+	 * @param contrasenya contiene la nueva contraseña
+	 * @return Un String que contiene el error en caso de error, y null si hay éxito.
+	 */
+	public static String cambiarContrasenya(UUID idUsuario, String contrasenya) {
+		String result = null;
+		Connection conn = null;
+		try {
+			conn = GestorPoolConexionesBD.getConnection();
+			
+			PreparedStatement updateUser = 
+					conn.prepareStatement("UPDATE usuarios SET contrasenna = ? WHERE id = ?;");
+			updateUser.setString(1, contrasenya);
+			updateUser.setObject(2, idUsuario);
+			
+			int rows = updateUser.executeUpdate();
+			if(rows != 1) {
+				result = "Ha habido un error con la actualización de la cuenta. Cuentas modificadas: " + Integer.toString(rows)+".";
+			}
+		}catch(Exception ex) {
+			ex.printStackTrace();
+		}finally {
+			GestorPoolConexionesBD.releaseConnection(conn);
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * Método para actualizar el nombre, contraseña y correo de un usuario dado su antiguo correo.
+	 * @param correoNuevo contiene el nuevo correo para la cuenta.
+	 * @param usuario contiene los nuevos valores de nombre y contraseña. Además del antiguo
+	 * 					  correo de la cuenta.
+	 * @return null si tiene éxito, o un String en caso de error.
+	 */
+	public static String actualizarCuenta(String correoNuevo, UsuarioVO usuario) {
+		String result = null;
+		Connection conn = null;
+		try {
+			conn = GestorPoolConexionesBD.getConnection();
+			
+			PreparedStatement updateUser = 
+					conn.prepareStatement("UPDATE usuarios SET correo = ?, nombre = ?, contrasenna = ? WHERE correo = ?;");
+			updateUser.setString(1, correoNuevo);
+			updateUser.setString(2, usuario.getNombre());
+			updateUser.setString(3, usuario.getContrasenna());
+			updateUser.setObject(4, usuario.getCorreo());
+			
+			int rows = updateUser.executeUpdate();
+			if(rows != 1) {
+				result = "Ha habido un error con la actualización de la cuenta. Cuentas modificadas: " + Integer.toString(rows)+".";
+			}
+		}catch(Exception ex) {
+			ex.printStackTrace();
+		}finally {
+			GestorPoolConexionesBD.releaseConnection(conn);
+		}
+		
+		return result;
+	}
+	
+	/**
 	 * Método para obtener un usuario por su correo
 	 * @param correo
 	 * @return El usuario correspondiente o null si no existe
