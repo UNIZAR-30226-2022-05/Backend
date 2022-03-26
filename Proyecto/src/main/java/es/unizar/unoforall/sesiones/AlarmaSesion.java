@@ -1,4 +1,4 @@
-package es.unizar.unoforall.apirest;
+package es.unizar.unoforall.sesiones;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,8 +16,13 @@ public class AlarmaSesion implements ActionListener {
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		System.out.println("Sesion " + sesionID + " caducada");
-		GestorSesiones.obtenerSesion(sesionID).getTimer().stop();
-		GestorSesiones.eliminarSesion(sesionID);
+		Sesion s = GestorSesiones.obtenerSesion(sesionID);
+		if (GestorSesiones.haySesionWS(sesionID)) {
+			s.getTimer().restart();
+		} else {
+			System.out.println("Sesion " + sesionID + " caducada");
+			s.getTimer().stop();
+			GestorSesiones.eliminarSesion(sesionID);
+		}
 	}
 }

@@ -1,4 +1,6 @@
-package es.unizar.unoforall.apirest;
+package es.unizar.unoforall.sesiones;
+
+import java.util.UUID;
 
 import javax.swing.Timer;
 

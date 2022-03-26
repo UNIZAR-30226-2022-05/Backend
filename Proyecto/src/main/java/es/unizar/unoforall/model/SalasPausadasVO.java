@@ -1,8 +1,8 @@
-package es.unizar.unoforall.model.partida;
+package es.unizar.unoforall.model;
 
 import java.util.UUID;
 
-import es.unizar.unoforall.apirest.partida.Sala;
+import es.unizar.unoforall.model.salas.Sala;
 
 public class SalasPausadasVO {
 	private final UUID id;

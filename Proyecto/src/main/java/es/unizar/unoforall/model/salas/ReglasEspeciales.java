@@ -1,4 +1,4 @@
-package es.unizar.unoforall.model.partida;
+package es.unizar.unoforall.model.salas;
 
 public class ReglasEspeciales {
 	private boolean encadenarRoboCartas;	//Encadenar +2 y +4

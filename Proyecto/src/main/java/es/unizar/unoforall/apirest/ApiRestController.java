@@ -9,12 +9,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import es.unizar.unoforall.apirest.partida.GestorSalas;
 import es.unizar.unoforall.db.GestorPoolConexionesBD;
 import es.unizar.unoforall.model.RespuestaLogin;
 import es.unizar.unoforall.model.UsuarioVO;
-import es.unizar.unoforall.model.partida.ConfigSala;
+import es.unizar.unoforall.model.salas.ConfigSala;
+import es.unizar.unoforall.salas.GestorSalas;
+import es.unizar.unoforall.sesiones.GestorSesiones;
+import es.unizar.unoforall.sesiones.Sesion;
 import es.unizar.unoforall.utils.CaracteresInvalidos;
+import es.unizar.unoforall.utils.Deserializar;
 
 
 /**
@@ -59,12 +62,12 @@ public class ApiRestController {
 	 * 		   	false en caso de que no exista dicha sesión.
 	 */
 	@PostMapping("/cerrarSesion")
-	public Boolean cerrarSesion(@RequestParam UUID sessionID) {
+	public Boolean cerrarSesion(@RequestParam UUID sesionID) {
 		boolean exito = false;
-		Sesion s = GestorSesiones.obtenerSesion(sessionID);
+		Sesion s = GestorSesiones.obtenerSesion(sesionID);
 		if (s!=null) {
 			exito = true;
-			GestorSesiones.eliminarSesion(sessionID);
+			GestorSesiones.eliminarSesion(sesionID);
 		}
 		return exito;
 	}
@@ -77,8 +80,8 @@ public class ApiRestController {
 	 * 		   	false en caso de que no exista dicha sesión.
 	 */
 	@PostMapping("/comprobarSesion")
-	public Boolean comprobarSesion(@RequestParam UUID sessionID) {
-		Sesion s = GestorSesiones.obtenerSesion(sessionID);
+	public Boolean comprobarSesion(@RequestParam UUID sesionID) {
+		Sesion s = GestorSesiones.obtenerSesion(sesionID);
 		if (s!=null) {
 			return true;
 		} else {
@@ -280,33 +283,52 @@ public class ApiRestController {
 	
 	
 	
-	
-	
+	/**************************************************************************/
+	// Salas
+	/**************************************************************************/
 	
 	/**
 	 * Método para crear una sala con la configuración especificada, y a la que
 	 * comenzará a pertenecer el usuario
 	 * @param sessionID			id de seisón del usuario
 	 * @param configuracion		configuración de la sala
+	 * @return					id de la sala creada
+	 * 							null si no ha sido posible crear la sala
+	 */
+	@PostMapping("/crearSala")
+	public UUID crearSala(@RequestParam String sesionID, @RequestParam String configuracion){		
+		
+		UUID _sesionID = Deserializar.deserializar(sesionID, UUID.class);
+		ConfigSala _configuracion = Deserializar.deserializar(configuracion, ConfigSala.class);
+		
+		UUID salaID;
+		Sesion s = GestorSesiones.obtenerSesion(_sesionID);
+		if (s!=null) {
+			salaID = GestorSalas.nuevaSala(_configuracion);
+		} else {
+			return null;
+		}
+		return salaID;
+    }
+	
+	/**
+	 * Método para buscar una sala pública con la configuración especificada
+	 * @param sessionID			id de seisón del usuario
+	 * @param salaID			id de la sala
+	 * @param configuracion		configuración deseada
 	 * @return					null si no ha habido ningún error
 	 * 		   					mensaje de error si se ha producido
 	 */
-	@PostMapping("/crearSala")
-	public String crearSala(@RequestParam UUID sessionID, @RequestParam ConfigSala configuracion){		
-		String error = null;
-		Sesion s = GestorSesiones.obtenerSesion(sessionID);
-		if (s!=null) {
-			GestorSalas.nuevaSala(configuracion, GestorSesiones.obtenerSesion(sessionID).getUsuario());
-		} else {
-			error = "La sesión ha caducado";
-		}
-		return error;
+	@PostMapping("/buscarSala")
+	public String buscarSala(@RequestParam String sessionID, @RequestParam UUID salaID,
+							@RequestParam ConfigSala configuracion){		
+		//TODO
+		return null;
     }
 	
 	
 	
-	
-	
+
 	
 	
 	

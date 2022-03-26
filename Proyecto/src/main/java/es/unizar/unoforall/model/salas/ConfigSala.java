@@ -1,4 +1,4 @@
-package es.unizar.unoforall.model.partida;
+package es.unizar.unoforall.model.salas;
 
 
 public class ConfigSala {
