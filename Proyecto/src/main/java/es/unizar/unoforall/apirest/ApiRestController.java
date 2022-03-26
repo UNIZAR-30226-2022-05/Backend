@@ -422,9 +422,11 @@ public class ApiRestController {
 	 * 		   					mensaje de error si se ha producido
 	 */
 	@PostMapping("/buscarSala")
-	public String buscarSala(@RequestParam String sessionID, @RequestParam UUID salaID,
+	public UUID buscarSala(@RequestParam String sessionID, @RequestParam UUID salaID,
 							@RequestParam ConfigSala configuracion){		
-		//TODO
+		
+		
+		
 		return null;
     }
 	

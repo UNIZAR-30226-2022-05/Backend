@@ -40,6 +40,8 @@ public class GestorSesiones {
 		sesiones.remove(sesionID);
 	}
 	
+	// Sesiones WS
+	
 	public static void vincularSesionWS(UUID sesionID, String wsSesionID) {
 		if (!GestorSesiones.obtenerSesion(sesionID).equals(null)) {
 			sesionesWS.put(wsSesionID, sesionID);
@@ -59,5 +61,9 @@ public class GestorSesiones {
 	
 	public static boolean haySesionWS(UUID sesionID) {
 		return sesionesWS.containsValue(sesionID);
+	}
+	
+	public static UUID obtenerSesionID(String wsSesionID) {
+		return sesionesWS.get(wsSesionID);
 	}
 }
