@@ -1,6 +1,7 @@
 package es.unizar.unoforall.apirest;
 
 
+import java.util.HashMap;
 import java.util.UUID;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +14,7 @@ import es.unizar.unoforall.db.GestorPoolConexionesBD;
 import es.unizar.unoforall.model.RespuestaLogin;
 import es.unizar.unoforall.model.UsuarioVO;
 import es.unizar.unoforall.model.salas.ConfigSala;
+import es.unizar.unoforall.model.salas.Sala;
 import es.unizar.unoforall.salas.GestorSalas;
 import es.unizar.unoforall.sesiones.GestorSesiones;
 import es.unizar.unoforall.utils.CaracteresInvalidos;
@@ -332,7 +334,7 @@ public class ApiRestController {
 	 * Método al que llamar para enviar una solicitud de amistad a otro usuario. Si ya se había recibido una
 	 * solicitud de dicho usuario, se toma como si se aceptase.
 	 * @param idSesion 	contiene el id de la sesion del usuario.
-	 * @param amigo		contiene el id de la cuenta del amigo.
+	 * @param amigo		(clase UUID) contiene el id de la cuenta del amigo.
 	 * @return			
 	 */
 	@PostMapping("/mandarPeticionAmistad")
@@ -360,7 +362,7 @@ public class ApiRestController {
 	 * Método para crear una sala con la configuración especificada, y a la que
 	 * comenzará a pertenecer el usuario
 	 * @param sessionID			id de seisón del usuario
-	 * @param configuracion		configuración de la sala
+	 * @param configuracion		(clase ConfigSala) configuración de la sala
 	 * @return					id de la sala creada
 	 * 							null si no ha sido posible crear la sala
 	 */
@@ -380,22 +382,46 @@ public class ApiRestController {
     }
 	
 	/**
-	 * Método para buscar una sala pública con la configuración especificada
-	 * @param sessionID			id de seisón del usuario
-	 * @param salaID			id de la sala
-	 * @param configuracion		configuración deseada
-	 * @return					null si no ha habido ningún error
-	 * 		   					mensaje de error si se ha producido
+	 * Método para buscar una sala pública mediante su id.
+	 * Solo se utilizará para previsualizar la configuración de la sala antes de 
+	 * unirse, pues para ello solo es necesario el salaID
+	 * @param sesionID			id de seisón del usuario
+	 * @param salaID			(clase UUID) id de la sala
+	 * @return					sala buscada
+	 * 							null si no es pública, está llena, o está en partida
 	 */
-	@PostMapping("/buscarSala")
-	public UUID buscarSala(@RequestParam String sessionID, @RequestParam UUID salaID,
-							@RequestParam ConfigSala configuracion){		
-		
-		
-		
-		return null;
+	@PostMapping("/buscarSalaID")
+	public Sala buscarSalaID(@RequestParam String sesionID, @RequestParam UUID salaID){		
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
+		if(usuarioID != null) {
+			return GestorSalas.buscarSalaID(salaID);
+		} else {
+			return null;
+		}
     }
 	
+	/**
+	 * Método para buscar salas públicas con una determinada configuración
+	 * @param sesionID			Id de seisón del usuario
+	 * @param configuracion		(clase ConfigSala) Configuración a buscar
+	 * 								modoJuego Undefined si no se quiere especificar
+	 * 								maxParticipantes = -1 si no se quieren especificar
+	 * 								reglas = null si no se quieren especificar
+	 *							Si configuración es null, devolverá todas las salas
+	 * @return					Salas públicas con un hueco libre y que no están
+	 * 							en partida que cumplen la configuración
+	 */
+	@PostMapping("/filtrarSalas")
+	public HashMap<UUID,Sala> filtrarSalas(@RequestParam String sesionID, 
+											@RequestParam String configuracion){		
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
+		if(usuarioID != null) {
+			ConfigSala _configuracion = Deserializar.deserializar(configuracion, ConfigSala.class);
+			return GestorSalas.buscarSalas(_configuracion);
+		} else {
+			return null;
+		}
+    }
 	
 	
 

@@ -28,6 +28,7 @@ public class GestorSesiones {
 	public static boolean iniciarSesion(UUID usuarioID, UUID claveInicio, String sesionID) {
 		if (clavesInicio.get(usuarioID).equals(claveInicio)) {
 			sesiones.put(sesionID, usuarioID);
+			clavesInicio.remove(usuarioID);
 			return true;
 		} else {
 			return false;
