@@ -1,4 +1,4 @@
-package es.unizar.unoforall.model.partida;
+package es.unizar.pruebaCliente;
 
 import java.sql.Date;
 import java.util.UUID;
@@ -46,4 +46,12 @@ public class PartidasAcabadasVO {
 	public UUID getId() {
 		return id;
 	}
+
+	@Override
+	public String toString() {
+		return "PartidasAcabadasVO [id=" + id + ", fechaInicioPartida=" + fechaInicioPartida + ", fechaFinPartida="
+				+ fechaFinPartida + ", numIas=" + numIas + ", modoJuego=" + modoJuego + "]";
+	}
+	
+	
 }

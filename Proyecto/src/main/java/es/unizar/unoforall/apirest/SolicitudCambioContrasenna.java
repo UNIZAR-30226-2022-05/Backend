@@ -3,11 +3,11 @@ package es.unizar.unoforall.apirest;
 import javax.swing.Timer;
 
 
-public class SolicitudCambioContrasenya {
+public class SolicitudCambioContrasenna {
 	private Timer timer;
 	private int codigo;
 	
-	public SolicitudCambioContrasenya( Timer timer, Integer codigo) {
+	public SolicitudCambioContrasenna( Timer timer, Integer codigo) {
 		this.timer=timer;
 		this.codigo=codigo;
 	}

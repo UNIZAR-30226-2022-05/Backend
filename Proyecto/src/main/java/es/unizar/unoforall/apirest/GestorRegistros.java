@@ -34,7 +34,8 @@ public class GestorRegistros {
 	 */
 	public static String anadirUsuario(UsuarioVO user) {
 		String error = null;
-		if (!usuariosPendientes.containsKey(user.getCorreo())) {
+		if (!usuariosPendientes.containsKey(user.getCorreo()) &&
+				!GestorActualizaCuentas.peticiones.containsKey(user.getCorreo())) {
 			int codigo = (int) ((Math.random() * (MAX_CODIGO - MIN_CODIGO)) + MIN_CODIGO);
 			
 			
@@ -55,7 +56,7 @@ public class GestorRegistros {
 				t.start();
 			}
 		} else {
-			error = "El correo ya está vinculado a una petición de registro.";
+			error = "El correo ya está vinculado a una petición de registro o de actualización de cuenta.";
 		}
 		return error;
 	}
@@ -100,7 +101,6 @@ public class GestorRegistros {
 		} else {
 			error = "No hay una petición de registro con este correo. Puede que ya esté registrado o que su petición haya expirado.";
 		}
-		
 		return error;
 	}
 }
