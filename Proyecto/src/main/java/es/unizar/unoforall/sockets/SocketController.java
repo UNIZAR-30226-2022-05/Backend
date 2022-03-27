@@ -12,6 +12,7 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import es.unizar.unoforall.apirest.UsuarioDAO;
 import es.unizar.unoforall.model.UsuarioVO;
+import es.unizar.unoforall.model.salas.NotificacionSala;
 import es.unizar.unoforall.model.salas.Sala;
 import es.unizar.unoforall.salas.GestorSalas;
 import es.unizar.unoforall.sesiones.GestorSesiones;
@@ -54,13 +55,33 @@ public class SocketController {
 	 * @return				El usuario de destino recibirá el VO del emisor
 	 * @throws Exception
 	 */
-	@MessageMapping("/enviarNotificacion")
-	@SendTo("/topic/notificaciones/{usrDestino}")
-	public UsuarioVO enviarNotificacion(@DestinationVariable UUID usrDestino, 
+	@MessageMapping("/notifAmistad")
+	@SendTo("/topic/notifAmistad/{usrDestino}")
+	public UsuarioVO enviarNotifAmistad(@DestinationVariable UUID usrDestino, 
 							@Header("simpSessionId") String sesionID, 
 							Object vacio) throws Exception {
 		
 		return UsuarioDAO.getUsuario(GestorSesiones.obtenerUsuarioID(sesionID));
+	}
+	
+	/**
+	 * Método para enviar una notificación de invitación a partida al usuario 
+	 * con id 'usrDestino' si este está susscrito al canal de destino
+	 * @param usrDestino	En la URL: id del usuario de destino
+	 * @param sesionID		Automático
+	 * @param salaID		ID de la sala a invitar
+	 * @return				El usuario de destino recibirá la NotificacionSala 
+	 * 						con el id de la sala, y se podrá conectar a esta
+	 * 						en /salas/unirse/{salaID}
+	 * @throws Exception
+	 */
+	@MessageMapping("/notifSala")
+	@SendTo("/topic/notifSala/{usrDestino}")
+	public NotificacionSala enviarNotifSala(@DestinationVariable UUID usrDestino, 
+							@Header("simpSessionId") String sesionID, 
+							UUID salaID) throws Exception {
+		return new NotificacionSala(salaID, 
+				UsuarioDAO.getUsuario(GestorSesiones.obtenerUsuarioID(sesionID)));
 	}
 	
 	
