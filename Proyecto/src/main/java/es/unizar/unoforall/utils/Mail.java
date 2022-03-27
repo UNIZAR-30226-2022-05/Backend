@@ -29,8 +29,9 @@ public class Mail {
     	faltanCredenciales = false;
     	Properties propiedades = new Properties();
     	try {
-			propiedades.load(new FileReader("credenciales.properties"));
+			propiedades.load(new FileReader("../credenciales.properties"));
 		} catch (FileNotFoundException e) {
+			System.err.println("No se encuentra el fichero credenciales.properties");
 			faltanCredenciales = true;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
