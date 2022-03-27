@@ -72,6 +72,16 @@ public class Sala {
 		return participantes.size();
 	}
 	
+	public boolean puedeUnirse() {
+		if (getConfiguracion().isEsPublica()
+				|| numParticipantes() == getConfiguracion().getMaxParticipantes() 
+				|| isEnPartida()) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
 
 	@Override
 	public String toString() {

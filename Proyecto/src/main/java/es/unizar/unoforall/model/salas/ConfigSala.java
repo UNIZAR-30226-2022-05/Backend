@@ -2,7 +2,7 @@ package es.unizar.unoforall.model.salas;
 
 
 public class ConfigSala {
-	public enum ModoJuego{Original, Attack, Parejas};
+	public enum ModoJuego{Original, Attack, Parejas, Undefined};
 	
 	private ModoJuego modoJuego;
 	private ReglasEspeciales reglas;
