@@ -4,11 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import es.unizar.unoforall.model.UsuarioVO;
 import es.unizar.unoforall.model.salas.ConfigSala;
-import es.unizar.unoforall.model.salas.Sala;
 import es.unizar.unoforall.model.salas.ConfigSala.ModoJuego;
-import es.unizar.unoforall.sesiones.GestorSesiones;
+import es.unizar.unoforall.model.salas.Sala;
 
 public class GestorSalas {
 	private static HashMap<UUID,Sala> salas;
@@ -32,9 +30,9 @@ public class GestorSalas {
 	public static Sala buscarSalaID(UUID salaID) {
 		Sala sala = salas.get(salaID);
 		if (sala.puedeUnirse()) {
-			return null;
-		} else {
 			return sala;
+		} else {
+			return null;
 		}
 	}
 	
@@ -52,13 +50,12 @@ public class GestorSalas {
 					(configuracion.getModoJuego().equals(ModoJuego.Undefined)
 					|| configuracion.getModoJuego().equals(sala.getConfiguracion().getModoJuego()))
 						&&
-					(configuracion.getMaxParticipantes() == -1 
+					(configuracion.getMaxParticipantes() == -1
 					|| configuracion.getMaxParticipantes() == sala.getConfiguracion().getMaxParticipantes())	
 						&&
 					(configuracion.getReglas().equals(null)
 					|| configuracion.getReglas().equals(sala.getConfiguracion().getReglas()))
 					){
-					
 					result.put(salaID, sala);
 				} 
 			}

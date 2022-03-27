@@ -60,7 +60,7 @@ public class SocketController {
 	 * @return				(Clase UsuarioVO) El usuario de destino recibirá el VO del emisor
 	 * @throws Exception
 	 */
-	@MessageMapping("/notifAmistad")
+	@MessageMapping("/notifAmistad/{usrDestino}")
 	@SendTo("/topic/notifAmistad/{usrDestino}")
 	public String enviarNotifAmistad(@DestinationVariable UUID usrDestino, 
 							@Header("simpSessionId") String sesionID, 
@@ -80,7 +80,7 @@ public class SocketController {
 	 * 						en /salas/unirse/{salaID}
 	 * @throws Exception
 	 */
-	@MessageMapping("/notifSala")
+	@MessageMapping("/notifSala/{usrDestino}")
 	@SendTo("/topic/notifSala/{usrDestino}")
 	public String enviarNotifSala(@DestinationVariable UUID usrDestino, 
 							@Header("simpSessionId") String sesionID, 
@@ -111,7 +111,7 @@ public class SocketController {
 		
 		GestorSalas.obtenerSala(salaID).
 			nuevoParticipante(UsuarioDAO.getUsuario(GestorSesiones.obtenerUsuarioID(sesionID)));
-		System.out.println(GestorSalas.obtenerSala(salaID));
+		
 		return Serializar.serializar(GestorSalas.obtenerSala(salaID));
 	}
 	

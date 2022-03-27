@@ -1,5 +1,7 @@
 package es.unizar.unoforall.model.salas;
 
+import java.util.Objects;
+
 public class ReglasEspeciales {
 	private boolean encadenarRoboCartas;	//Encadenar +2 y +4
 	private boolean redirigirRoboCartas;	//Redirigir +2 y +4 con cambio de sentido
@@ -60,6 +62,27 @@ public class ReglasEspeciales {
 				+ redirigirRoboCartas + ", jugarVariasCartas=" + jugarVariasCartas + ", evitarEspecialFinal="
 				+ evitarEspecialFinal + ", cartaRayosX=" + cartaRayosX + ", cartaIntercambio=" + cartaIntercambio
 				+ ", cartaX2=" + cartaX2 + "]";
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(cartaIntercambio, cartaRayosX, cartaX2, encadenarRoboCartas, evitarEspecialFinal,
+				jugarVariasCartas, redirigirRoboCartas);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ReglasEspeciales other = (ReglasEspeciales) obj;
+		return cartaIntercambio == other.cartaIntercambio && cartaRayosX == other.cartaRayosX
+				&& cartaX2 == other.cartaX2 && encadenarRoboCartas == other.encadenarRoboCartas
+				&& evitarEspecialFinal == other.evitarEspecialFinal && jugarVariasCartas == other.jugarVariasCartas
+				&& redirigirRoboCartas == other.redirigirRoboCartas;
 	}
 	
 	

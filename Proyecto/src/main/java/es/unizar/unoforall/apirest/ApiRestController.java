@@ -461,10 +461,11 @@ public class ApiRestController {
 	 * 							null si no es pública, está llena, o está en partida
 	 */
 	@PostMapping("/buscarSalaID")
-	public Sala buscarSalaID(@RequestParam String sesionID, @RequestParam UUID salaID){		
+	public String buscarSalaID(@RequestParam String sesionID, @RequestParam String salaID){		
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
+		UUID _salaID = Serializar.deserializar(salaID, UUID.class);
 		if(usuarioID != null) {
-			return GestorSalas.buscarSalaID(salaID);
+			return Serializar.serializar(GestorSalas.buscarSalaID(_salaID));
 		} else {
 			return null;
 		}
@@ -482,14 +483,13 @@ public class ApiRestController {
 	 * 							en partida que cumplen la configuración
 	 */
 	@PostMapping("/filtrarSalas")
-	public RespuestaSalas filtrarSalas(@RequestParam String sesionID, 
+	public String filtrarSalas(@RequestParam String sesionID, 
 											@RequestParam String configuracion){		
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
 		if(usuarioID != null) {
 			ConfigSala _configuracion = Serializar.deserializar(configuracion, ConfigSala.class);
 			RespuestaSalas r = new RespuestaSalas(GestorSalas.buscarSalas(_configuracion));
-			System.out.println(r.getSalas().size());
-			return r;
+			return Serializar.serializar(r);
 		} else {
 			return null;
 		}

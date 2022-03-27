@@ -84,11 +84,11 @@ public class Sala {
 	
 	public boolean puedeUnirse() {
 		if (getConfiguracion().isEsPublica()
-				|| numParticipantes() == getConfiguracion().getMaxParticipantes() 
-				|| isEnPartida()) {
-			return false;
-		} else {
+				&& numParticipantes() < getConfiguracion().getMaxParticipantes() 
+				&& !isEnPartida()) {
 			return true;
+		} else {
+			return false;
 		}
 	}
 	
