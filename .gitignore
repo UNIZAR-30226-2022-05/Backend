@@ -29,8 +29,4 @@ hs_err_pid*
 # Notas internas
 NOTAS.md
 
-Scripts PostgreSQL/export_postgreSQL_database.sh
-
-Scripts PostgreSQL/import_postgreSQL_database.sh
-
-Scripts PostgreSQL/unistall_postgreSQL.sh
+Scripts PostgreSQL/*.sh
