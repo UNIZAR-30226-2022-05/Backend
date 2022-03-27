@@ -149,10 +149,10 @@ public class UsuarioDAO {
 	/**
 	 * Método para actualizar la contraseña de un usuario dado su identificador
 	 * @param idUsuario contiene el identificador de la cuenta en la base de datos.
-	 * @param contrasenya contiene la nueva contraseña
+	 * @param contrasenna contiene la nueva contraseña
 	 * @return Un String que contiene el error en caso de error, y null si hay éxito.
 	 */
-	public static String cambiarContrasenya(UUID idUsuario, String contrasenya) {
+	public static String cambiarContrasenna(UUID idUsuario, String contrasenna) {
 		String result = null;
 		Connection conn = null;
 		try {
@@ -160,7 +160,7 @@ public class UsuarioDAO {
 			
 			PreparedStatement updateUser = 
 					conn.prepareStatement("UPDATE usuarios SET contrasenna = ? WHERE id = ?;");
-			updateUser.setString(1, contrasenya);
+			updateUser.setString(1, contrasenna);
 			updateUser.setObject(2, idUsuario);
 			
 			int rows = updateUser.executeUpdate();
@@ -278,7 +278,7 @@ public class UsuarioDAO {
 	
 	/**
 	 * Dado el id del usuario, devuelve la lista de usuarios a los que ha solicitado amistad y que
-	 * no le han aceptado.
+	 * no le han aceptado ni rechazado.
 	 * @param idUsuario	contiene el id de la cuenta del usuario
 	 * @return			devuelve una lista de usuarios indicando que la sesión no ha expirado y una lista con
 	 * 					los usuarios que ha sacado. Si ha habido un error, lo ha indicado en el atributo <error>
@@ -295,7 +295,7 @@ public class UsuarioDAO {
 			getRequests.setObject(1,idUsuario);
 			ResultSet rs = getRequests.executeQuery();
 			while(rs.next()) {
-				UsuarioVO user = getUsuario((UUID) rs.getObject("id"));
+				UsuarioVO user = getUsuario((UUID) rs.getObject("receptor"));
 				user.setContrasenna(null); //No pasamos datos confidenciales
 				lu.getUsuarios().add(user);
 			}
@@ -308,5 +308,124 @@ public class UsuarioDAO {
 		return lu;
 	}
 	
+	/**
+	 * Dado el id del usuario, devuelve la lista de usuarios que le han solicitado amistad y que no
+	 * les ha dado respuesta aún.
+	 * @param idUsuario	contiene el id de la cuenta del usuario
+	 * @return			devuelve una lista de usuarios indicando que la sesión no ha expirado y una lista con
+	 * 					los usuarios que ha sacado. Si ha habido un error, lo ha indicado en el atributo <error>
+	 * 					de la lista devuelta.
+	 */
+	public static ListaUsuarios sacarPeticionesRecibidas(UUID idUsuario) {
+		ListaUsuarios lu = new ListaUsuarios(false);
+		Connection conn = null;
+		
+		try {
+			conn = GestorPoolConexionesBD.getConnection();
+			PreparedStatement getRequests = 
+					conn.prepareStatement("SELECT emisor FROM amigo_de WHERE receptor = ? and aceptada=false");
+			getRequests.setObject(1,idUsuario);
+			ResultSet rs = getRequests.executeQuery();
+			while(rs.next()) {
+				UsuarioVO user = getUsuario((UUID) rs.getObject("emisor"));
+				user.setContrasenna(null); //No pasamos datos confidenciales
+				lu.getUsuarios().add(user);
+			}
+		} catch(Exception ex) {
+			ex.printStackTrace();
+			lu.setError("Ha surgido un problema con la base de datos.");
+		}finally {
+			GestorPoolConexionesBD.releaseConnection(conn);
+		}
+		return lu;
+	}
 	
+	/**
+	 * Dado el id del usuario, devuelve la lista de usuarios a los que ha aceptado la solicitud de amistad.
+	 * @param idUsuario	contiene el id de la cuenta del usuario
+	 * @return			devuelve una lista de usuarios indicando que la sesión no ha expirado y una lista con
+	 * 					los usuarios que ha sacado. Si ha habido un error, lo ha indicado en el atributo <error>
+	 * 					de la lista devuelta.
+	 */
+	public static ListaUsuarios sacarAmigos(UUID idUsuario) {
+		ListaUsuarios lu = new ListaUsuarios(false);
+		Connection conn = null;
+		
+		try {
+			conn = GestorPoolConexionesBD.getConnection();
+			//Sacar los amigos que me solicitaron.
+			PreparedStatement getRequestsE = 
+					conn.prepareStatement("SELECT emisor FROM amigo_de WHERE receptor = ? and aceptada=true");
+			getRequestsE.setObject(1,idUsuario);
+			ResultSet rsE = getRequestsE.executeQuery();
+			
+			while(rsE.next()) {
+				UsuarioVO user = getUsuario((UUID) rsE.getObject("emisor"));
+				user.setContrasenna(null); //No pasamos datos confidenciales
+				lu.getUsuarios().add(user);
+			}
+			
+			//Sacar los amigos que solicité.
+			PreparedStatement getRequestsR = 
+					conn.prepareStatement("SELECT receptor FROM amigo_de WHERE emisor = ? and aceptada=true");
+			getRequestsR.setObject(1,idUsuario);
+			ResultSet rsR = getRequestsR.executeQuery();
+			
+			while(rsR.next()) {
+				UsuarioVO user = getUsuario((UUID) rsR.getObject("receptor"));
+				user.setContrasenna(null); //No pasamos datos confidenciales
+				lu.getUsuarios().add(user);
+			}
+			
+		} catch(Exception ex) {
+			ex.printStackTrace();
+			lu.setError("Ha surgido un problema con la base de datos.");
+		}finally {
+			GestorPoolConexionesBD.releaseConnection(conn);
+		}
+		return lu;
+	}
+	
+	/**
+	 * Dado el id del usuario, devuelve la lista de usuarios a los que ha aceptado la solicitud de amistad.
+	 * @param idUsuario	contiene el id de la cuenta del usuario
+	 * @return			devuelve null si todo va bien. En caso contrario devuelve un mensaje de error.
+	 */
+	public static String mandarPeticion(UUID idUsuario, UUID amigo) {
+		String error = null;
+		Connection conn = null;
+		
+		try {
+			conn = GestorPoolConexionesBD.getConnection();
+			//Sacar los amigos que me solicitaron.
+			PreparedStatement getRequest = 
+					conn.prepareStatement("SELECT * FROM amigo_de WHERE emisor = ? and receptor = ? and aceptada=false");
+			getRequest.setObject(1,amigo);
+			getRequest.setObject(2, idUsuario);
+			ResultSet rs = getRequest.executeQuery();
+			
+			if(rs.next()) { //Ya había una petición de amistado
+				PreparedStatement updateRequest = 
+						conn.prepareStatement("UPDATE amigo_de SET aceptada = true WHERE emisor = ? and receptor = ?;");
+				updateRequest.setObject(1,amigo);
+				updateRequest.setObject(2, idUsuario);
+				int rows = updateRequest.executeUpdate();
+				if(rows != 1) {
+					error = "Ha habido un error con la solicitud de amistad. Solicitudes acpetadas: " + Integer.toString(rows)+".";
+				}
+			} else { //Se crea la solicitud de amistad
+				PreparedStatement insertRequest = conn.prepareStatement("INSERT INTO amigo_de VALUES(?,?,false)");
+				insertRequest.setObject(1, idUsuario);
+				insertRequest.setObject(2,amigo);
+				insertRequest.execute();
+			}
+			
+		} catch(Exception ex) {
+			ex.printStackTrace();
+			error = "Ha surgido un problema con la base de datos.";
+		}finally {
+			GestorPoolConexionesBD.releaseConnection(conn);
+		}
+		return error;
+	}
 }

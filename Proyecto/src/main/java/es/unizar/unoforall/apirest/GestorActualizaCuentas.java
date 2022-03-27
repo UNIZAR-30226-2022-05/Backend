@@ -38,16 +38,21 @@ private final static int EXPIRACION_REGISTRO = 5*60000;
 									UsuarioDAO.getUsuario(correoNuevo)==null) {
 			UsuarioVO usuario = new UsuarioVO(correoNuevo,nombre,contrasenya);
 			int codigo = (int) ((Math.random() * (MAX_CODIGO - MIN_CODIGO)) + MIN_CODIGO);
-			Mail.sendMail(correoNuevo, 
+			boolean exitoMail = Mail.sendMail(correoNuevo, 
 					"Solicitud de actualización de la cuenta en UNOForAll", 
 					"Su código de verificación es: " + Integer.toString(codigo) +
 					".\nRecuerde que si tarda más de 5 minutos tendrá que volver a "
 					+ "solicitarla (podrá usar el mismo correo, nombre y contraseña)");
-			AlarmaActualizarCuentas alarm = new AlarmaActualizarCuentas(correoNuevo);
-			Timer t = new Timer(EXPIRACION_REGISTRO,alarm);
-			RegistroTemporal rt = new RegistroTemporal(usuario,t,codigo);
-			peticiones.put(usuarioID,rt);
-			t.start();
+			if (!exitoMail)	{
+				System.err.println("No se ha encontrado el archivo credenciales.properties");
+				error = "Fallo en el servidor: no se pudo enviar el correo";
+			} else {
+				AlarmaActualizarCuentas alarm = new AlarmaActualizarCuentas(correoNuevo);
+				Timer t = new Timer(EXPIRACION_REGISTRO,alarm);
+				RegistroTemporal rt = new RegistroTemporal(usuario,t,codigo);
+				peticiones.put(usuarioID,rt);
+				t.start();
+			}
 		} else {
 			error = "El nuevo correo ya está en uso por otra cuenta o registro.";
 		}
