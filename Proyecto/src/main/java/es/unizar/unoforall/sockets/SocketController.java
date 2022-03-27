@@ -10,35 +10,40 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
+import com.google.gson.Gson;
+
 import es.unizar.unoforall.apirest.UsuarioDAO;
 import es.unizar.unoforall.model.UsuarioVO;
 import es.unizar.unoforall.model.salas.NotificacionSala;
 import es.unizar.unoforall.model.salas.Sala;
 import es.unizar.unoforall.salas.GestorSalas;
 import es.unizar.unoforall.sesiones.GestorSesiones;
+import es.unizar.unoforall.utils.Serializar;
 
 @Controller
 public class SocketController {	
 	
 	/**
 	 * Método para iniciar sesión
-	 * @param usrID			En la URL: id del usuario
+	 * @param usrID			En la URL: clave para iniciar sesión obtenida en el login
 	 * @param sesionID		Automático
-	 * @param claveInicio	Clave para iniciar sesión obtenida en el login
+	 * @param vacio			Cualquier objeto no nulo
 	 * @return				True si ha habido éxito y false en caso contrario
 	 * @throws Exception
 	 */
-	@MessageMapping("/conectarse/{usrID}")
-	@SendTo("/topic/conectarse/{usrID}")
-	public boolean login(@DestinationVariable UUID usrID, 
+	@MessageMapping("/conectarse/{claveInicio}")
+	@SendTo("/topic/conectarse/{claveInicio}")
+	public String login(@DestinationVariable UUID claveInicio, 
 							@Header("simpSessionId") String sesionID, 
-							UUID claveInicio) throws Exception {
-		
-		System.out.println(usrID + " se ha vinculado a " + sesionID);
-		
-		boolean exito = GestorSesiones.iniciarSesion(usrID, claveInicio, sesionID);
-		
-		return exito;
+							Object vacio) throws Exception {
+				
+		boolean exito = GestorSesiones.iniciarSesion(claveInicio, sesionID);
+		if (exito) {
+			System.out.println("Nueva sesión: " + sesionID);
+			return sesionID;
+		} else {
+			return null;
+		}
 	}
 		
 	
@@ -52,16 +57,16 @@ public class SocketController {
 	 * @param usrDestino	En la URL: id del usuario de destino
 	 * @param sesionID		Automático
 	 * @param vacio			Cualquier objeto no nulo
-	 * @return				El usuario de destino recibirá el VO del emisor
+	 * @return				(Clase UsuarioVO) El usuario de destino recibirá el VO del emisor
 	 * @throws Exception
 	 */
 	@MessageMapping("/notifAmistad")
 	@SendTo("/topic/notifAmistad/{usrDestino}")
-	public UsuarioVO enviarNotifAmistad(@DestinationVariable UUID usrDestino, 
+	public String enviarNotifAmistad(@DestinationVariable UUID usrDestino, 
 							@Header("simpSessionId") String sesionID, 
 							Object vacio) throws Exception {
 		
-		return UsuarioDAO.getUsuario(GestorSesiones.obtenerUsuarioID(sesionID));
+		return Serializar.serializar(UsuarioDAO.getUsuario(GestorSesiones.obtenerUsuarioID(sesionID)));
 	}
 	
 	/**
@@ -70,18 +75,18 @@ public class SocketController {
 	 * @param usrDestino	En la URL: id del usuario de destino
 	 * @param sesionID		Automático
 	 * @param salaID		ID de la sala a invitar
-	 * @return				El usuario de destino recibirá la NotificacionSala 
+	 * @return				(Clase NotificacionSala) El usuario de destino recibirá la NotificacionSala 
 	 * 						con el id de la sala, y se podrá conectar a esta
 	 * 						en /salas/unirse/{salaID}
 	 * @throws Exception
 	 */
 	@MessageMapping("/notifSala")
 	@SendTo("/topic/notifSala/{usrDestino}")
-	public NotificacionSala enviarNotifSala(@DestinationVariable UUID usrDestino, 
+	public String enviarNotifSala(@DestinationVariable UUID usrDestino, 
 							@Header("simpSessionId") String sesionID, 
 							UUID salaID) throws Exception {
-		return new NotificacionSala(salaID, 
-				UsuarioDAO.getUsuario(GestorSesiones.obtenerUsuarioID(sesionID)));
+		return Serializar.serializar(new NotificacionSala(salaID, 
+				UsuarioDAO.getUsuario(GestorSesiones.obtenerUsuarioID(sesionID))));
 	}
 	
 	
@@ -95,19 +100,19 @@ public class SocketController {
 	 * @param salaID		En la URL: id de la sala
 	 * @param sesionID		Automático
 	 * @param vacio			Cualquier objeto no nulo
-	 * @return				La sala a la que se ha unido el usuario
+	 * @return				(Clase Sala) La sala a la que se ha unido el usuario
 	 * @throws Exception
 	 */
 	@MessageMapping("/salas/unirse/{salaID}")
 	@SendTo("/topic/salas/{salaID}")
-	public Sala unirseSala(@DestinationVariable UUID salaID, 
+	public String unirseSala(@DestinationVariable UUID salaID, 
 							@Header("simpSessionId") String sesionID, 
 							Object vacio) throws Exception {
 		
 		GestorSalas.obtenerSala(salaID).
 			nuevoParticipante(UsuarioDAO.getUsuario(GestorSesiones.obtenerUsuarioID(sesionID)));
-		
-		return GestorSalas.obtenerSala(salaID);
+		System.out.println(GestorSalas.obtenerSala(salaID));
+		return Serializar.serializar(GestorSalas.obtenerSala(salaID));
 	}
 	
 	/**
@@ -115,19 +120,19 @@ public class SocketController {
 	 * @param salaID		En la URL: id de la sala
 	 * @param sesionID		Automático
 	 * @param vacio			Cualquier objeto no nulo
-	 * @return				La sala actualizada
+	 * @return				(Clase Sala) La sala actualizada
 	 * @throws Exception
 	 */
 	@MessageMapping("/salas/listo/{salaID}")
 	@SendTo("/topic/salas/{salaID}")
-	public Sala listoSala(@DestinationVariable UUID salaID, 
+	public String listoSala(@DestinationVariable UUID salaID, 
 							@Header("simpSessionId") String sesionID, 
 							Object vacio) throws Exception {
 		
 		GestorSalas.obtenerSala(salaID).
 			nuevoParticipanteListo(GestorSesiones.obtenerUsuarioID(sesionID));
 		
-		return GestorSalas.obtenerSala(salaID);
+		return Serializar.serializar(GestorSalas.obtenerSala(salaID));
 	}
 	
 	/**
@@ -135,26 +140,18 @@ public class SocketController {
 	 * @param salaID		En la URL: id de la sala
 	 * @param sesionID		Automático
 	 * @param vacio			Cualquier objeto no nulo
-	 * @return				La sala actualizada o null si ha sido eliminada
+	 * @return				(Clase Sala) La sala actualizada o null si ha sido eliminada
 	 * @throws Exception
 	 */
 	@MessageMapping("/salas/salir/{salaID}")
 	@SendTo("/topic/salas/{salaID}")
-	public Sala salirseSala(@DestinationVariable UUID salaID, 
+	public String salirseSala(@DestinationVariable UUID salaID, 
 							@Header("simpSessionId") String sesionID, 
 							Object vacio) throws Exception {
 				
-		GestorSalas.obtenerSala(salaID).
-			eliminarParticipante(GestorSesiones.obtenerUsuarioID(sesionID));
-		
-		if(GestorSalas.obtenerSala(salaID).numParticipantes() == 0) {
-			GestorSalas.eliminarSala(salaID);
-			return null;
-		} else {
-			return GestorSalas.obtenerSala(salaID);
-		}
+		return Serializar.serializar(GestorSalas.eliminarParticipanteSala(salaID, 
+								GestorSesiones.obtenerUsuarioID(sesionID)));
 	}
-	
 	
 	
 	
@@ -162,7 +159,10 @@ public class SocketController {
 	@EventListener
 	public void onDisconnectEvent(SessionDisconnectEvent event) {
 		String sesionID = event.getSessionId();
-		GestorSesiones.eliminarSesion(sesionID);
+		
+		GestorSalas.eliminarParticipanteSalas(GestorSesiones.obtenerUsuarioID(sesionID));
+		GestorSesiones.eliminarSesion(sesionID);		
+		
 		System.err.println("Client disconnected with session id:" + sesionID);
 	}
 }

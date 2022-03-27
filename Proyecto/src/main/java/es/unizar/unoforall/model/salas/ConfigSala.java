@@ -9,6 +9,10 @@ public class ConfigSala {
 	private int maxParticipantes;
 	private boolean esPublica;
 	
+	public ConfigSala() {
+		
+	}
+	
 	public ConfigSala(ModoJuego modoJuego, ReglasEspeciales reglas, 
 			int maxParticipantes, boolean esPublica) {
 		super();

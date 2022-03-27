@@ -16,14 +16,15 @@ public class Sala {
 	//Conjunto de participantes con el indicador de si están listos o no
 	private HashMap<UUID, Boolean> participantes_listos;
 	
-	
-	public Sala(ConfigSala configuracion) {
-		super();
-		this.configuracion = configuracion;
-		this.setEnPartida(false);
-		
+	public Sala() {
 		participantes = new HashMap<>();
 		participantes_listos = new HashMap<>();
+	}
+	
+	public Sala(ConfigSala configuracion) {
+		this();
+		this.configuracion = configuracion;
+		this.setEnPartida(false);
 	}
 
 	public ConfigSala getConfiguracion() {
@@ -58,6 +59,15 @@ public class Sala {
 	public void nuevoParticipanteListo(UUID participanteID) {
 		if(participantes.containsKey(participanteID)) {
 			participantes_listos.put(participanteID, true);
+		}
+	}
+	
+	// Devuelve un hashmap con el  usuarioID - UsuarioVO
+	public boolean hayParticipante(UUID usuarioID) {
+		if (participantes.containsKey(usuarioID)) {
+			return true;
+		} else {
+			return false;
 		}
 	}
 	

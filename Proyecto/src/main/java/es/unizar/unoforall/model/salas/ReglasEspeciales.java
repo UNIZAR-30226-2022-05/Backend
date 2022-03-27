@@ -10,6 +10,10 @@ public class ReglasEspeciales {
 	private boolean cartaIntercambio;		//Intercambiar mano por la del siguiente jugador
 	private boolean cartaX2;				//Hacer que el siguiente jugador robe el número de cartas que posee
 	
+	public ReglasEspeciales() {
+		
+	}
+	
 	public ReglasEspeciales(boolean encadenarRoboCartas, boolean redirigirRoboCartas, boolean jugarVariasCartas,
 			boolean evitarEspecialFinal, boolean cartaRayosX, boolean cartaIntercambio, boolean cartaX2) {
 		super();

@@ -14,11 +14,12 @@ import es.unizar.unoforall.db.GestorPoolConexionesBD;
 import es.unizar.unoforall.model.RespuestaLogin;
 import es.unizar.unoforall.model.UsuarioVO;
 import es.unizar.unoforall.model.salas.ConfigSala;
+import es.unizar.unoforall.model.salas.RespuestaSalas;
 import es.unizar.unoforall.model.salas.Sala;
 import es.unizar.unoforall.salas.GestorSalas;
 import es.unizar.unoforall.sesiones.GestorSesiones;
 import es.unizar.unoforall.utils.CaracteresInvalidos;
-import es.unizar.unoforall.utils.Deserializar;
+import es.unizar.unoforall.utils.Serializar;
 
 
 /**
@@ -46,12 +47,12 @@ public class ApiRestController {
 		UsuarioVO usuario = UsuarioDAO.getUsuario(correo);
 		
 		if (usuario == null) {
-			return new RespuestaLogin(false, "Usuario no registrado", null);
+			return new RespuestaLogin(false, "Usuario no registrado", null, null);
 		} else if (!usuario.getContrasenna().equals(contrasenna))  {
-			return new RespuestaLogin(false, "Contraseña incorrecta", null);
+			return new RespuestaLogin(false, "Contraseña incorrecta", null, usuario.getId());
 		} else {
 			UUID claveInicio = GestorSesiones.nuevaClaveInicio(usuario.getId());	
-			return new RespuestaLogin(true, "", claveInicio);
+			return new RespuestaLogin(true, "", claveInicio, usuario.getId());
 		}
     }
 	
@@ -384,7 +385,7 @@ public class ApiRestController {
 	public String mandarPeticionAmistad(@RequestParam String sessionID, 
 															@RequestParam String amigo) {
 		String error = null;
-		UUID _amigo = Deserializar.deserializar(amigo, UUID.class);		//USA ESTE
+		UUID _amigo = Serializar.deserializar(amigo, UUID.class);		//USA ESTE
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 		if(usuarioID != null) {
 			error = UsuarioDAO.mandarPeticion(usuarioID,_amigo);		
@@ -436,12 +437,12 @@ public class ApiRestController {
 	 * 							null si no ha sido posible crear la sala
 	 */
 	@PostMapping("/crearSala")
-	public UUID crearSala(@RequestParam String sessionID, @RequestParam String configuracion){		
+	public UUID crearSala(@RequestParam String sesionID, @RequestParam String configuracion){		
 		
-		ConfigSala _configuracion = Deserializar.deserializar(configuracion, ConfigSala.class);
+		ConfigSala _configuracion = Serializar.deserializar(configuracion, ConfigSala.class);
 		
 		UUID salaID;
-		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
 		if(usuarioID != null) {
 			salaID = GestorSalas.nuevaSala(_configuracion);
 		} else {
@@ -481,12 +482,14 @@ public class ApiRestController {
 	 * 							en partida que cumplen la configuración
 	 */
 	@PostMapping("/filtrarSalas")
-	public HashMap<UUID,Sala> filtrarSalas(@RequestParam String sesionID, 
+	public RespuestaSalas filtrarSalas(@RequestParam String sesionID, 
 											@RequestParam String configuracion){		
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
 		if(usuarioID != null) {
-			ConfigSala _configuracion = Deserializar.deserializar(configuracion, ConfigSala.class);
-			return GestorSalas.buscarSalas(_configuracion);
+			ConfigSala _configuracion = Serializar.deserializar(configuracion, ConfigSala.class);
+			RespuestaSalas r = new RespuestaSalas(GestorSalas.buscarSalas(_configuracion));
+			System.out.println(r.getSalas().size());
+			return r;
 		} else {
 			return null;
 		}

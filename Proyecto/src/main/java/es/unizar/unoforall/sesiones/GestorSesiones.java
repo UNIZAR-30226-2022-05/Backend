@@ -11,7 +11,7 @@ public class GestorSesiones {
 	// Relación  sesionID (websockets) - UsuarioID
 	private static HashMap<String, UUID> sesiones;
 	
-	// Relación  usuarioID - clave inicio sesión
+	// Relación   clave inicio sesión - usuarioID
 	private static HashMap<UUID, UUID> clavesInicio;
 	
 	static {
@@ -21,14 +21,14 @@ public class GestorSesiones {
 	
 	public static UUID nuevaClaveInicio(UUID usuarioID) {
 		UUID claveInicio = UUID.randomUUID();
-		clavesInicio.put(usuarioID, claveInicio);
+		clavesInicio.put(claveInicio, usuarioID);
 		return claveInicio;
 	}
 	
-	public static boolean iniciarSesion(UUID usuarioID, UUID claveInicio, String sesionID) {
-		if (clavesInicio.get(usuarioID).equals(claveInicio)) {
-			sesiones.put(sesionID, usuarioID);
-			clavesInicio.remove(usuarioID);
+	public static boolean iniciarSesion(UUID claveInicio, String sesionID) {
+		if (clavesInicio.containsKey(claveInicio)) {
+			sesiones.put(sesionID, clavesInicio.get(claveInicio));
+			clavesInicio.remove(claveInicio);
 			return true;
 		} else {
 			return false;

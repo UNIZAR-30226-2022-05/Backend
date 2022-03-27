@@ -8,6 +8,10 @@ public class NotificacionSala {
 	private UUID salaID;
 	private UsuarioVO remitente;
 	
+	public NotificacionSala() {
+		
+	}
+	
 	public NotificacionSala(UUID salaID, UsuarioVO remitente) {
 		super();
 		this.salaID = salaID;

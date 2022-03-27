@@ -5,13 +5,15 @@ import java.util.UUID;
 public class RespuestaLogin {
 	private boolean exito;
 	private String errorInfo;
-	private UUID sesionID;
+	private UUID claveInicio;
+	private UUID usuarioID;
 	
-	public RespuestaLogin(boolean exito, String errorInfo, UUID sessionID) {
+	public RespuestaLogin(boolean exito, String errorInfo, UUID claveInicio, UUID usuarioID) {
 		super();
 		this.exito = exito;
 		this.errorInfo = errorInfo;
-		this.sesionID = sessionID;
+		this.claveInicio = claveInicio;
+		this.usuarioID = usuarioID;
 	}
 
 	public boolean isExito() {
@@ -30,18 +32,27 @@ public class RespuestaLogin {
 		this.errorInfo = errorInfo;
 	}
 
-	public UUID getSesionID() {
-		return sesionID;
+	public UUID getClaveInicio() {
+		return claveInicio;
 	}
 
-	public void setSesionID(UUID sessionID) {
-		this.sesionID = sessionID;
+	public void setClaveInicio(UUID claveInicio) {
+		this.claveInicio = claveInicio;
+	}
+	
+	public UUID getUsuarioID() {
+		return usuarioID;
+	}
+
+	public void setUsuarioID(UUID usuarioID) {
+		this.usuarioID = usuarioID;
 	}
 
 	@Override
 	public String toString() {
-		return "RespuestaLogin [exito=" + exito + ", errorInfo=" + errorInfo + ", sesionID=" + sesionID + "]";
+		return "RespuestaLogin [exito=" + exito + ", errorInfo=" + errorInfo + ", claveInicio=" + claveInicio
+				+ ", usuarioID=" + usuarioID + "]";
 	}
-	
+
 	
 }

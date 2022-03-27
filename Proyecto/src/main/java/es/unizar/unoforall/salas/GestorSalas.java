@@ -8,6 +8,7 @@ import es.unizar.unoforall.model.UsuarioVO;
 import es.unizar.unoforall.model.salas.ConfigSala;
 import es.unizar.unoforall.model.salas.Sala;
 import es.unizar.unoforall.model.salas.ConfigSala.ModoJuego;
+import es.unizar.unoforall.sesiones.GestorSesiones;
 
 public class GestorSalas {
 	private static HashMap<UUID,Sala> salas;
@@ -67,5 +68,29 @@ public class GestorSalas {
 	
 	public static void eliminarSala(UUID salaID) {
 		salas.remove(salaID);
+	}
+	
+	public static Sala eliminarParticipanteSala(UUID salaID, UUID usuarioID) {
+		GestorSalas.obtenerSala(salaID).eliminarParticipante(usuarioID);
+		
+		if(GestorSalas.obtenerSala(salaID).numParticipantes() == 0) {
+			System.out.println("Eliminando sala " + salaID);
+			GestorSalas.eliminarSala(salaID);
+			return null;
+		} else {
+			return GestorSalas.obtenerSala(salaID);
+		}
+	}
+	
+	public static void eliminarParticipanteSalas(UUID usuarioID) {
+		for(Map.Entry<UUID, Sala> entry : salas.entrySet()) {
+			UUID salaID = entry.getKey();
+			Sala sala = entry.getValue();
+			
+			if (sala.hayParticipante(usuarioID)) {
+				System.out.println("Eliminando participante desconectado");
+				eliminarParticipanteSala(salaID, usuarioID);
+			}
+		}
 	}
 }
