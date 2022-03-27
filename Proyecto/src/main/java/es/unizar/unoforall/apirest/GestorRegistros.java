@@ -46,7 +46,6 @@ public class GestorRegistros {
 				+ "registrarse (podrá usar el mismo correo)");
 			
 			if (!exitoMail)	{
-				System.err.println("No se ha encontrado el archivo credenciales.properties");
 				error = "Fallo en el servidor: no se pudo enviar el correo";
 			} else {
 				AlarmaRegistro alarm = new AlarmaRegistro(user.getCorreo());

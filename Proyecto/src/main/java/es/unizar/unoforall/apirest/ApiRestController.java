@@ -192,16 +192,16 @@ public class ApiRestController {
 	 * @return				true si ha cerrado la sesión.
 	 * 						false en caso de que ya no exista. (Ya estaba cerrada).
 	 */
-	@PostMapping("/cerrarSesion")
-	public boolean cerrarSesion(@RequestParam String sessionID) {
-		boolean exito = false;
-		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
-		if(usuarioID!=null) {
-			exito = true;
-			GestorSesiones.eliminarSesion(sessionID);
-		}
-		return exito;
-	}
+//	@PostMapping("/cerrarSesion")													SE HACE POR WEBSOCKETS !!!!
+//	public boolean cerrarSesion(@RequestParam String sessionID) {
+//		boolean exito = false;
+//		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
+//		if(usuarioID!=null) {
+//			exito = true;
+//			GestorSesiones.eliminarSesion(sessionID);
+//		}
+//		return exito;
+//	}
 	
 	/**
 	 * Función a la que llamar para borrar la cuenta del usuario activo.
@@ -381,19 +381,19 @@ public class ApiRestController {
 	 * 					Devuelve "SESION_EXPIRADA" si la sesión ha expirado.
 	 * 					Devuelve un mensaje de error en otro caso.	
 	 */
-	@PostMapping("/mandarPeticionAmistad")
-	public String mandarPeticionAmistad(@RequestParam String sessionID, 
-															@RequestParam String amigo) {
-		String error = null;
-		UUID _amigo = Serializar.deserializar(amigo, UUID.class);		//USA ESTE
-		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
-		if(usuarioID != null) {
-			error = UsuarioDAO.mandarPeticion(usuarioID,_amigo);		
-		} else {
-			error = "SESION_EXPIRADA";
-		}
-		return error;
-	}
+//	@PostMapping("/mandarPeticionAmistad")
+//	public String mandarPeticionAmistad(@RequestParam String sessionID, 
+//															@RequestParam String amigo) {
+//		String error = null;
+//		UUID _amigo = Serializar.deserializar(amigo, UUID.class);		//USA ESTE
+//		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
+//		if(usuarioID != null) {
+//			error = UsuarioDAO.mandarPeticion(usuarioID,_amigo);		
+//		} else {
+//			error = "SESION_EXPIRADA";
+//		}
+//		return error;
+//	}
 	
 	/**
 	 * Método al que llamar para buscar a un amigo por correo.

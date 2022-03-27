@@ -65,8 +65,10 @@ public class SocketController {
 	public String enviarNotifAmistad(@DestinationVariable UUID usrDestino, 
 							@Header("simpSessionId") String sesionID, 
 							Object vacio) throws Exception {
-		
-		return Serializar.serializar(UsuarioDAO.getUsuario(GestorSesiones.obtenerUsuarioID(sesionID)));
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
+		String error = UsuarioDAO.mandarPeticion(usuarioID,usrDestino);	
+		System.err.println(error);
+		return Serializar.serializar(UsuarioDAO.getUsuario(usuarioID));
 	}
 	
 	/**
