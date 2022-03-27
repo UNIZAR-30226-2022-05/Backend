@@ -1,4 +1,4 @@
-package es.unizar.unoforall.model.partida;
+package es.unizar.pruebaCliente.salas;
 
 public class ReglasEspeciales {
 	private boolean encadenarRoboCartas;	//Encadenar +2 y +4
@@ -9,6 +9,10 @@ public class ReglasEspeciales {
 	private boolean cartaRayosX;			//Ver carta aleatoria del siguiente jugador
 	private boolean cartaIntercambio;		//Intercambiar mano por la del siguiente jugador
 	private boolean cartaX2;				//Hacer que el siguiente jugador robe el número de cartas que posee
+	
+	public ReglasEspeciales() {
+		
+	}
 	
 	public ReglasEspeciales(boolean encadenarRoboCartas, boolean redirigirRoboCartas, boolean jugarVariasCartas,
 			boolean evitarEspecialFinal, boolean cartaRayosX, boolean cartaIntercambio, boolean cartaX2) {
@@ -49,4 +53,14 @@ public class ReglasEspeciales {
 	public boolean isCartaX2() {
 		return cartaX2;
 	}
+
+	@Override
+	public String toString() {
+		return "ReglasEspeciales [encadenarRoboCartas=" + encadenarRoboCartas + ", redirigirRoboCartas="
+				+ redirigirRoboCartas + ", jugarVariasCartas=" + jugarVariasCartas + ", evitarEspecialFinal="
+				+ evitarEspecialFinal + ", cartaRayosX=" + cartaRayosX + ", cartaIntercambio=" + cartaIntercambio
+				+ ", cartaX2=" + cartaX2 + "]";
+	}
+	
+	
 }

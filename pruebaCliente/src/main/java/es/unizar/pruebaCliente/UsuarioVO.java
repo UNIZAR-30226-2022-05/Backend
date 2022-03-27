@@ -1,4 +1,4 @@
-package es.unizar.unoforall.model;
+package es.unizar.pruebaCliente;
 
 
 import java.util.UUID;

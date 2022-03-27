@@ -1,6 +1,8 @@
-package es.unizar.unoforall.model.partida;
+package es.unizar.unoforall.model;
 
 import java.util.UUID;
+
+import es.unizar.unoforall.model.salas.Sala;
 
 public class SalasPausadasVO {
 	private final UUID id;
@@ -33,4 +35,11 @@ public class SalasPausadasVO {
 	public UUID getId() {
 		return id;
 	}
+
+	@Override
+	public String toString() {
+		return "SalasPausadasVO [id=" + id + ", maxParticipantes=" + maxParticipantes + ", sala=" + sala + "]";
+	}
+	
+	
 }
