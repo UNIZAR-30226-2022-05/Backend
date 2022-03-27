@@ -2,6 +2,7 @@ package es.unizar.unoforall.apirest;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.swing.Timer;
 
@@ -13,7 +14,7 @@ private final static int EXPIRACION_REGISTRO = 5*60000;
 	
 	private final static int MAX_CODIGO = 999999;
 	private final static int MIN_CODIGO = 100000;
-	static Map<String,RegistroTemporal> peticiones;
+	static Map<UUID,RegistroTemporal> peticiones;
 	
 	static {
 		peticiones = new HashMap<>();
@@ -26,16 +27,16 @@ private final static int EXPIRACION_REGISTRO = 5*60000;
 	 * @param correo contiene el correo asociado a la cuenta cuya contraseña se
 	 * 		  quiere reestablecer.
 	 */
-	public static String anyadirPeticion(String correoViejo, String correoNuevo, String contrasenya, String nombre) {
+	public static String anyadirPeticion(UUID usuarioID, String correoNuevo, String contrasenya, String nombre) {
 		/*if (peticiones.containsKey(correo)) {
 			peticiones.get(correo).getTimer().stop();
 			peticiones.remove(correo);
 		}*/
 		String error = null;
 		if (!GestorRegistros.usuariosPendientes.containsKey(correoNuevo) &&
-									!peticiones.containsKey(correoNuevo) && 
+									!peticiones.containsKey(usuarioID) && 
 									UsuarioDAO.getUsuario(correoNuevo)==null) {
-			UsuarioVO usuario = new UsuarioVO(correoViejo,nombre,contrasenya);
+			UsuarioVO usuario = new UsuarioVO(correoNuevo,nombre,contrasenya);
 			int codigo = (int) ((Math.random() * (MAX_CODIGO - MIN_CODIGO)) + MIN_CODIGO);
 			Mail.sendMail(correoNuevo, 
 					"Solicitud de actualización de la cuenta en UNOForAll", 
@@ -45,7 +46,7 @@ private final static int EXPIRACION_REGISTRO = 5*60000;
 			AlarmaActualizarCuentas alarm = new AlarmaActualizarCuentas(correoNuevo);
 			Timer t = new Timer(EXPIRACION_REGISTRO,alarm);
 			RegistroTemporal rt = new RegistroTemporal(usuario,t,codigo);
-			peticiones.put(correoNuevo,rt);
+			peticiones.put(usuarioID,rt);
 			t.start();
 		} else {
 			error = "El nuevo correo ya está en uso por otra cuenta o registro.";
@@ -54,13 +55,13 @@ private final static int EXPIRACION_REGISTRO = 5*60000;
 	}
 	
 	
-	public static String confirmarCodigo(String correo, Integer codigo) {
+	public static String confirmarCodigo(UUID usuarioID, Integer codigo) {
 		String error = null;
-		if (peticiones.containsKey(correo)) {
-			if (peticiones.get(correo).getCodigo()==codigo) {
-				peticiones.get(correo).getTimer().stop();
-				UsuarioDAO.actualizarCuenta(correo,peticiones.get(correo).getUsuario());
-				peticiones.remove(correo);
+		if (peticiones.containsKey(usuarioID)) {
+			if (peticiones.get(usuarioID).getCodigo()==codigo) {
+				peticiones.get(usuarioID).getTimer().stop();
+				UsuarioDAO.actualizarCuenta(peticiones.get(usuarioID).getUsuario());
+				peticiones.remove(usuarioID);
 			} else {
 				error = "Ha introducido un código erróneo. Vuelva a mirarlo en el correo.";
 			}
@@ -70,11 +71,11 @@ private final static int EXPIRACION_REGISTRO = 5*60000;
 		return error;
 	}
 	
-	public static String cancelarActualizacion(String correo) {
+	public static String cancelarActualizacion(UUID usuarioID) {
 		String error = null;
-		if (peticiones.containsKey(correo)) {
-			peticiones.get(correo).getTimer().stop();
-			peticiones.remove(correo);
+		if (peticiones.containsKey(usuarioID)) {
+			peticiones.get(usuarioID).getTimer().stop();
+			peticiones.remove(usuarioID);
 		} else {
 			error = "No hay una petición de actualización con este correo. Puede que ya haya aplicado o expirado.";
 		}

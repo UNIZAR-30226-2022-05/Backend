@@ -183,7 +183,7 @@ public class UsuarioDAO {
 	 * 					  correo de la cuenta.
 	 * @return null si tiene éxito, o un String en caso de error.
 	 */
-	public static String actualizarCuenta(String correoNuevo, UsuarioVO usuario) {
+	public static String actualizarCuenta(UsuarioVO usuario) {
 		String result = null;
 		Connection conn = null;
 		try {
@@ -191,10 +191,10 @@ public class UsuarioDAO {
 			
 			PreparedStatement updateUser = 
 					conn.prepareStatement("UPDATE usuarios SET correo = ?, nombre = ?, contrasenna = ? WHERE correo = ?;");
-			updateUser.setString(1, correoNuevo);
+			updateUser.setString(1, usuario.getCorreo());
 			updateUser.setString(2, usuario.getNombre());
 			updateUser.setString(3, usuario.getContrasenna());
-			updateUser.setObject(4, usuario.getCorreo());
+			updateUser.setObject(4, usuario.getId());
 			
 			int rows = updateUser.executeUpdate();
 			if(rows != 1) {

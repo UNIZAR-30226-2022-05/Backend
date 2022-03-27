@@ -15,7 +15,6 @@ import es.unizar.unoforall.model.UsuarioVO;
 import es.unizar.unoforall.model.salas.ConfigSala;
 import es.unizar.unoforall.salas.GestorSalas;
 import es.unizar.unoforall.sesiones.GestorSesiones;
-import es.unizar.unoforall.sesiones.Sesion;
 import es.unizar.unoforall.utils.CaracteresInvalidos;
 import es.unizar.unoforall.utils.Deserializar;
 
@@ -49,48 +48,10 @@ public class ApiRestController {
 		} else if (!usuario.getContrasenna().equals(contrasenna))  {
 			return new RespuestaLogin(false, "Contraseña incorrecta", null);
 		} else {
-			UUID sesionID = GestorSesiones.nuevaSesion(usuario);	
-			return new RespuestaLogin(true, "", sesionID);
+			UUID claveInicio = GestorSesiones.nuevaClaveInicio(usuario.getId());	
+			return new RespuestaLogin(true, "", claveInicio);
 		}
     }
-	
-	
-	/**
-	 * Método para cerrar la sesión por parte del usuario
-	 * @param 	sessionID contiene el id de la sesión
-	 * @return 	true en caso de que se haya cerrado la sesión.
-	 * 		   	false en caso de que no exista dicha sesión.
-	 */
-	@PostMapping("/cerrarSesion")
-	public Boolean cerrarSesion(@RequestParam UUID sesionID) {
-		boolean exito = false;
-		Sesion s = GestorSesiones.obtenerSesion(sesionID);
-		if (s!=null) {
-			exito = true;
-			GestorSesiones.eliminarSesion(sesionID);
-		}
-		return exito;
-	}
-	
-	
-	/**
-	 * Método para comprobar si el id de sesión es válido todavía
-	 * @param 	sessionID contiene el id de la sesión
-	 * @return 	true en caso de que la sesión siga activa.
-	 * 		   	false en caso de que no exista dicha sesión.
-	 */
-	@PostMapping("/comprobarSesion")
-	public Boolean comprobarSesion(@RequestParam UUID sesionID) {
-		Sesion s = GestorSesiones.obtenerSesion(sesionID);
-		if (s!=null) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-	
-	
-	
 	
 	
 	/**
@@ -120,7 +81,6 @@ public class ApiRestController {
 		}	
         return error;
     }
-	
 	
 	/**
 	 * Método para registrar un usuario - PASO 2: confirmar el correo 
@@ -153,88 +113,6 @@ public class ApiRestController {
 		return exito;
     }
 	
-	/**
-	 * Función a la que llamar para solicitar cambiar algún dato de la cuenta. Manda
-	 * un código al correo, con el que se pasa al paso dos.
-	 * @param idSesion 		id de la sesión del usuario.
-	 * @param correoNuevo 	nuevo valor de correo para la cuenta, puede ser el mismo
-	 * 		 			  	que correoViejo.
-	 * @param nombre 		nuevo nombre para la cuenta
-	 * @param contrasenya 	nuevo valor para la contraseña de la cuenta. 
-	 * @return 				un String con un mensaje de error que es null si todo va bien.
-	 * 						En caso de que no haya una sesión asignada a al id dado, devuelve "SESION_EXPIRADA".
-	 * 		   				En cualquier otro caso, la información estará contenida en el String.
-	 */
-	@PostMapping("/actualizarCuentaStepOne")
-	public String actualizarCuentaStepOne(@RequestParam UUID idSesion,
-								String correoNuevo, String nombre, String contrasenya){
-		String error = null;
-		Sesion sesion = GestorSesiones.obtenerSesion(idSesion);
-		if(sesion!=null) {
-			sesion.getTimer().restart();
-			if (!CaracteresInvalidos.hayCaracteresInvalidos(correoNuevo) &&
-						!CaracteresInvalidos.hayCaracteresInvalidos(nombre) &&
-						!CaracteresInvalidos.hayCaracteresInvalidos(contrasenya)) { 
-				
-				UsuarioVO user = UsuarioDAO.getUsuario(sesion.getUsuario().getCorreo());
-				if (user!=null) {
-					GestorActualizaCuentas.anyadirPeticion(user.getCorreo(), correoNuevo,
-																contrasenya, nombre);
-				} else {
-					error = "La cuenta ya no existe.";
-				}
-			} else {
-				error = "Los campos introducidos contienen caracteres inválidos.";
-			}
-		} else {
-			error = "SESION_EXPIRADA";
-		}
-			
-        return error;
-    }
-	
-	/**
-	 * Función a la que llamar para confirmar el código y aplicar el cambio. 
-	 * @param idSesion	id de la sesión del usuario.
-	 * @param codigo	código enviado al correo pasado por parámetro.
-	 * @return			null si no ha habido ningún error.
-	 * 					En caso de que no haya una sesión asignada a al id dado, devuelve "SESION_EXPIRADA". 		   				
-	 * 					Devuelve un mensaje con información del error si se ha producido alguno.
-	 */
-	@PostMapping("/actualizarCuentaStepTwo")
-	public String actualizarCuentaStepTwo(@RequestParam UUID idSesion,
-												 @RequestParam Integer codigo){		
-		String error = null;
-		Sesion sesion = GestorSesiones.obtenerSesion(idSesion);
-		if(sesion!=null) {
-			sesion.getTimer().restart();
-			error = GestorActualizaCuentas.confirmarCodigo(sesion.getUsuario().getCorreo(), codigo);
-		} else {
-			error = "SESION_EXPIRADA";
-		}
-		return error;
-    }
-	
-	/**
-	 * Función a la que llamar cuando se cancela una actualización. Para evitar boicoteos mejor que
-	 * solo se pueda llamar desde la ventana de confirmación de código.
-	 * @param correo 	contiene el nuevo correo que se había planteado para la actualización.
-	 * @return 			null en caso de que se haya podido cancelar la petición de registro.
-	 * 		   			"SESION_EXPIRADA" en caso de que la sesión del usuario haya caducado.
-	 * 					un String especificando el error que haya sucedido.
-	 */
-	@PostMapping("/actualizarCancel")
-	public String actualizarCancel(@RequestParam UUID idSesion){
-		String error = null;
-		Sesion sesion = GestorSesiones.obtenerSesion(idSesion);
-		if(sesion!=null) {
-			sesion.getTimer().restart();
-			error = GestorActualizaCuentas.cancelarActualizacion(sesion.getUsuario().getCorreo());
-		} else {
-			error = "SESION_EXPIRADA";
-		}
-		return error;
-    }
 	
 	/**
 	 * Función a la que llamar para solicitar reestablecer la contraseña. Manda
@@ -298,6 +176,98 @@ public class ApiRestController {
 		return error;
     }
 	
+	
+	
+	
+	/**************************************************************************/
+	// Cuenta
+	/**************************************************************************/
+	
+	/**
+	 * Función a la que llamar para solicitar cambiar algún dato de la cuenta. Manda
+	 * un código al correo, con el que se pasa al paso dos.
+	 * @param idSesion 		id de la sesión del usuario.
+	 * @param correoNuevo 	nuevo valor de correo para la cuenta, puede ser el mismo
+	 * 		 			  	que correoViejo.
+	 * @param nombre 		nuevo nombre para la cuenta
+	 * @param contrasenya 	nuevo valor para la contraseña de la cuenta. 
+	 * @return 				un String con un mensaje de error que es null si todo va bien.
+	 * 						En caso de que no haya una sesión asignada a al id dado, devuelve "SESION_EXPIRADA".
+	 * 		   				En cualquier otro caso, la información estará contenida en el String.
+	 */
+	@PostMapping("/actualizarCuentaStepOne")
+	public String actualizarCuentaStepOne(@RequestParam String sesionID,
+								String correoNuevo, String nombre, String contrasenya){
+		String error = null;
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
+		if(usuarioID != null) {
+			if (!CaracteresInvalidos.hayCaracteresInvalidos(correoNuevo) &&
+						!CaracteresInvalidos.hayCaracteresInvalidos(nombre) &&
+						!CaracteresInvalidos.hayCaracteresInvalidos(contrasenya)) { 
+				
+				UsuarioVO user = UsuarioDAO.getUsuario(usuarioID);
+				if (user!=null) {
+					GestorActualizaCuentas.anyadirPeticion(usuarioID, correoNuevo,
+																contrasenya, nombre);
+				} else {
+					error = "La cuenta ya no existe.";
+				}
+			} else {
+				error = "Los campos introducidos contienen caracteres inválidos.";
+			}
+		} else {
+			error = "SESION_EXPIRADA";
+		}
+			
+        return error;
+    }
+	
+	/**
+	 * Función a la que llamar para confirmar el código y aplicar el cambio. 
+	 * @param idSesion	id de la sesión del usuario.
+	 * @param codigo	código enviado al correo pasado por parámetro.
+	 * @return			null si no ha habido ningún error.
+	 * 					En caso de que no haya una sesión asignada a al id dado, devuelve "SESION_EXPIRADA". 		   				
+	 * 					Devuelve un mensaje con información del error si se ha producido alguno.
+	 */
+	@PostMapping("/actualizarCuentaStepTwo")
+	public String actualizarCuentaStepTwo(@RequestParam String sesionID,
+												 @RequestParam Integer codigo){		
+		String error = null;
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
+		if(usuarioID != null) {
+			error = GestorActualizaCuentas.confirmarCodigo(usuarioID, codigo);
+		} else {
+			error = "SESION_EXPIRADA";
+		}
+		return error;
+    }
+	
+	/**
+	 * Función a la que llamar cuando se cancela una actualización. Para evitar boicoteos mejor que
+	 * solo se pueda llamar desde la ventana de confirmación de código.
+	 * @param correo 	contiene el nuevo correo que se había planteado para la actualización.
+	 * @return 			null en caso de que se haya podido cancelar la petición de registro.
+	 * 		   			"SESION_EXPIRADA" en caso de que la sesión del usuario haya caducado.
+	 * 					un String especificando el error que haya sucedido.
+	 */
+	@PostMapping("/actualizarCancel")
+	public String actualizarCancel(@RequestParam String sesionID){
+		String error = null;
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
+		if(usuarioID != null) {
+			error = GestorActualizaCuentas.cancelarActualizacion(usuarioID);
+		} else {
+			error = "SESION_EXPIRADA";
+		}
+		return error;
+    }
+	
+
+	/**************************************************************************/
+	// Amigos
+	/**************************************************************************/
+	
 	/**
 	 * Método al que llamar para sacar las solicitudes de amistad que ha hecho el usuario
 	 * y que aún no se han aceptado.
@@ -307,12 +277,12 @@ public class ApiRestController {
 	 * 					extraer.
 	 */
 	@PostMapping("/sacarPeticionesEnviadas")
-	public ListaUsuarios sacarPeticionesEnviadas(@RequestParam UUID idSesion) {
-		Sesion sesion = GestorSesiones.obtenerSesion(idSesion);
+	public ListaUsuarios sacarPeticionesEnviadas(@RequestParam String sesionID) {
 		ListaUsuarios lu = null;
-		if(sesion!=null) {
-			sesion.getTimer().restart();
-			lu = UsuarioDAO.sacarPeticionesEnviadas(sesion.getUsuario().getId());		
+		
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
+		if(usuarioID != null) {
+			lu = UsuarioDAO.sacarPeticionesEnviadas(usuarioID);		
 		} else {
 			lu = new ListaUsuarios(true);
 		}
@@ -328,11 +298,10 @@ public class ApiRestController {
 	 * 					extraer.
 	 */
 	@PostMapping("/sacarPeticionesRecibidas")
-	public ListaUsuarios sacarPeticionesRecibidas(@RequestParam UUID idSesion) {
-		Sesion sesion = GestorSesiones.obtenerSesion(idSesion);
+	public ListaUsuarios sacarPeticionesRecibidas(@RequestParam String sesionID) {
 		ListaUsuarios lu = null;
-		if(sesion!=null) {
-			sesion.getTimer().restart();
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
+		if(usuarioID != null) {
 			//lu = UsuarioDAO.sacarPeticionesRecibidas(sesion.getMiUsuario().getId());		
 		} else {
 			lu = new ListaUsuarios(true);
@@ -348,11 +317,10 @@ public class ApiRestController {
 	 * 					extraer.
 	 */
 	@PostMapping("/sacarAmigos")
-	public ListaUsuarios sacarAmigos(@RequestParam UUID idSesion) {
-		Sesion sesion = GestorSesiones.obtenerSesion(idSesion);
+	public ListaUsuarios sacarAmigos(@RequestParam String sesionID) {
 		ListaUsuarios lu = null;
-		if(sesion!=null) {
-			sesion.getTimer().restart();
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
+		if(usuarioID != null) {
 			//lu = UsuarioDAO.sacarAmigos(sesion.getMiUsuario().getId());		
 		} else {
 			lu = new ListaUsuarios(true);
@@ -368,12 +336,12 @@ public class ApiRestController {
 	 * @return			
 	 */
 	@PostMapping("/mandarPeticionAmistad")
-	public ListaUsuarios mandarPeticionAmistad(@RequestParam UUID idSesion, 
-															@RequestParam UUID amigo) {
-		Sesion sesion = GestorSesiones.obtenerSesion(idSesion);
+	public ListaUsuarios mandarPeticionAmistad(@RequestParam String sesionID, 
+															@RequestParam String amigo) {
 		ListaUsuarios lu = null;
-		if(sesion!=null) {
-			sesion.getTimer().restart();
+		UUID _amigo = Deserializar.deserializar(amigo, UUID.class);		//USA ESTE
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
+		if(usuarioID != null) {
 			//lu = UsuarioDAO.mandarPeticion(sesion.getMiUsuario().getId());		
 		} else {
 			lu = new ListaUsuarios(true);
@@ -399,13 +367,11 @@ public class ApiRestController {
 	@PostMapping("/crearSala")
 	public UUID crearSala(@RequestParam String sesionID, @RequestParam String configuracion){		
 		
-		UUID _sesionID = Deserializar.deserializar(sesionID, UUID.class);
 		ConfigSala _configuracion = Deserializar.deserializar(configuracion, ConfigSala.class);
 		
 		UUID salaID;
-		Sesion sesion = GestorSesiones.obtenerSesion(_sesionID);
-		if (sesion!=null) {
-			sesion.getTimer().restart();
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
+		if(usuarioID != null) {
 			salaID = GestorSalas.nuevaSala(_configuracion);
 		} else {
 			return null;
