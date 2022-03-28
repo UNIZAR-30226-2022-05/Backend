@@ -6,19 +6,17 @@ import es.unizar.unoforall.model.UsuarioVO;
 
 /**
  * <expirado> 	true si la sesión ha expirado, y false en caso contrario.
- * <error>		null si no ha habido ningún error. Si ha ocurrido alguno, se informa por este String.
+ * <error>		"null" si no ha habido ningún error. Si ha ocurrido alguno, se informa por este String.
  * <usuarios>	una lista de UsuariosVO.
  */
 public class ListaUsuarios {
 	private boolean expirado;
-	private String error = null;
+	private String error = "null";
 	private ArrayList<UsuarioVO> usuarios = null;
 	
 	public ListaUsuarios(boolean expirado) {
-		this.expirado = expirado;
-		if(!expirado) {
-			usuarios = new ArrayList<UsuarioVO>();
-		}
+		this.expirado = expirado;	
+		usuarios = new ArrayList<UsuarioVO>();
 	}
 
 	public boolean isExpirado() {

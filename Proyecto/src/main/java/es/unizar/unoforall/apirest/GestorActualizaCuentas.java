@@ -32,7 +32,7 @@ private final static int EXPIRACION_REGISTRO = 5*60000;
 			peticiones.get(correo).getTimer().stop();
 			peticiones.remove(correo);
 		}*/
-		String error = null;
+		String error = "nulo";
 		if (!GestorRegistros.usuariosPendientes.containsKey(correoNuevo) &&
 									!peticiones.containsKey(usuarioID) && 
 									UsuarioDAO.getUsuario(correoNuevo)==null) {
@@ -61,7 +61,7 @@ private final static int EXPIRACION_REGISTRO = 5*60000;
 	
 	
 	public static String confirmarCodigo(UUID usuarioID, Integer codigo) {
-		String error = null;
+		String error = "nulo";
 		if (peticiones.containsKey(usuarioID)) {
 			if (peticiones.get(usuarioID).getCodigo()==codigo) {
 				peticiones.get(usuarioID).getTimer().stop();
