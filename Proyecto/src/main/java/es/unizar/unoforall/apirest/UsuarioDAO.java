@@ -190,7 +190,7 @@ public class UsuarioDAO {
 			conn = GestorPoolConexionesBD.getConnection();
 			
 			PreparedStatement updateUser = 
-					conn.prepareStatement("UPDATE usuarios SET correo = ?, nombre = ?, contrasenna = ? WHERE correo = ?;");
+					conn.prepareStatement("UPDATE usuarios SET correo = ?, nombre = ?, contrasenna = ? WHERE id = ?;");
 			updateUser.setString(1, usuario.getCorreo());
 			updateUser.setString(2, usuario.getNombre());
 			updateUser.setString(3, usuario.getContrasenna());

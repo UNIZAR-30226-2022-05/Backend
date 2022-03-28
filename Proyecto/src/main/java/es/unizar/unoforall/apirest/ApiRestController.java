@@ -68,13 +68,13 @@ public class ApiRestController {
 	@PostMapping("/registerStepOne")
 	public String registerStepOne(@RequestParam String correo, 
 				@RequestParam String contrasenna, @RequestParam String nombre){
-		String error = "nulo";
+		String error = null;
 		if (!CaracteresInvalidos.hayCaracteresInvalidos(correo)
 				&& !CaracteresInvalidos.hayCaracteresInvalidos(contrasenna)
 				&& !CaracteresInvalidos.hayCaracteresInvalidos(nombre)) {
 			UsuarioVO user = UsuarioDAO.getUsuario(correo);
 			if (user==null) {
-					user = new UsuarioVO(correo,nombre,contrasenna);
+					user = new UsuarioVO(null,correo,nombre,contrasenna);
 					error = GestorRegistros.anadirUsuario(user);
 			} else {
 				error = "El correo ya está asociado a una cuenta.";
@@ -126,7 +126,7 @@ public class ApiRestController {
 	 */
 	@PostMapping("/reestablecercontrasennaStepOne")
 	public String reestablecercontrasennaStepOne(@RequestParam String correo){
-		String error = "nulo";
+		String error = null;
 		if (!CaracteresInvalidos.hayCaracteresInvalidos(correo)) { //Esto cuando esté definida la clase CaracteresInvalidos
 			UsuarioVO user = UsuarioDAO.getUsuario(correo);
 			
@@ -170,7 +170,7 @@ public class ApiRestController {
 	public String reestablecercontrasennaStepThree(@RequestParam String correo,
 												 @RequestParam String contrasenna){		
 		UsuarioVO user = UsuarioDAO.getUsuario(correo);
-		String error = "nulo";
+		String error = null;
 		if (user!=null) {
 			error = UsuarioDAO.cambiarContrasenna(user.getId(), contrasenna);
 		} else {
@@ -384,7 +384,7 @@ public class ApiRestController {
 //	@PostMapping("/mandarPeticionAmistad")
 //	public String mandarPeticionAmistad(@RequestParam String sessionID, 
 //															@RequestParam String amigo) {
-//		String error = "nulo";
+//		String error = null;
 //		UUID _amigo = Serializar.deserializar(amigo, UUID.class);		//USA ESTE
 //		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 //		if(usuarioID != null) {
@@ -458,7 +458,7 @@ public class ApiRestController {
 	 * @param sesionID			id de seisón del usuario
 	 * @param salaID			(clase UUID) id de la sala
 	 * @return					sala buscada
-	 * 							null si no es pública, está llena, o está en partida
+	 * 							"nulo" si no es pública, está llena, o está en partida
 	 */
 	@PostMapping("/buscarSalaID")
 	public String buscarSalaID(@RequestParam String sesionID, @RequestParam String salaID){		
@@ -480,7 +480,8 @@ public class ApiRestController {
 	 * 								reglas = null si no se quieren especificar
 	 *							Si configuración es null, devolverá todas las salas
 	 * @return					Salas públicas con un hueco libre y que no están
-	 * 							en partida que cumplen la configuración
+	 * 							en partida que cumplen la configuración.
+	 * 							"nulo" si no se ha encontrado ninguna
 	 */
 	@PostMapping("/filtrarSalas")
 	public String filtrarSalas(@RequestParam String sesionID, 
@@ -491,7 +492,7 @@ public class ApiRestController {
 			RespuestaSalas r = new RespuestaSalas(GestorSalas.buscarSalas(_configuracion));
 			return Serializar.serializar(r);
 		} else {
-			return null;
+			return "nulo";
 		}
     }
 	

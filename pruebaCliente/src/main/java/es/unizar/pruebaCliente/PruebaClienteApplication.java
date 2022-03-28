@@ -290,7 +290,7 @@ public class PruebaClienteApplication {
 					
 					apirest.openConnection();
 			    	String retorno = apirest.receiveObject(String.class);
-			    	if(retorno.equals("null")) {
+			    	if(retorno.equals("nulo")) {
 			    		System.out.println("Introduce el código:");
 						Integer codigo = Integer.valueOf(scanner.nextLine());
 						
@@ -301,7 +301,7 @@ public class PruebaClienteApplication {
 						
 						apirest.openConnection();
 				    	retorno = apirest.receiveObject(String.class);
-				    	if (retorno == "null") {
+				    	if (retorno == "nulo") {
 							 System.out.println("Introduce la nueva contraseña:");
 							 String miContrasenna = scanner.nextLine();
 							 apirest = new RestAPI("/api/reestablecercontrasennaStepTwo");
@@ -311,7 +311,7 @@ public class PruebaClienteApplication {
 							
 							 apirest.openConnection();
 					    	 retorno = apirest.receiveObject(String.class);
-					    	 if (retorno.equals("null")){
+					    	 if (retorno.equals("nulo")){
 					    		 System.out.println("Contraseña reestablecida.");
 					    	 } else {
 					    	 	System.out.println(retorno);
@@ -351,7 +351,7 @@ public class PruebaClienteApplication {
 					
 					apirest.openConnection();
 			    	String retorno = apirest.receiveObject(String.class);
-			    	if (retorno.equals("null")) {
+			    	if (retorno.equals("nulo")) {
 			    		System.out.println("Introduzca el código:");
 						Integer codigo = Integer.valueOf(scanner.nextLine());
 						
@@ -362,7 +362,7 @@ public class PruebaClienteApplication {
 						
 						apirest.openConnection();
 				    	retorno = apirest.receiveObject(String.class);
-				    	if (retorno.equals("null")) {
+				    	if (retorno.equals("nulo")) {
 				    		System.out.println("Exito.");
 				    	} else {
 				    		System.out.println(retorno);
