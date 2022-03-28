@@ -1,0 +1,20 @@
+PRIMERA VEZ
+1. descargar de 'Drive > Despliegue Backend' el fichero 'import_postgreSQL_database.sh' (verificar que está en formato UNIX) y 'main.zip'
+2. ejecutar 'import_postgreSQL_database.sh'
+3. copiar el fichero 'credenciales.properties' que está en 'Drive > Despliegue Backend' dentro de la carpeta 'Backend > Proyecto'
+4. Compilar el backend con  'Backend > Proyecto > compilar.bat'
+5. PERMITIR ENVÍO DE CORREOS:
+	en:   	C:\Program Files\Java\jdk-17.0.2\conf\security\java.security
+			/usr/lib/jvm/java-11-openjdk-amd64/conf/security/java.security
+	comentar: jdk.tls.disabledAlgorithms ...  y las siguientes dos líneas
+	Fuente:
+	https://stackoverflow.com/questions/67899129/postfix-and-openjdk-11-no-appropriate-protocol-protocol-is-disabled-or-cipher
+
+6. Ejecutar el backend en cmd con  'java -jar target/backend.....'
+		SI NO SE TIENE LA VARIABLE DE SISTEMA JAVA_HOME: añadirla en panel de control poniendo el directorio de java 17
+
+
+
+
+SIGUIENTES VECES
+1. Asegurarse de iniciar la BD con  'sudo service postgresql start'

@@ -8,7 +8,7 @@ import java.util.UUID;
  * 
  */
 public class UsuarioVO {	
-	private final UUID id;
+	private UUID id;
 	private String correo;
 	private String nombre;
 	private String contrasenna;
@@ -16,6 +16,9 @@ public class UsuarioVO {
 	private int totalPartidas;
 	private int numVictorias;
 	
+	public UsuarioVO() {
+		
+	}
 	
 	public UsuarioVO(UUID id, String correo, String nombre, String contrasenna, int puntos, int totalPartidas, int numVictorias) {
 		if(id == null) {
@@ -103,5 +106,11 @@ public class UsuarioVO {
 
 	public void setNumVictorias(int numVictorias) {
 		this.numVictorias = numVictorias;
+	}
+
+	@Override
+	public String toString() {
+		return "UsuarioVO [id=" + id + ", correo=" + correo + ", nombre=" + nombre + ", contrasenna=" + contrasenna
+				+ ", puntos=" + puntos + ", totalPartidas=" + totalPartidas + ", numVictorias=" + numVictorias + "]";
 	}
 }

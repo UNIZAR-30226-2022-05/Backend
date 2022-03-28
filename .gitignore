@@ -16,7 +16,7 @@ ignorar/
 *.war
 *.nar
 *.ear
-*.zip
+#*.zip
 *.tar.gz
 *.rar
 
@@ -28,3 +28,5 @@ hs_err_pid*
 
 # Notas internas
 NOTAS.md
+
+Scripts PostgreSQL/*.sh

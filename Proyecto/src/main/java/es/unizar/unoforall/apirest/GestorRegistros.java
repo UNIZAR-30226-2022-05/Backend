@@ -6,6 +6,7 @@ import java.util.Map;
 
 import javax.swing.Timer;
 
+import es.unizar.unoforall.apirest.UsuarioDAO;
 import es.unizar.unoforall.model.UsuarioVO;
 import es.unizar.unoforall.utils.Mail;
 
@@ -13,9 +14,10 @@ import es.unizar.unoforall.utils.Mail;
 
 public class GestorRegistros {
 	//El registro temporal exipirará en 5 min
-	private final static int EXPIRACION_REGISTRO = 300000;  
-	private final static int MAX = 999999;
-	private final static int MIN = 100000;
+	private final static int EXPIRACION_REGISTRO = 5*60000;  
+	
+	private final static int MAX_CODIGO = 999999;
+	private final static int MIN_CODIGO = 100000;
 	
 	static Map<String,RegistroTemporal> usuariosPendientes;
 	
@@ -32,32 +34,39 @@ public class GestorRegistros {
 	 */
 	public static String anadirUsuario(UsuarioVO user) {
 		String error = null;
-		if (!usuariosPendientes.containsKey(user.getCorreo())) {
-			int codigo = (int) ((Math.random() * (MAX - MIN)) + MIN);
+		if (!usuariosPendientes.containsKey(user.getCorreo()) &&
+				!GestorActualizaCuentas.peticiones.containsKey(user.getCorreo())) {
+			int codigo = (int) ((Math.random() * (MAX_CODIGO - MIN_CODIGO)) + MIN_CODIGO);
 			
-			Mail.sendMail(user.getCorreo(), 
+			
+			boolean exitoMail = Mail.sendMail(user.getCorreo(), 
 				"Verificación de la cuenta en UNOForAll", 
 				"Su código de verificación es: " + Integer.toString(codigo) +
 				".\nRecuerde que si tarda más de 5 minutos tendrá que volver a "
 				+ "registrarse (podrá usar el mismo correo)");
 			
-			AlarmaRegistro alarm = new AlarmaRegistro(user.getCorreo());
-			Timer t = new Timer(EXPIRACION_REGISTRO,alarm);
-			RegistroTemporal rt = new RegistroTemporal(user,t,codigo);
-			usuariosPendientes.put(user.getCorreo(),rt);
-			t.start();
+			if (!exitoMail)	{
+				error = "Fallo en el servidor: no se pudo enviar el correo";
+			} else {
+				AlarmaRegistro alarm = new AlarmaRegistro(user.getCorreo());
+				Timer t = new Timer(EXPIRACION_REGISTRO,alarm);
+				RegistroTemporal rt = new RegistroTemporal(user,t,codigo);
+				usuariosPendientes.put(user.getCorreo(),rt);
+				t.start();
+			}
 		} else {
-			error = "El correo ya está vinculado a una petición de registro.";
+			error = "El correo ya está vinculado a una petición de registro o de actualización de cuenta.";
 		}
 		return error;
 	}
 	
 	
 	/**
-	 * 
-	 * @param correo
-	 * @param codigo
-	 * @return
+	 * Verifica que el código es el que está asociado al correo del map
+	 * @param correo	correo del usuario
+	 * @param codigo	código recibido
+	 * @return			null si no se ha producido ningún error, y el motivo del 
+	 * 					error en caso contrario
 	 */
 	public static String confirmarRegistro(String correo, Integer codigo) {
 		String error = null;
@@ -73,6 +82,24 @@ public class GestorRegistros {
 			error = "Su petición de registro ha expirado, vuelva a realizarla.";
 		}
 		
+		return error;
+	}
+	
+	/**
+	 * Verifica que el código es el que está asociado al correo del map
+	 * @param correo	correo del usuario
+	 * @param codigo	código recibido
+	 * @return			null si no se ha producido ningún error, y el motivo del 
+	 * 					error en caso contrario
+	 */
+	public static String cancelarRegistro(String correo) {
+		String error = null;
+		if (usuariosPendientes.containsKey(correo)) {
+			GestorRegistros.usuariosPendientes.get(correo).getTimer().stop();
+			usuariosPendientes.remove(correo);
+		} else {
+			error = "No hay una petición de registro con este correo. Puede que ya esté registrado o que su petición haya expirado.";
+		}
 		return error;
 	}
 }
