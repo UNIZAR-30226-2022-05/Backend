@@ -26,7 +26,7 @@ public class GestorContrasennas {
 	 * 		  quiere reestablecer.
 	 */
 	public static String anyadirPeticion(String correo) {
-		String error = null;
+		String error = "null";
 		if (peticiones.containsKey(correo)) {
 			peticiones.get(correo).getTimer().stop();
 			peticiones.remove(correo);
@@ -51,7 +51,7 @@ public class GestorContrasennas {
 	}
 	
 	public static String confirmarCodigo(String correo, Integer codigo) {
-		String error = null;
+		String error = "null";
 		if (peticiones.containsKey(correo)) {
 			if (peticiones.get(correo).getCodigo()==codigo) {
 				peticiones.get(correo).getTimer().stop();

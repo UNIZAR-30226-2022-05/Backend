@@ -28,7 +28,7 @@ public class SocketController {
 	 * @param usrID			En la URL: clave para iniciar sesión obtenida en el login
 	 * @param sesionID		Automático
 	 * @param vacio			Cualquier objeto no nulo
-	 * @return				True si ha habido éxito y false en caso contrario
+	 * @return				el id de sesión si ha habido éxito, y null en caso contrario
 	 * @throws Exception
 	 */
 	@MessageMapping("/conectarse/{claveInicio}")
@@ -42,7 +42,7 @@ public class SocketController {
 			System.out.println("Nueva sesión: " + sesionID);
 			return sesionID;
 		} else {
-			return null;
+			return "null";
 		}
 	}
 		
@@ -103,6 +103,8 @@ public class SocketController {
 	 * @param sesionID		Automático
 	 * @param vacio			Cualquier objeto no nulo
 	 * @return				(Clase Sala) La sala a la que se ha unido el usuario
+	 * 						Sala con 'noExiste' = true si la sala no existe o 
+	 * 						el usuario no está logueado
 	 * @throws Exception
 	 */
 	@MessageMapping("/salas/unirse/{salaID}")
@@ -110,6 +112,15 @@ public class SocketController {
 	public String unirseSala(@DestinationVariable UUID salaID, 
 							@Header("simpSessionId") String sesionID, 
 							Object vacio) throws Exception {
+		
+		if (GestorSalas.obtenerSala(salaID) == null) {
+			return Serializar.serializar(new Sala());
+		}
+		if (GestorSesiones.obtenerUsuarioID(sesionID) == null) {
+			return Serializar.serializar(new Sala());
+		}
+		
+		System.out.println(sesionID + " se une a la sala " + salaID);
 		
 		GestorSalas.obtenerSala(salaID).
 			nuevoParticipante(UsuarioDAO.getUsuario(GestorSesiones.obtenerUsuarioID(sesionID)));
@@ -123,6 +134,8 @@ public class SocketController {
 	 * @param sesionID		Automático
 	 * @param vacio			Cualquier objeto no nulo
 	 * @return				(Clase Sala) La sala actualizada
+	 * 						Sala con 'noExiste' = true si la sala no existe o 
+	 * 						el usuario no está logueado
 	 * @throws Exception
 	 */
 	@MessageMapping("/salas/listo/{salaID}")
@@ -131,6 +144,12 @@ public class SocketController {
 							@Header("simpSessionId") String sesionID, 
 							Object vacio) throws Exception {
 		
+		if (GestorSalas.obtenerSala(salaID) == null) {
+			return Serializar.serializar(new Sala());
+		}
+		if (GestorSesiones.obtenerUsuarioID(sesionID) == null) {
+			return Serializar.serializar(new Sala());
+		}
 		GestorSalas.obtenerSala(salaID).
 			nuevoParticipanteListo(GestorSesiones.obtenerUsuarioID(sesionID));
 		
@@ -142,7 +161,9 @@ public class SocketController {
 	 * @param salaID		En la URL: id de la sala
 	 * @param sesionID		Automático
 	 * @param vacio			Cualquier objeto no nulo
-	 * @return				(Clase Sala) La sala actualizada o null si ha sido eliminada
+	 * @return				(Clase Sala) La sala actualizada
+	 * 						Sala con 'noExiste' = true si la sala no existe o 
+	 * 						ha sido eliminada
 	 * @throws Exception
 	 */
 	@MessageMapping("/salas/salir/{salaID}")
@@ -150,9 +171,21 @@ public class SocketController {
 	public String salirseSala(@DestinationVariable UUID salaID, 
 							@Header("simpSessionId") String sesionID, 
 							Object vacio) throws Exception {
-				
-		return Serializar.serializar(GestorSalas.eliminarParticipanteSala(salaID, 
-								GestorSesiones.obtenerUsuarioID(sesionID)));
+		
+		if (GestorSalas.obtenerSala(salaID) == null) {
+			return Serializar.serializar(new Sala());
+		}
+		if (GestorSesiones.obtenerUsuarioID(sesionID) == null) {
+			return Serializar.serializar(new Sala());
+		}		
+		Sala s = GestorSalas.eliminarParticipanteSala(salaID, 
+				GestorSesiones.obtenerUsuarioID(sesionID));
+		
+		if (s == null) {
+			return Serializar.serializar(new Sala());
+		} else {
+			return Serializar.serializar(s);
+		}
 	}
 	
 	

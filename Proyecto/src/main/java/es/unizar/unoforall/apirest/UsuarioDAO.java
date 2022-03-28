@@ -153,7 +153,7 @@ public class UsuarioDAO {
 	 * @return Un String que contiene el error en caso de error, y null si hay éxito.
 	 */
 	public static String cambiarContrasenna(UUID idUsuario, String contrasenna) {
-		String result = null;
+		String result = "null";
 		Connection conn = null;
 		try {
 			conn = GestorPoolConexionesBD.getConnection();
@@ -184,7 +184,7 @@ public class UsuarioDAO {
 	 * @return null si tiene éxito, o un String en caso de error.
 	 */
 	public static String actualizarCuenta(UsuarioVO usuario) {
-		String result = null;
+		String result = "null";
 		Connection conn = null;
 		try {
 			conn = GestorPoolConexionesBD.getConnection();
@@ -392,7 +392,7 @@ public class UsuarioDAO {
 	 * @return			devuelve null si todo va bien. En caso contrario devuelve un mensaje de error.
 	 */
 	public static String mandarPeticion(UUID idUsuario, UUID amigo) {
-		String error = null;
+		String error = "null";
 		Connection conn = null;
 		
 		try {

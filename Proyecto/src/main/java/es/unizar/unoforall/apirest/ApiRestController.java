@@ -14,6 +14,7 @@ import es.unizar.unoforall.db.GestorPoolConexionesBD;
 import es.unizar.unoforall.model.RespuestaLogin;
 import es.unizar.unoforall.model.UsuarioVO;
 import es.unizar.unoforall.model.salas.ConfigSala;
+import es.unizar.unoforall.model.salas.RespuestaSala;
 import es.unizar.unoforall.model.salas.RespuestaSalas;
 import es.unizar.unoforall.model.salas.Sala;
 import es.unizar.unoforall.salas.GestorSalas;
@@ -36,7 +37,8 @@ public class ApiRestController {
 	 * @param correo		correo del usuario
 	 * @param contrasenna	hash de la contraseña del usuario
 	 * @return 				RespuestaLogin.isExito = true si no ha habido errores
-	 * 							RespuestaLogin.sessionID tiene el id de sesión
+	 * 							RespuestaLogin.claveInicio tiene la clave de inicio
+	 * 							RespuestaLogin.usuarioID tiene el uuid del usuario
 	 * 						RespuestaLogin.isExito = false en caso contrario
 	 * 							RespuestaLogin.errorInfo especifica el motivo del error
 	 */
@@ -49,7 +51,7 @@ public class ApiRestController {
 		if (usuario == null) {
 			return new RespuestaLogin(false, "Usuario no registrado", null, null);
 		} else if (!usuario.getContrasenna().equals(contrasenna))  {
-			return new RespuestaLogin(false, "Contraseña incorrecta", null, usuario.getId());
+			return new RespuestaLogin(false, "Contraseña incorrecta", null, null);
 		} else {
 			UUID claveInicio = GestorSesiones.nuevaClaveInicio(usuario.getId());	
 			return new RespuestaLogin(true, "", claveInicio, usuario.getId());
@@ -68,7 +70,7 @@ public class ApiRestController {
 	@PostMapping("/registerStepOne")
 	public String registerStepOne(@RequestParam String correo, 
 				@RequestParam String contrasenna, @RequestParam String nombre){
-		String error = null;
+		String error = "null";
 		if (!CaracteresInvalidos.hayCaracteresInvalidos(correo)
 				&& !CaracteresInvalidos.hayCaracteresInvalidos(contrasenna)
 				&& !CaracteresInvalidos.hayCaracteresInvalidos(nombre)) {
@@ -126,7 +128,7 @@ public class ApiRestController {
 	 */
 	@PostMapping("/reestablecercontrasennaStepOne")
 	public String reestablecercontrasennaStepOne(@RequestParam String correo){
-		String error = null;
+		String error = "null";
 		if (!CaracteresInvalidos.hayCaracteresInvalidos(correo)) { //Esto cuando esté definida la clase CaracteresInvalidos
 			UsuarioVO user = UsuarioDAO.getUsuario(correo);
 			
@@ -170,7 +172,7 @@ public class ApiRestController {
 	public String reestablecercontrasennaStepThree(@RequestParam String correo,
 												 @RequestParam String contrasenna){		
 		UsuarioVO user = UsuarioDAO.getUsuario(correo);
-		String error = null;
+		String error = "null";
 		if (user!=null) {
 			error = UsuarioDAO.cambiarContrasenna(user.getId(), contrasenna);
 		} else {
@@ -253,7 +255,6 @@ public class ApiRestController {
 				if (user!=null) {
 					error = GestorActualizaCuentas.anyadirPeticion(usuarioID, correoNuevo,
 																contrasenna, nombre);
-					error = "null";
 				} else {
 					error = "La cuenta ya no existe.";
 				}
@@ -438,18 +439,16 @@ public class ApiRestController {
 	 * 							null si no ha sido posible crear la sala
 	 */
 	@PostMapping("/crearSala")
-	public UUID crearSala(@RequestParam String sesionID, @RequestParam String configuracion){		
+	public RespuestaSala crearSala(@RequestParam String sesionID, @RequestParam String configuracion){		
 		
 		ConfigSala _configuracion = Serializar.deserializar(configuracion, ConfigSala.class);
 		
-		UUID salaID;
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
 		if(usuarioID != null) {
-			salaID = GestorSalas.nuevaSala(_configuracion);
+			return new RespuestaSala(true, "", GestorSalas.nuevaSala(_configuracion));
 		} else {
-			return null;
+			return new RespuestaSala(false, "La sesión ha caducado", null);
 		}
-		return salaID;
     }
 	
 	/**
@@ -468,7 +467,7 @@ public class ApiRestController {
 		if(usuarioID != null) {
 			return Serializar.serializar(GestorSalas.buscarSalaID(_salaID));
 		} else {
-			return null;
+			return "null";
 		}
     }
 	
