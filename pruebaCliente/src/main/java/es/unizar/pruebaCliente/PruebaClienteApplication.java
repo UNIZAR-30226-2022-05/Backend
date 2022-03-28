@@ -197,6 +197,13 @@ public class PruebaClienteApplication {
 					api.sendObject("/app/notifSala/" + usuarioID, UUID.fromString(salaID));
 				
 					
+					
+					
+					
+					
+					
+					//////////////////////// Sin probar ///////////////////////////////////////
+					
 				} else if (orden.equals("buscarAmigo")) {
 					System.out.println("Introduce id usuario amigo:");
 					String correoAmigo = scanner.nextLine();
@@ -290,7 +297,7 @@ public class PruebaClienteApplication {
 					
 					apirest.openConnection();
 			    	String retorno = apirest.receiveObject(String.class);
-			    	if(retorno.equals("nulo")) {
+			    	if(retorno == null) {
 			    		System.out.println("Introduce el código:");
 						Integer codigo = Integer.valueOf(scanner.nextLine());
 						
@@ -301,7 +308,7 @@ public class PruebaClienteApplication {
 						
 						apirest.openConnection();
 				    	retorno = apirest.receiveObject(String.class);
-				    	if (retorno == "nulo") {
+				    	if (retorno == null) {
 							 System.out.println("Introduce la nueva contraseña:");
 							 String miContrasenna = scanner.nextLine();
 							 apirest = new RestAPI("/api/reestablecercontrasennaStepTwo");
@@ -311,7 +318,7 @@ public class PruebaClienteApplication {
 							
 							 apirest.openConnection();
 					    	 retorno = apirest.receiveObject(String.class);
-					    	 if (retorno.equals("nulo")){
+					    	 if (retorno == null){
 					    		 System.out.println("Contraseña reestablecida.");
 					    	 } else {
 					    	 	System.out.println(retorno);
@@ -351,7 +358,7 @@ public class PruebaClienteApplication {
 					
 					apirest.openConnection();
 			    	String retorno = apirest.receiveObject(String.class);
-			    	if (retorno.equals("nulo")) {
+			    	if (retorno == null) {
 			    		System.out.println("Introduzca el código:");
 						Integer codigo = Integer.valueOf(scanner.nextLine());
 						
@@ -362,7 +369,7 @@ public class PruebaClienteApplication {
 						
 						apirest.openConnection();
 				    	retorno = apirest.receiveObject(String.class);
-				    	if (retorno.equals("nulo")) {
+				    	if (retorno == null) {
 				    		System.out.println("Exito.");
 				    	} else {
 				    		System.out.println(retorno);

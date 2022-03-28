@@ -242,7 +242,7 @@ public class ApiRestController {
 	@PostMapping("/actualizarCuentaStepOne")
 	public String actualizarCuentaStepOne(@RequestParam String sessionID,
 								String correoNuevo, String nombre, String contrasenna){
-		String error = "nulo";
+		String error = "null";
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 		if(usuarioID != null) {
 			if (!CaracteresInvalidos.hayCaracteresInvalidos(correoNuevo) &&
@@ -253,6 +253,7 @@ public class ApiRestController {
 				if (user!=null) {
 					error = GestorActualizaCuentas.anyadirPeticion(usuarioID, correoNuevo,
 																contrasenna, nombre);
+					error = "null";
 				} else {
 					error = "La cuenta ya no existe.";
 				}
@@ -277,7 +278,7 @@ public class ApiRestController {
 	@PostMapping("/actualizarCuentaStepTwo")
 	public String actualizarCuentaStepTwo(@RequestParam String sessionID,
 												 @RequestParam Integer codigo){		
-		String error = "nulo";
+		String error = "null";
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 		if(usuarioID != null) {
 			error = GestorActualizaCuentas.confirmarCodigo(usuarioID, codigo);
@@ -297,7 +298,7 @@ public class ApiRestController {
 	 */
 	@PostMapping("/actualizarCancel")
 	public String actualizarCancel(@RequestParam String sessionID){
-		String error = "nulo";
+		String error = "null";
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 		if(usuarioID != null) {
 			error = GestorActualizaCuentas.cancelarActualizacion(usuarioID);
@@ -458,7 +459,7 @@ public class ApiRestController {
 	 * @param sesionID			id de seisón del usuario
 	 * @param salaID			(clase UUID) id de la sala
 	 * @return					sala buscada
-	 * 							"nulo" si no es pública, está llena, o está en partida
+	 * 							"null" si no es pública, está llena, o está en partida
 	 */
 	@PostMapping("/buscarSalaID")
 	public String buscarSalaID(@RequestParam String sesionID, @RequestParam String salaID){		
@@ -481,7 +482,7 @@ public class ApiRestController {
 	 *							Si configuración es null, devolverá todas las salas
 	 * @return					Salas públicas con un hueco libre y que no están
 	 * 							en partida que cumplen la configuración.
-	 * 							"nulo" si no se ha encontrado ninguna
+	 * 							"null" si no se ha encontrado ninguna
 	 */
 	@PostMapping("/filtrarSalas")
 	public String filtrarSalas(@RequestParam String sesionID, 
@@ -492,7 +493,7 @@ public class ApiRestController {
 			RespuestaSalas r = new RespuestaSalas(GestorSalas.buscarSalas(_configuracion));
 			return Serializar.serializar(r);
 		} else {
-			return "nulo";
+			return "null";
 		}
     }
 	
