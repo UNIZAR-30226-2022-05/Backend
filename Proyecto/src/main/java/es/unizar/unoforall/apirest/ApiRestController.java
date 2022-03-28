@@ -68,7 +68,7 @@ public class ApiRestController {
 	@PostMapping("/registerStepOne")
 	public String registerStepOne(@RequestParam String correo, 
 				@RequestParam String contrasenna, @RequestParam String nombre){
-		String error = "null";
+		String error = "nulo";
 		if (!CaracteresInvalidos.hayCaracteresInvalidos(correo)
 				&& !CaracteresInvalidos.hayCaracteresInvalidos(contrasenna)
 				&& !CaracteresInvalidos.hayCaracteresInvalidos(nombre)) {
@@ -126,7 +126,7 @@ public class ApiRestController {
 	 */
 	@PostMapping("/reestablecercontrasennaStepOne")
 	public String reestablecercontrasennaStepOne(@RequestParam String correo){
-		String error = "null";
+		String error = "nulo";
 		if (!CaracteresInvalidos.hayCaracteresInvalidos(correo)) { //Esto cuando esté definida la clase CaracteresInvalidos
 			UsuarioVO user = UsuarioDAO.getUsuario(correo);
 			
@@ -170,7 +170,7 @@ public class ApiRestController {
 	public String reestablecercontrasennaStepThree(@RequestParam String correo,
 												 @RequestParam String contrasenna){		
 		UsuarioVO user = UsuarioDAO.getUsuario(correo);
-		String error = "null";
+		String error = "nulo";
 		if (user!=null) {
 			error = UsuarioDAO.cambiarContrasenna(user.getId(), contrasenna);
 		} else {
@@ -242,7 +242,7 @@ public class ApiRestController {
 	@PostMapping("/actualizarCuentaStepOne")
 	public String actualizarCuentaStepOne(@RequestParam String sessionID,
 								String correoNuevo, String nombre, String contrasenna){
-		String error = "null";
+		String error = "nulo";
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 		if(usuarioID != null) {
 			if (!CaracteresInvalidos.hayCaracteresInvalidos(correoNuevo) &&
@@ -262,7 +262,7 @@ public class ApiRestController {
 		} else {
 			error = "SESION_EXPIRADA";
 		}
-			
+		System.out.println("error: ");
         return error;
     }
 	
@@ -277,7 +277,7 @@ public class ApiRestController {
 	@PostMapping("/actualizarCuentaStepTwo")
 	public String actualizarCuentaStepTwo(@RequestParam String sessionID,
 												 @RequestParam Integer codigo){		
-		String error = "null";
+		String error = "nulo";
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 		if(usuarioID != null) {
 			error = GestorActualizaCuentas.confirmarCodigo(usuarioID, codigo);
@@ -297,7 +297,7 @@ public class ApiRestController {
 	 */
 	@PostMapping("/actualizarCancel")
 	public String actualizarCancel(@RequestParam String sessionID){
-		String error = "null";
+		String error = "nulo";
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 		if(usuarioID != null) {
 			error = GestorActualizaCuentas.cancelarActualizacion(usuarioID);
@@ -384,7 +384,7 @@ public class ApiRestController {
 //	@PostMapping("/mandarPeticionAmistad")
 //	public String mandarPeticionAmistad(@RequestParam String sessionID, 
 //															@RequestParam String amigo) {
-//		String error = "null";
+//		String error = "nulo";
 //		UUID _amigo = Serializar.deserializar(amigo, UUID.class);		//USA ESTE
 //		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 //		if(usuarioID != null) {
