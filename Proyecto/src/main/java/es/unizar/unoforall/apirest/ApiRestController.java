@@ -208,16 +208,22 @@ public class ApiRestController {
 //	}
 	/**
 	 * Función a la que llamar para sacar el listado de las partidas que ha terminado el
-	 * usuario.
+	 * usuario, junto a los datos de cada participante humano que jugó cada una.
 	 * @param sessionID		contiene el id de sesión del usuario.
-	 * @return				una lista de partidas que indica si la sesión ha expirado,
-	 * 						si ha habido un error y la lista de partidas que haya podido
-     * 						extraer.
+	 * @return				una lista de partidas y sus participantes que indica si la 
+	 * 						sesión ha expirado, si ha habido un error y la lista de 
+	 * 						partidas que haya podido extraer.
 	 */
 	@PostMapping("/sacarPartidasJugadas")
 	public ListaPartidas sacarPartidasJugadas(@RequestParam String sessionID){
 		ListaPartidas lp = null;
-		//TODO
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
+		if(usuarioID != null) {
+			lp = PartidasDAO.getPartidas(usuarioID);
+		} else {
+			lp = new ListaPartidas(true);
+			lp.setError("SESION_EXPIRADA");
+		}
 		return lp;
 	}
 	
@@ -230,13 +236,13 @@ public class ApiRestController {
 	 * 						si ha habido un error y la lista de participantes que haya podido
      * 						extraer.
 	 */
-	@PostMapping("/sacarParticipantes")
+	/*@PostMapping("/sacarParticipantes")
 	public ListaParticipantes sacarPartidasJugadas(@RequestParam String sessionID,
 															@RequestParam String partida){
 		ListaParticipantes lp = null;
-		//TODO
+		//T-ODO
 		return lp;
-	}
+	}*/
 	
 	/**
 	 * Función a la que llamar para borrar la cuenta del usuario activo.
