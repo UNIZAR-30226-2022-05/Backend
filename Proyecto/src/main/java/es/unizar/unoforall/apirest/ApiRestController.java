@@ -14,6 +14,7 @@ import es.unizar.unoforall.db.GestorPoolConexionesBD;
 import es.unizar.unoforall.model.RespuestaLogin;
 import es.unizar.unoforall.model.UsuarioVO;
 import es.unizar.unoforall.model.salas.ConfigSala;
+import es.unizar.unoforall.model.salas.RespuestaSala;
 import es.unizar.unoforall.model.salas.RespuestaSalas;
 import es.unizar.unoforall.model.salas.Sala;
 import es.unizar.unoforall.salas.GestorSalas;
@@ -36,7 +37,8 @@ public class ApiRestController {
 	 * @param correo		correo del usuario
 	 * @param contrasenna	hash de la contraseña del usuario
 	 * @return 				RespuestaLogin.isExito = true si no ha habido errores
-	 * 							RespuestaLogin.sessionID tiene el id de sesión
+	 * 							RespuestaLogin.claveInicio tiene la clave de inicio
+	 * 							RespuestaLogin.usuarioID tiene el uuid del usuario
 	 * 						RespuestaLogin.isExito = false en caso contrario
 	 * 							RespuestaLogin.errorInfo especifica el motivo del error
 	 */
@@ -49,7 +51,7 @@ public class ApiRestController {
 		if (usuario == null) {
 			return new RespuestaLogin(false, "Usuario no registrado", null, null);
 		} else if (!usuario.getContrasenna().equals(contrasenna))  {
-			return new RespuestaLogin(false, "Contraseña incorrecta", null, usuario.getId());
+			return new RespuestaLogin(false, "Contraseña incorrecta", null, null);
 		} else {
 			UUID claveInicio = GestorSesiones.nuevaClaveInicio(usuario.getId());	
 			return new RespuestaLogin(true, "", claveInicio, usuario.getId());
@@ -68,13 +70,13 @@ public class ApiRestController {
 	@PostMapping("/registerStepOne")
 	public String registerStepOne(@RequestParam String correo, 
 				@RequestParam String contrasenna, @RequestParam String nombre){
-		String error = "nulo";
+		String error = "null";
 		if (!CaracteresInvalidos.hayCaracteresInvalidos(correo)
 				&& !CaracteresInvalidos.hayCaracteresInvalidos(contrasenna)
 				&& !CaracteresInvalidos.hayCaracteresInvalidos(nombre)) {
 			UsuarioVO user = UsuarioDAO.getUsuario(correo);
 			if (user==null) {
-					user = new UsuarioVO(correo,nombre,contrasenna);
+					user = new UsuarioVO(null,correo,nombre,contrasenna);
 					error = GestorRegistros.anadirUsuario(user);
 			} else {
 				error = "El correo ya está asociado a una cuenta.";
@@ -126,7 +128,7 @@ public class ApiRestController {
 	 */
 	@PostMapping("/reestablecercontrasennaStepOne")
 	public String reestablecercontrasennaStepOne(@RequestParam String correo){
-		String error = "nulo";
+		String error = "null";
 		if (!CaracteresInvalidos.hayCaracteresInvalidos(correo)) { //Esto cuando esté definida la clase CaracteresInvalidos
 			UsuarioVO user = UsuarioDAO.getUsuario(correo);
 			
@@ -170,7 +172,7 @@ public class ApiRestController {
 	public String reestablecercontrasennaStepThree(@RequestParam String correo,
 												 @RequestParam String contrasenna){		
 		UsuarioVO user = UsuarioDAO.getUsuario(correo);
-		String error = "nulo";
+		String error = "null";
 		if (user!=null) {
 			error = UsuarioDAO.cambiarContrasenna(user.getId(), contrasenna);
 		} else {
@@ -242,7 +244,7 @@ public class ApiRestController {
 	@PostMapping("/actualizarCuentaStepOne")
 	public String actualizarCuentaStepOne(@RequestParam String sessionID,
 								String correoNuevo, String nombre, String contrasenna){
-		String error = "nulo";
+		String error = "null";
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 		if(usuarioID != null) {
 			if (!CaracteresInvalidos.hayCaracteresInvalidos(correoNuevo) &&
@@ -277,7 +279,7 @@ public class ApiRestController {
 	@PostMapping("/actualizarCuentaStepTwo")
 	public String actualizarCuentaStepTwo(@RequestParam String sessionID,
 												 @RequestParam Integer codigo){		
-		String error = "nulo";
+		String error = "null";
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 		if(usuarioID != null) {
 			error = GestorActualizaCuentas.confirmarCodigo(usuarioID, codigo);
@@ -297,7 +299,7 @@ public class ApiRestController {
 	 */
 	@PostMapping("/actualizarCancel")
 	public String actualizarCancel(@RequestParam String sessionID){
-		String error = "nulo";
+		String error = "null";
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 		if(usuarioID != null) {
 			error = GestorActualizaCuentas.cancelarActualizacion(usuarioID);
@@ -384,7 +386,7 @@ public class ApiRestController {
 //	@PostMapping("/mandarPeticionAmistad")
 //	public String mandarPeticionAmistad(@RequestParam String sessionID, 
 //															@RequestParam String amigo) {
-//		String error = "nulo";
+//		String error = null;
 //		UUID _amigo = Serializar.deserializar(amigo, UUID.class);		//USA ESTE
 //		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 //		if(usuarioID != null) {
@@ -437,18 +439,16 @@ public class ApiRestController {
 	 * 							null si no ha sido posible crear la sala
 	 */
 	@PostMapping("/crearSala")
-	public UUID crearSala(@RequestParam String sesionID, @RequestParam String configuracion){		
+	public RespuestaSala crearSala(@RequestParam String sesionID, @RequestParam String configuracion){		
 		
 		ConfigSala _configuracion = Serializar.deserializar(configuracion, ConfigSala.class);
 		
-		UUID salaID;
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
 		if(usuarioID != null) {
-			salaID = GestorSalas.nuevaSala(_configuracion);
+			return new RespuestaSala(true, "", GestorSalas.nuevaSala(_configuracion));
 		} else {
-			return null;
+			return new RespuestaSala(false, "La sesión ha caducado", null);
 		}
-		return salaID;
     }
 	
 	/**
@@ -458,7 +458,7 @@ public class ApiRestController {
 	 * @param sesionID			id de seisón del usuario
 	 * @param salaID			(clase UUID) id de la sala
 	 * @return					sala buscada
-	 * 							null si no es pública, está llena, o está en partida
+	 * 							"null" si no es pública, está llena, o está en partida
 	 */
 	@PostMapping("/buscarSalaID")
 	public String buscarSalaID(@RequestParam String sesionID, @RequestParam String salaID){		
@@ -467,7 +467,7 @@ public class ApiRestController {
 		if(usuarioID != null) {
 			return Serializar.serializar(GestorSalas.buscarSalaID(_salaID));
 		} else {
-			return null;
+			return "null";
 		}
     }
 	
@@ -480,7 +480,8 @@ public class ApiRestController {
 	 * 								reglas = null si no se quieren especificar
 	 *							Si configuración es null, devolverá todas las salas
 	 * @return					Salas públicas con un hueco libre y que no están
-	 * 							en partida que cumplen la configuración
+	 * 							en partida que cumplen la configuración.
+	 * 							"null" si no se ha encontrado ninguna
 	 */
 	@PostMapping("/filtrarSalas")
 	public String filtrarSalas(@RequestParam String sesionID, 
@@ -491,7 +492,7 @@ public class ApiRestController {
 			RespuestaSalas r = new RespuestaSalas(GestorSalas.buscarSalas(_configuracion));
 			return Serializar.serializar(r);
 		} else {
-			return null;
+			return "null";
 		}
     }
 	

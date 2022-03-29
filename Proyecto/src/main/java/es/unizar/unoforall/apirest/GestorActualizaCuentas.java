@@ -32,11 +32,11 @@ private final static int EXPIRACION_REGISTRO = 5*60000;
 			peticiones.get(correo).getTimer().stop();
 			peticiones.remove(correo);
 		}*/
-		String error = "nulo";
+		String error = "null";
 		if (!GestorRegistros.usuariosPendientes.containsKey(correoNuevo) &&
 									!peticiones.containsKey(usuarioID) && 
 									UsuarioDAO.getUsuario(correoNuevo)==null) {
-			UsuarioVO usuario = new UsuarioVO(correoNuevo,nombre,contrasenya);
+			UsuarioVO usuario = new UsuarioVO(usuarioID, correoNuevo,nombre,contrasenya);
 			int codigo = (int) ((Math.random() * (MAX_CODIGO - MIN_CODIGO)) + MIN_CODIGO);
 			boolean exitoMail = Mail.sendMail(correoNuevo, 
 					"Solicitud de actualización de la cuenta en UNOForAll", 

@@ -33,8 +33,11 @@ public class UsuarioVO {
 		this.numVictorias = numVictorias;
 	}
 	
-	public UsuarioVO(String correo, String nombre, String contrasenna) {
-		this.id = UUID.randomUUID();
+	public UsuarioVO(UUID id, String correo, String nombre, String contrasenna) {
+		if(id == null) {
+			id = UUID.randomUUID();
+		}
+		this.id = id;
 		this.correo = correo;
 		this.nombre = nombre;
 		this.contrasenna = contrasenna;

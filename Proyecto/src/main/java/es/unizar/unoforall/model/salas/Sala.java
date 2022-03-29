@@ -7,6 +7,9 @@ import java.util.UUID;
 import es.unizar.unoforall.model.UsuarioVO;
 
 public class Sala {	
+	//Para devolver una sala que no existe
+	private boolean noExiste;
+	
 	private ConfigSala configuracion;
 	
 	private boolean enPartida;
@@ -19,12 +22,14 @@ public class Sala {
 	public Sala() {
 		participantes = new HashMap<>();
 		participantes_listos = new HashMap<>();
+		noExiste = true;
 	}
 	
 	public Sala(ConfigSala configuracion) {
 		this();
 		this.configuracion = configuracion;
 		this.setEnPartida(false);
+		this.noExiste = false;
 	}
 
 	public ConfigSala getConfiguracion() {
@@ -97,5 +102,9 @@ public class Sala {
 	public String toString() {
 		return "Sala [configuracion=" + configuracion + ", enPartida=" + enPartida + ", participantes=" + participantes
 				+ "]";
+	}
+
+	public boolean isNoExiste() {
+		return noExiste;
 	}
 }

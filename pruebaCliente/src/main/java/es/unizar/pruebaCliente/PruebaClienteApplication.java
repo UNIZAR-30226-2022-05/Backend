@@ -15,25 +15,12 @@ import com.google.gson.reflect.TypeToken;
 import es.unizar.pruebaCliente.salas.ConfigSala;
 import es.unizar.pruebaCliente.salas.NotificacionSala;
 import es.unizar.pruebaCliente.salas.ReglasEspeciales;
+import es.unizar.pruebaCliente.salas.RespuestaSala;
 import es.unizar.pruebaCliente.salas.Sala;
 
 
 @SpringBootApplication
 public class PruebaClienteApplication {
-	
-//	static class Empleado {
-//		public String nombre;
-//		public String apellido;
-//		public int sueldo;
-//		
-//		public Empleado() {}
-//		
-//		public Empleado(String n, String a, int s) {
-//			nombre = n;
-//			apellido = a;
-//			sueldo = s;
-//		}
-//	}
 	
 	private static Object LOCK = new Object();
 	private static String sesionID = "EMPTY";
@@ -71,11 +58,23 @@ public class PruebaClienteApplication {
     	
 		apirest.openConnection();
     	RespuestaLogin resp = apirest.receiveObject(RespuestaLogin.class);
-		System.out.println("clave inicio: " + resp.getClaveInicio());
+    	
+    	while(!resp.isExito()) {
+    		System.out.println("Correo");
+    		correo = scanner.nextLine();
+    		System.out.println("Contraseña");
+    		contrasenna = scanner.nextLine();
+    		
+    		apirest = new RestAPI("/api/login");
+    		apirest.addParameter("correo", correo);
+    		apirest.addParameter("contrasenna", contrasenna);
+    		apirest.setOnError(e -> {System.out.println(e);});
+        	
+    		apirest.openConnection();
+        	resp = apirest.receiveObject(RespuestaLogin.class);
+    	}
+    	System.out.println("clave inicio: " + resp.getClaveInicio());
 		
-		if(resp.getClaveInicio() == null) {
-			return;
-		}
 				
 		//CONEXION
 		WebSocketAPI api = new WebSocketAPI();
@@ -83,11 +82,15 @@ public class PruebaClienteApplication {
     	api.openConnection();
     	
     	api.subscribe("/topic/conectarse/" + resp.getClaveInicio(), String.class, s -> {
-    		sesionID = s;
-    		System.out.println("ID sesión: " + sesionID);
-    		synchronized (LOCK) {
-				LOCK.notify();
-			}
+    		if (s == null) {
+    			System.out.println("Error al iniciar sesión (se queda bloqueado el cliente)");
+    		} else {
+    			sesionID = s;
+    			System.out.println("ID sesión: " + sesionID);
+	    		synchronized (LOCK) {
+					LOCK.notify();
+				}
+    		}
     	});
     	
     	api.sendObject("/app/conectarse/" + resp.getClaveInicio(), "vacio");
@@ -126,16 +129,24 @@ public class PruebaClienteApplication {
 					apirest.setOnError(e -> {System.out.println(e);});
 			    	
 					apirest.openConnection();
-					UUID salaID = apirest.receiveObject(UUID.class);
-					System.out.println("sala creada:" + salaID);
-				
+					RespuestaSala salaID = apirest.receiveObject(RespuestaSala.class);
+					if (salaID.isExito()) {
+						System.out.println("sala creada:" + salaID.getSalaID());
+					} else {
+						System.out.println("error:" + salaID.getErrorInfo());
+					}
 					
 				} else if (orden.equals("unirse")) {
 					System.out.println("Introduce id sala:");
 					String salaID = scanner.nextLine();
 					
 			    	api.subscribe("/topic/salas/" + salaID, Sala.class, s -> {
-			    		System.out.println("Estado de la sala: " + s);
+			    		if (s.isNoExiste()) {
+			    			System.out.println("Error al conectarse a la sala");
+			    			api.unsubscribe("/topic/salas/" + salaID);
+			    		} else {
+			    			System.out.println("Estado de la sala: " + s);
+			    		}
 			    	});
 			    	
 			    	api.sendObject("/app/salas/unirse/" + salaID, "vacio");
@@ -196,6 +207,13 @@ public class PruebaClienteApplication {
 					
 					api.sendObject("/app/notifSala/" + usuarioID, UUID.fromString(salaID));
 				
+					
+					
+					
+					
+					
+					
+					//////////////////////// Sin probar ///////////////////////////////////////
 					
 				} else if (orden.equals("buscarAmigo")) {
 					System.out.println("Introduce id usuario amigo:");
@@ -290,7 +308,7 @@ public class PruebaClienteApplication {
 					
 					apirest.openConnection();
 			    	String retorno = apirest.receiveObject(String.class);
-			    	if(retorno.equals("null")) {
+			    	if(retorno == null) {
 			    		System.out.println("Introduce el código:");
 						Integer codigo = Integer.valueOf(scanner.nextLine());
 						
@@ -301,7 +319,7 @@ public class PruebaClienteApplication {
 						
 						apirest.openConnection();
 				    	retorno = apirest.receiveObject(String.class);
-				    	if (retorno == "null") {
+				    	if (retorno == null) {
 							 System.out.println("Introduce la nueva contraseña:");
 							 String miContrasenna = scanner.nextLine();
 							 apirest = new RestAPI("/api/reestablecercontrasennaStepTwo");
@@ -311,7 +329,7 @@ public class PruebaClienteApplication {
 							
 							 apirest.openConnection();
 					    	 retorno = apirest.receiveObject(String.class);
-					    	 if (retorno.equals("null")){
+					    	 if (retorno == null){
 					    		 System.out.println("Contraseña reestablecida.");
 					    	 } else {
 					    	 	System.out.println(retorno);
@@ -351,7 +369,7 @@ public class PruebaClienteApplication {
 					
 					apirest.openConnection();
 			    	String retorno = apirest.receiveObject(String.class);
-			    	if (retorno.equals("null")) {
+			    	if (retorno == null) {
 			    		System.out.println("Introduzca el código:");
 						Integer codigo = Integer.valueOf(scanner.nextLine());
 						
@@ -362,7 +380,7 @@ public class PruebaClienteApplication {
 						
 						apirest.openConnection();
 				    	retorno = apirest.receiveObject(String.class);
-				    	if (retorno.equals("null")) {
+				    	if (retorno == null) {
 				    		System.out.println("Exito.");
 				    	} else {
 				    		System.out.println(retorno);
