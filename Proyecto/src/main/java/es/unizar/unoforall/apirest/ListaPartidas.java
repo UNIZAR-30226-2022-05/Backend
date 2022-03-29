@@ -2,6 +2,7 @@ package es.unizar.unoforall.apirest;
 
 import java.util.ArrayList;
 
+import es.unizar.unoforall.model.HaJugadoVO;
 import es.unizar.unoforall.model.PartidasAcabadasVO;
 
 /**
@@ -12,11 +13,11 @@ import es.unizar.unoforall.model.PartidasAcabadasVO;
 public class ListaPartidas {
 	private boolean expirado;
 	private String error = "null";
-	private ArrayList<PartidasAcabadasVO> partidas = null;
+	private ArrayList<Partida> partidas = null;
 	
 	public ListaPartidas(boolean expirado) {
 		this.expirado = expirado;	
-		partidas = new ArrayList<PartidasAcabadasVO>();
+		partidas = new ArrayList<Partida>();
 	}
 
 	public boolean isExpirado() {
@@ -27,11 +28,11 @@ public class ListaPartidas {
 		this.expirado = expirado;
 	}
 
-	public ArrayList<PartidasAcabadasVO> getPartidas() {
+	public ArrayList<Partida> getPartidas() {
 		return partidas;
 	}
 
-	public void setPartidas(ArrayList<PartidasAcabadasVO> partidas) {
+	public void setPartidas(ArrayList<Partida> partidas) {
 		this.partidas = partidas;
 	}
 
