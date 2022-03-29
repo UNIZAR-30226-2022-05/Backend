@@ -2,19 +2,20 @@ package es.unizar.unoforall.apirest;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.UUID;
 
 public class AlarmaActualizarCuentas implements ActionListener {
 	
-	private String correo;
+	private UUID id;
 	
-	public AlarmaActualizarCuentas(String correo) {
-		this.correo = correo;
+	public AlarmaActualizarCuentas(UUID sessionID) {
+		this.id = sessionID;
 	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		GestorActualizaCuentas.peticiones.get(correo).getTimer().stop();
-		GestorActualizaCuentas.peticiones.remove(correo);
+		GestorActualizaCuentas.peticiones.get(id).getTimer().stop();
+		GestorActualizaCuentas.peticiones.remove(id);
 	}
 
 }

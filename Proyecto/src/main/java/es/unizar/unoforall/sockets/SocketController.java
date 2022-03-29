@@ -53,7 +53,8 @@ public class SocketController {
 	
 	/**
 	 * Método para enviar una notificación de amistad al usuario con id 
-	 * 'usrDestino' si este está susscrito al canal de destino
+	 * 'usrDestino' si este está susscrito al canal de destino. También
+	 * registra la solicitud en la base de datos.
 	 * @param usrDestino	En la URL: id del usuario de destino
 	 * @param sesionID		Automático
 	 * @param vacio			Cualquier objeto no nulo

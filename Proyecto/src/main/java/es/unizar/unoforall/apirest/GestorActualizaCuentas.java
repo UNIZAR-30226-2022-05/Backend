@@ -47,7 +47,7 @@ private final static int EXPIRACION_REGISTRO = 5*60000;
 				System.err.println("No se ha encontrado el archivo credenciales.properties");
 				error = "Fallo en el servidor: no se pudo enviar el correo";
 			} else {
-				AlarmaActualizarCuentas alarm = new AlarmaActualizarCuentas(correoNuevo);
+				AlarmaActualizarCuentas alarm = new AlarmaActualizarCuentas(usuarioID);
 				Timer t = new Timer(EXPIRACION_REGISTRO,alarm);
 				RegistroTemporal rt = new RegistroTemporal(usuario,t,codigo);
 				peticiones.put(usuarioID,rt);

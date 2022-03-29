@@ -261,7 +261,7 @@ public class UsuarioDAO {
 			
 			UUID idUsuario = usuario.getId();
 			PreparedStatement delUser = 
-					conn.prepareStatement("DELETE FROM usuarios WHERE id_usuario=?;");
+					conn.prepareStatement("DELETE FROM usuarios WHERE id=?;");
 			delUser.setObject(1, idUsuario);
 			delUser.execute();
 			

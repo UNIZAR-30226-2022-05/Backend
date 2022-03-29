@@ -206,17 +206,44 @@ public class PruebaClienteApplication {
 					String salaID = scanner.nextLine();
 					
 					api.sendObject("/app/notifSala/" + usuarioID, UUID.fromString(salaID));
-				
+				} else if (orden.equals("modificarCuenta")) {
+					System.out.println("Introduzca su nuevo nombre:");
+					String nuevoNombre = scanner.nextLine();
+					System.out.println("Introduzca su nueva contraseña:");
+					String nuevaContrasenna = scanner.nextLine();
+					System.out.println("Introduzca su nuevo correo:");
+					String nuevoCorreo = scanner.nextLine();
 					
+					apirest = new RestAPI("/api/actualizarCuentaStepOne");
+					apirest.addParameter("sessionID",sesionID);
+					apirest.addParameter("correoNuevo",nuevoCorreo);
+					apirest.addParameter("nombre",nuevoNombre);
+					apirest.addParameter("contrasenna",nuevaContrasenna);
+					apirest.setOnError(e -> {System.out.println(e);});
 					
-					
-					
-					
-					
-					//////////////////////// Sin probar ///////////////////////////////////////
-					
+					apirest.openConnection();
+			    	String retorno = apirest.receiveObject(String.class);
+			    	if (retorno == null) {
+			    		System.out.println("Introduzca el código:");
+						Integer codigo = Integer.valueOf(scanner.nextLine());
+						
+						apirest = new RestAPI("/api/actualizarCuentaStepTwo");
+						apirest.addParameter("sessionID",sesionID);
+						apirest.addParameter("codigo",codigo);
+						apirest.setOnError(e -> {System.out.println(e);});
+						
+						apirest.openConnection();
+				    	retorno = apirest.receiveObject(String.class);
+				    	if (retorno == null) {
+				    		System.out.println("Exito.");
+				    	} else {
+				    		System.out.println(retorno);
+				    	}
+			    	} else {
+			    		System.out.println(retorno);
+			    	}
 				} else if (orden.equals("buscarAmigo")) {
-					System.out.println("Introduce id usuario amigo:");
+					System.out.println("Introduce correo usuario amigo:");
 					String correoAmigo = scanner.nextLine();
 					
 					apirest = new RestAPI("/api/buscarAmigo");
@@ -228,7 +255,7 @@ public class PruebaClienteApplication {
 			    	ListaUsuarios retorno = apirest.receiveObject(ListaUsuarios.class);
 			    	if(retorno.isExpirado()) {
 			    		System.out.println("La sesión ha expirado.");
-			    	} else if (retorno.getError().equals(null)) {
+			    	} else if (retorno.getError()!=null) {
 			    		System.out.println("Ha sucedido el siguiente error:"+retorno.getError());
 			    	} else {
 			    		System.out.println("Datos del usuario: ");
@@ -237,8 +264,39 @@ public class PruebaClienteApplication {
 			    		System.out.println("Puntos: "+ retorno.getUsuarios().get(0).getPuntos());
 			    	}
 			    		
-				} else if (orden.equals("mandarPeticion")) {
+				} /*else if (orden.equals("mandarPeticion")) {//es la prueba de código "Amigo"
 					break;
+				} */
+				  else if (orden.equals("aceptarPeticion")) {
+				    apirest = new RestAPI("/api/sacarPeticionesRecibidas");
+					apirest.addParameter("sessionID", sesionID);
+					apirest.setOnError(e -> {System.out.println(e);});
+					
+					apirest.openConnection();
+			    	ListaUsuarios retorno = apirest.receiveObject(ListaUsuarios.class);
+			    	if(retorno.isExpirado()) {
+			    		System.out.println("La sesión ha expirado.");
+			    	} else if (retorno.getError().equals(null)) {
+			    		System.out.println("Ha sucedido el siguiente error: "+retorno.getError());
+			    	} else {
+			    		System.out.println("Introduzca el código que desea aceptar: ");
+			    		for (UsuarioVO usuario : retorno.getUsuarios()) {
+				    		System.out.println("Datos del usuario: "+usuario.getId());
+			    		}
+			    		String identificador = scanner.nextLine();
+			    		apirest = new RestAPI("/api/aceptarPeticionAmistad");
+						apirest.addParameter("sessionID", sesionID);
+						apirest.addParameter("amigo", identificador);
+						apirest.setOnError(e -> {System.out.println(e);});
+						
+						apirest.openConnection();
+				    	String error = apirest.receiveObject(String.class);
+				    	if(error==null) {
+				    		System.out.println("¡Ya sois amigos!");
+				    	} else {
+				    		System.out.println("Ha surgido un error: " + error);
+				    	}
+			    	}
 				} else if (orden.equals("peticionesEnviadas")) {
 					
 					apirest = new RestAPI("/api/sacarPeticionesEnviadas");
@@ -298,11 +356,11 @@ public class PruebaClienteApplication {
 				    		System.out.println("Puntos: "+ usuario.getPuntos());
 			    		}
 			    	}
-				} else if (orden.equals("reestableerContraseña")) {
+				} else if (orden.equals("reestablecerContrasenna")) {
 					System.out.println("Introduce tu correo:");
 					String miCorreo = scanner.nextLine();
 					
-					apirest = new RestAPI("/api/reestablecercontrasennaStepOne");
+					apirest = new RestAPI("/api/reestablecerContrasennaStepOne");
 					apirest.addParameter("correo",miCorreo);
 					apirest.setOnError(e -> {System.out.println(e);});
 					
@@ -312,7 +370,7 @@ public class PruebaClienteApplication {
 			    		System.out.println("Introduce el código:");
 						Integer codigo = Integer.valueOf(scanner.nextLine());
 						
-						apirest = new RestAPI("/api/reestablecercontrasennaStepTwo");
+						apirest = new RestAPI("/api/reestablecerContrasennaStepTwo");
 						apirest.addParameter("correo",miCorreo);
 						apirest.addParameter("codigo", codigo);
 						apirest.setOnError(e -> {System.out.println(e);});
@@ -322,7 +380,7 @@ public class PruebaClienteApplication {
 				    	if (retorno == null) {
 							 System.out.println("Introduce la nueva contraseña:");
 							 String miContrasenna = scanner.nextLine();
-							 apirest = new RestAPI("/api/reestablecercontrasennaStepTwo");
+							 apirest = new RestAPI("/api/reestablecerContrasennaStepThree");
 							 apirest.addParameter("correo",miCorreo);
 							 apirest.addParameter("contrasenna", miContrasenna);
 							 apirest.setOnError(e -> {System.out.println(e);});
@@ -350,45 +408,11 @@ public class PruebaClienteApplication {
 					
 					apirest.openConnection();
 			    	String retorno = apirest.receiveObject(String.class);
-			    	System.out.println(retorno);
+			    	System.out.println(retorno);	
+				}
+			    	//////////////////////// Sin probar ///////////////////////////////////////
 				
-				} else if (orden.equals("modificarCuenta")) {
-					System.out.println("Introduzca su nuevo nombre:");
-					String nuevoNombre = scanner.nextLine();
-					System.out.println("Introduzca su nueva contraseña:");
-					String nuevaContrasenna = scanner.nextLine();
-					System.out.println("Introduzca su nuevo correo:");
-					String nuevoCorreo = scanner.nextLine();
-					
-					apirest = new RestAPI("/api/actualizarCuentaStepOne");
-					apirest.addParameter("sessionID",sesionID);
-					apirest.addParameter("correoNuevo",nuevoCorreo);
-					apirest.addParameter("nombre",nuevoNombre);
-					apirest.addParameter("contrasenna",nuevaContrasenna);
-					apirest.setOnError(e -> {System.out.println(e);});
-					
-					apirest.openConnection();
-			    	String retorno = apirest.receiveObject(String.class);
-			    	if (retorno == null) {
-			    		System.out.println("Introduzca el código:");
-						Integer codigo = Integer.valueOf(scanner.nextLine());
-						
-						apirest = new RestAPI("/api/actualizarCuentaStepTwo");
-						apirest.addParameter("sessionID",sesionID);
-						apirest.addParameter("codigo",codigo);
-						apirest.setOnError(e -> {System.out.println(e);});
-						
-						apirest.openConnection();
-				    	retorno = apirest.receiveObject(String.class);
-				    	if (retorno == null) {
-				    		System.out.println("Exito.");
-				    	} else {
-				    		System.out.println(retorno);
-				    	}
-			    	} else {
-			    		System.out.println(retorno);
-			    	}
-				} else if (orden.equals("exit")) {
+				  else if (orden.equals("exit")) {
 					break;
 				}
 		}

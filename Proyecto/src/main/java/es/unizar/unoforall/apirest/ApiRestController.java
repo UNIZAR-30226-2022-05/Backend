@@ -1,6 +1,7 @@
 package es.unizar.unoforall.apirest;
 
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -21,6 +22,7 @@ import es.unizar.unoforall.salas.GestorSalas;
 import es.unizar.unoforall.sesiones.GestorSesiones;
 import es.unizar.unoforall.utils.CaracteresInvalidos;
 import es.unizar.unoforall.utils.Serializar;
+import es.unizar.unoforall.model.PartidasAcabadasVO;
 
 
 /**
@@ -126,7 +128,7 @@ public class ApiRestController {
 	 * @return 			un String con un mensaje de error que es null si todo va bien.
 	 * 		   			Si ocurre algo, la información estará contenida en el String.
 	 */
-	@PostMapping("/reestablecercontrasennaStepOne")
+	@PostMapping("/reestablecerContrasennaStepOne")
 	public String reestablecercontrasennaStepOne(@RequestParam String correo){
 		String error = "null";
 		if (!CaracteresInvalidos.hayCaracteresInvalidos(correo)) { //Esto cuando esté definida la clase CaracteresInvalidos
@@ -168,7 +170,7 @@ public class ApiRestController {
 	 * @return 				un String null si todo va bien.
 	 * 		   				Si ocurre algo, la información estará contenida en el String.
 	 */
-	@PostMapping("/reestablecercontrasennaStepThree")
+	@PostMapping("/reestablecerContrasennaStepThree")
 	public String reestablecercontrasennaStepThree(@RequestParam String correo,
 												 @RequestParam String contrasenna){		
 		UsuarioVO user = UsuarioDAO.getUsuario(correo);
@@ -204,6 +206,37 @@ public class ApiRestController {
 //		}
 //		return exito;
 //	}
+	/**
+	 * Función a la que llamar para sacar el listado de las partidas que ha terminado el
+	 * usuario.
+	 * @param sessionID		contiene el id de sesión del usuario.
+	 * @return				una lista de partidas que indica si la sesión ha expirado,
+	 * 						si ha habido un error y la lista de partidas que haya podido
+     * 						extraer.
+	 */
+	@PostMapping("/sacarPartidasJugadas")
+	public ListaPartidas sacarPartidasJugadas(@RequestParam String sessionID){
+		ListaPartidas lp = null;
+		//TODO
+		return lp;
+	}
+	
+	/**
+	 * Función a la que llamar para sacar el listado de participantes con sus resultados en
+	 * la partida, de los datos de la cuenta del participante solo se extrae su id.
+	 * @param sessionID		contiene el id de sesión del usuario.
+	 * @param partida		contiene el id de la partida que interesa al usuario.
+	 * @return				una lista de participantes que indica si la sesión ha expirado,
+	 * 						si ha habido un error y la lista de participantes que haya podido
+     * 						extraer.
+	 */
+	@PostMapping("/sacarParticipantes")
+	public ListaParticipantes sacarPartidasJugadas(@RequestParam String sessionID,
+															@RequestParam String partida){
+		ListaParticipantes lp = null;
+		//TODO
+		return lp;
+	}
 	
 	/**
 	 * Función a la que llamar para borrar la cuenta del usuario activo.
@@ -252,9 +285,15 @@ public class ApiRestController {
 						!CaracteresInvalidos.hayCaracteresInvalidos(contrasenna)) { 
 				
 				UsuarioVO user = UsuarioDAO.getUsuario(usuarioID);
+				UsuarioVO user2 = UsuarioDAO.getUsuario(correoNuevo);
 				if (user!=null) {
-					error = GestorActualizaCuentas.anyadirPeticion(usuarioID, correoNuevo,
-																contrasenna, nombre);
+					if(correoNuevo==user.getCorreo() || user2==null){
+						error = GestorActualizaCuentas.anyadirPeticion(usuarioID, correoNuevo,
+								contrasenna, nombre);
+					} else {
+						error = "El correo que desea utilizar ya está en uso.";
+					}
+					
 				} else {
 					error = "La cuenta ya no existe.";
 				}
@@ -396,9 +435,31 @@ public class ApiRestController {
 //		}
 //		return error;
 //	}
+	/**
+	 * Método al que llamar para aceptar la solicitud de amistad a otro usuario.
+	 * @param idSesion 	contiene el id de la sesion del usuario.
+	 * @param amigo		contiene el id de la cuenta del amigo.
+	 * @return			Devuelve null si todo ha ido bien.
+	 * 					Devuelve "SESION_EXPIRADA" si la sesión ha expirado.
+	 * 					Devuelve un mensaje de error en otro caso.	 
+	 */
+	@PostMapping("/aceptarPeticionAmistad")
+	public String aceptarPeticionAmistad(@RequestParam String sessionID,
+															 @RequestParam String amigo) {
+		String error = "null";
+		UUID _amigo = Serializar.deserializar(amigo, UUID.class);
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
+		if(usuarioID != null) {
+			error = UsuarioDAO.mandarPeticion(usuarioID,_amigo); //Acepta porque ya existe la petición.		
+		} else {
+			error = "SESION_EXPIRADA";
+		}
+		return error;
+	}
 	
 	/**
-	 * Método al que llamar para buscar a un amigo por correo.
+	 * Método al que llamar para buscar a un amigo por correo, (no tienen por qué estar 
+	 * registrados como amigos, es para el punto de buscar usuario por correo).
 	 * @param idSesion 	contiene el id de la sesion del usuario.
 	 * @param amigo		contiene el correo de la cuenta del amigo.
 	 * @return			Devuelve un objeto ListaUsuarios que indica si la sesión ha expirado, 
@@ -449,7 +510,7 @@ public class ApiRestController {
 		} else {
 			return new RespuestaSala(false, "La sesión ha caducado", null);
 		}
-    }
+	}
 	
 	/**
 	 * Método para buscar una sala pública mediante su id.
