@@ -32,11 +32,11 @@ private final static int EXPIRACION_REGISTRO = 5*60000;
 			peticiones.get(correo).getTimer().stop();
 			peticiones.remove(correo);
 		}*/
-		String error = null;
+		String error = "null";
 		if (!GestorRegistros.usuariosPendientes.containsKey(correoNuevo) &&
 									!peticiones.containsKey(usuarioID) && 
 									UsuarioDAO.getUsuario(correoNuevo)==null) {
-			UsuarioVO usuario = new UsuarioVO(correoNuevo,nombre,contrasenya);
+			UsuarioVO usuario = new UsuarioVO(usuarioID, correoNuevo,nombre,contrasenya);
 			int codigo = (int) ((Math.random() * (MAX_CODIGO - MIN_CODIGO)) + MIN_CODIGO);
 			boolean exitoMail = Mail.sendMail(correoNuevo, 
 					"Solicitud de actualización de la cuenta en UNOForAll", 
@@ -47,7 +47,7 @@ private final static int EXPIRACION_REGISTRO = 5*60000;
 				System.err.println("No se ha encontrado el archivo credenciales.properties");
 				error = "Fallo en el servidor: no se pudo enviar el correo";
 			} else {
-				AlarmaActualizarCuentas alarm = new AlarmaActualizarCuentas(correoNuevo);
+				AlarmaActualizarCuentas alarm = new AlarmaActualizarCuentas(usuarioID);
 				Timer t = new Timer(EXPIRACION_REGISTRO,alarm);
 				RegistroTemporal rt = new RegistroTemporal(usuario,t,codigo);
 				peticiones.put(usuarioID,rt);
@@ -61,7 +61,7 @@ private final static int EXPIRACION_REGISTRO = 5*60000;
 	
 	
 	public static String confirmarCodigo(UUID usuarioID, Integer codigo) {
-		String error = null;
+		String error = "null";
 		if (peticiones.containsKey(usuarioID)) {
 			if (peticiones.get(usuarioID).getCodigo()==codigo) {
 				peticiones.get(usuarioID).getTimer().stop();
@@ -77,7 +77,7 @@ private final static int EXPIRACION_REGISTRO = 5*60000;
 	}
 	
 	public static String cancelarActualizacion(UUID usuarioID) {
-		String error = null;
+		String error = "null";
 		if (peticiones.containsKey(usuarioID)) {
 			peticiones.get(usuarioID).getTimer().stop();
 			peticiones.remove(usuarioID);

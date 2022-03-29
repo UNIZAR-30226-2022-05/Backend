@@ -1,8 +1,11 @@
 # Notas
 cambia las "contrasenya" por "contrasenna" que es lo que habíamos usado hasta ahora
 	ya he cambiado algunos
+/*RE: Hecho el cambio en las clases encargadas del reestablecimiento y el API REST
 
 haz que UsuarioDAO.cambiarContrasenna use internamente UsuarioDAO.modificarUsuario por no hacer otra consulta distinta a la bd
+/*RE: Considero que eso es marear la perdiz, porque tendría que hacer una consulta adicional para sacar el resto de valores
+/*	  que debería conservar.
 
 ya quedaremos para reorganizar paquetes
 

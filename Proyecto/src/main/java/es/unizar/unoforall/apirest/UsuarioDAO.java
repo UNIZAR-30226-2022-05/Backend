@@ -153,7 +153,7 @@ public class UsuarioDAO {
 	 * @return Un String que contiene el error en caso de error, y null si hay éxito.
 	 */
 	public static String cambiarContrasenna(UUID idUsuario, String contrasenna) {
-		String result = null;
+		String result = "null";
 		Connection conn = null;
 		try {
 			conn = GestorPoolConexionesBD.getConnection();
@@ -184,13 +184,13 @@ public class UsuarioDAO {
 	 * @return null si tiene éxito, o un String en caso de error.
 	 */
 	public static String actualizarCuenta(UsuarioVO usuario) {
-		String result = null;
+		String result = "null";
 		Connection conn = null;
 		try {
 			conn = GestorPoolConexionesBD.getConnection();
 			
 			PreparedStatement updateUser = 
-					conn.prepareStatement("UPDATE usuarios SET correo = ?, nombre = ?, contrasenna = ? WHERE correo = ?;");
+					conn.prepareStatement("UPDATE usuarios SET correo = ?, nombre = ?, contrasenna = ? WHERE id = ?;");
 			updateUser.setString(1, usuario.getCorreo());
 			updateUser.setString(2, usuario.getNombre());
 			updateUser.setString(3, usuario.getContrasenna());
@@ -261,7 +261,7 @@ public class UsuarioDAO {
 			
 			UUID idUsuario = usuario.getId();
 			PreparedStatement delUser = 
-					conn.prepareStatement("DELETE FROM usuarios WHERE id_usuario=?;");
+					conn.prepareStatement("DELETE FROM usuarios WHERE id=?;");
 			delUser.setObject(1, idUsuario);
 			delUser.execute();
 			
@@ -392,7 +392,7 @@ public class UsuarioDAO {
 	 * @return			devuelve null si todo va bien. En caso contrario devuelve un mensaje de error.
 	 */
 	public static String mandarPeticion(UUID idUsuario, UUID amigo) {
-		String error = null;
+		String error = "null";
 		Connection conn = null;
 		
 		try {

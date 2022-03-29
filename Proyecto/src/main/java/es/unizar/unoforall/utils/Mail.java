@@ -7,6 +7,7 @@ import java.util.Properties;
 
 import javax.mail.Message;
 import javax.mail.PasswordAuthentication;
+import javax.mail.SendFailedException;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
@@ -82,6 +83,8 @@ public class Mail {
 	        t.sendMessage(message, message.getAllRecipients());
 	        t.close();
 	        return true;
+		}catch(SendFailedException e) {
+			return false;
 		}catch(Exception ex) {
 			ex.printStackTrace();
 			if(t != null) {

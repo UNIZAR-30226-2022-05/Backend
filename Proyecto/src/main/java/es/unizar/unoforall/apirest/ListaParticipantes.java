@@ -2,21 +2,21 @@ package es.unizar.unoforall.apirest;
 
 import java.util.ArrayList;
 
-import es.unizar.unoforall.model.UsuarioVO;
+import es.unizar.unoforall.model.HaJugadoVO;
 
 /**
  * <expirado> 	true si la sesión ha expirado, y false en caso contrario.
  * <error>		"null" si no ha habido ningún error. Si ha ocurrido alguno, se informa por este String.
  * <usuarios>	una lista de UsuariosVO.
  */
-public class ListaUsuarios {
+public class ListaParticipantes {
 	private boolean expirado;
 	private String error = "null";
-	private ArrayList<UsuarioVO> usuarios = null;
+	private ArrayList<HaJugadoVO> participantes = null;
 	
-	public ListaUsuarios(boolean expirado) {
+	public ListaParticipantes(boolean expirado) {
 		this.expirado = expirado;	
-		usuarios = new ArrayList<UsuarioVO>();
+		participantes = new ArrayList<HaJugadoVO>();
 	}
 
 	public boolean isExpirado() {
@@ -26,13 +26,13 @@ public class ListaUsuarios {
 	public void setExpirado(boolean expirado) {
 		this.expirado = expirado;
 	}
-
-	public ArrayList<UsuarioVO> getUsuarios() {
-		return usuarios;
+	
+	public ArrayList<HaJugadoVO> getParticipantes() {
+		return participantes;
 	}
 
-	public void setUsuarios(ArrayList<UsuarioVO> usuarios) {
-		this.usuarios = usuarios;
+	public void setParticipantes(ArrayList<HaJugadoVO> participantes) {
+		this.participantes = participantes;
 	}
 
 	public String getError() {

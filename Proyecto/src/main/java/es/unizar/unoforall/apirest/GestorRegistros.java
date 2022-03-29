@@ -33,7 +33,7 @@ public class GestorRegistros {
 	 * 				error en caso contrario
 	 */
 	public static String anadirUsuario(UsuarioVO user) {
-		String error = null;
+		String error = "null";
 		if (!usuariosPendientes.containsKey(user.getCorreo()) &&
 				!GestorActualizaCuentas.peticiones.containsKey(user.getCorreo())) {
 			int codigo = (int) ((Math.random() * (MAX_CODIGO - MIN_CODIGO)) + MIN_CODIGO);
@@ -69,7 +69,7 @@ public class GestorRegistros {
 	 * 					error en caso contrario
 	 */
 	public static String confirmarRegistro(String correo, Integer codigo) {
-		String error = null;
+		String error = "null";
 		if (usuariosPendientes.containsKey(correo)) {
 			if (usuariosPendientes.get(correo).getCodigo()==codigo) {
 				UsuarioDAO.registrarUsuario(usuariosPendientes.get(correo).getUsuario());
@@ -93,7 +93,7 @@ public class GestorRegistros {
 	 * 					error en caso contrario
 	 */
 	public static String cancelarRegistro(String correo) {
-		String error = null;
+		String error = "null";
 		if (usuariosPendientes.containsKey(correo)) {
 			GestorRegistros.usuariosPendientes.get(correo).getTimer().stop();
 			usuariosPendientes.remove(correo);
