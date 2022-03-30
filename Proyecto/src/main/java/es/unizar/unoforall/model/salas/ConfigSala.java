@@ -10,12 +10,14 @@ public class ConfigSala {
 	private boolean esPublica;
 	
 	public ConfigSala() {
-		
+		this.modoJuego = ModoJuego.Undefined;
+		this.reglas = new ReglasEspeciales();
+		this.maxParticipantes = 4;
+		this.esPublica = true;
 	}
 	
 	public ConfigSala(ModoJuego modoJuego, ReglasEspeciales reglas, 
 			int maxParticipantes, boolean esPublica) {
-		super();
 		this.modoJuego = modoJuego;
 		this.reglas = reglas;
 		this.maxParticipantes = maxParticipantes;
