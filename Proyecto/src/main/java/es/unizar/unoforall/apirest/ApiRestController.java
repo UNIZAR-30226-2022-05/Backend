@@ -285,7 +285,7 @@ public class ApiRestController {
 				UsuarioVO user = UsuarioDAO.getUsuario(usuarioID);
 				UsuarioVO user2 = UsuarioDAO.getUsuario(correoNuevo);
 				if (user!=null) {
-					if(correoNuevo==user.getCorreo() || user2==null){
+					if(correoNuevo.equals(user.getCorreo()) || user2==null){
 						error = GestorActualizaCuentas.anyadirPeticion(usuarioID, correoNuevo,
 								contrasenna, nombre);
 					} else {
