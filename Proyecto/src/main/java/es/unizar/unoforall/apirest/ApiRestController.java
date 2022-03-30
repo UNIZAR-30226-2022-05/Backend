@@ -208,7 +208,7 @@ public class ApiRestController {
 		if (usuarioID == null) {
 			return new UsuarioVO();
 		} else {
-			return UsuarioDAO.getUsuario(sessionID);
+			return UsuarioDAO.getUsuario(usuarioID);
 		}
     }
 	
