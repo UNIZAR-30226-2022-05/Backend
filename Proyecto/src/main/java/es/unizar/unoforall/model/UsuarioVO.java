@@ -8,6 +8,8 @@ import java.util.UUID;
  * 
  */
 public class UsuarioVO {	
+	private boolean exito;
+	
 	private UUID id;
 	private String correo;
 	private String nombre;
@@ -17,7 +19,7 @@ public class UsuarioVO {
 	private int numVictorias;
 	
 	public UsuarioVO() {
-		
+		exito = false;
 	}
 	
 	public UsuarioVO(UUID id, String correo, String nombre, String contrasenna, int puntos, int totalPartidas, int numVictorias) {
@@ -31,6 +33,7 @@ public class UsuarioVO {
 		this.puntos = puntos;
 		this.totalPartidas = totalPartidas;
 		this.numVictorias = numVictorias;
+		this.exito = true;
 	}
 	
 	public UsuarioVO(UUID id, String correo, String nombre, String contrasenna) {
@@ -115,5 +118,9 @@ public class UsuarioVO {
 	public String toString() {
 		return "UsuarioVO [id=" + id + ", correo=" + correo + ", nombre=" + nombre + ", contrasenna=" + contrasenna
 				+ ", puntos=" + puntos + ", totalPartidas=" + totalPartidas + ", numVictorias=" + numVictorias + "]";
+	}
+
+	public boolean isExito() {
+		return exito;
 	}
 }

@@ -176,7 +176,12 @@ public class PruebaClienteApplication {
 			    	
 					apirest.openConnection();
 					Sala r = apirest.receiveObject(Sala.class);
-					System.out.println("sala encontrada:" + r);
+					
+					if (r.isNoExiste()) {
+		    			System.out.println("No se ha encontrado ninguna sala");
+		    		} else {
+		    			System.out.println("sala encontrada:" + r);
+		    		}
 				
 					
 				} else if (orden.equals("filtrar")) {
@@ -206,6 +211,7 @@ public class PruebaClienteApplication {
 					String salaID = scanner.nextLine();
 					
 					api.sendObject("/app/notifSala/" + usuarioID, UUID.fromString(salaID));
+				
 				} else if (orden.equals("modificarCuenta")) {
 					System.out.println("Introduzca su nuevo nombre:");
 					String nuevoNombre = scanner.nextLine();
@@ -242,6 +248,7 @@ public class PruebaClienteApplication {
 			    	} else {
 			    		System.out.println(retorno);
 			    	}
+			    	
 				} else if (orden.equals("buscarAmigo")) {
 					System.out.println("Introduce correo usuario amigo:");
 					String correoAmigo = scanner.nextLine();
@@ -264,10 +271,7 @@ public class PruebaClienteApplication {
 			    		System.out.println("Puntos: "+ retorno.getUsuarios().get(0).getPuntos());
 			    	}
 			    		
-				} /*else if (orden.equals("mandarPeticion")) {//es la prueba de código "Amigo"
-					break;
-				} */
-				  else if (orden.equals("aceptarPeticion")) {
+				} else if (orden.equals("aceptarPeticion")) {
 				    apirest = new RestAPI("/api/sacarPeticionesRecibidas");
 					apirest.addParameter("sessionID", sesionID);
 					apirest.setOnError(e -> {System.out.println(e);});
@@ -410,7 +414,6 @@ public class PruebaClienteApplication {
 			    	String retorno = apirest.receiveObject(String.class);
 			    	System.out.println(retorno);	
 				}
-			    	//////////////////////// Sin probar ///////////////////////////////////////
 				
 				  else if (orden.equals("exit")) {
 					break;

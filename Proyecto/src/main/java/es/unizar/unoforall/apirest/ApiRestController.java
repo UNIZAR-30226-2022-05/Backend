@@ -89,6 +89,7 @@ public class ApiRestController {
         return error;
     }
 	
+	
 	/**
 	 * Método para registrar un usuario - PASO 2: confirmar el correo 
 	 * introduciendo el código enviado a este
@@ -102,6 +103,7 @@ public class ApiRestController {
 		String error = GestorRegistros.confirmarRegistro(correo,codigo);	
         return error;
     }
+	
 	
 	/**
 	 * Función a la que llamar cuando se cancela un registro. Para evitar boicoteos mejor que
@@ -146,6 +148,7 @@ public class ApiRestController {
         return error;
     }
 	
+	
 	/**
 	 * Función a la que llamar para comprobar si el código introducido es correcto.
 	 * En caso de serlo, habrá que llamar a la función <reestablecercontrasennaStepThree> 
@@ -161,6 +164,7 @@ public class ApiRestController {
 		String error = GestorContrasennas.confirmarCodigo(correo, codigo);
         return error;
     }
+	
 	
 	/**
 	 * Función a la que llamar para modificar la contrasenna asociada a la cuenta
@@ -191,21 +195,24 @@ public class ApiRestController {
 	/**************************************************************************/
 	
 	/**
-	 * Función a la que llamar para cerrar la sesión de una cuenta.
-	 * @param sessionID		Contiene el identificador de la sesión.
-	 * @return				true si ha cerrado la sesión.
-	 * 						false en caso de que ya no exista. (Ya estaba cerrada).
+	 * Método para obtener el UsuarioVO del usuario
+	 * @param sessionID		contiene el id de sesión del usuario.
+	 * @return				el UsuarioVO del usuario
+	 * 						Si no se ha podido obtener por un fallo de sesión,
+	 * 						tendrá el atributo 'exito' a false
 	 */
-//	@PostMapping("/cerrarSesion")													SE HACE POR WEBSOCKETS !!!!
-//	public boolean cerrarSesion(@RequestParam String sessionID) {
-//		boolean exito = false;
-//		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
-//		if(usuarioID!=null) {
-//			exito = true;
-//			GestorSesiones.eliminarSesion(sessionID);
-//		}
-//		return exito;
-//	}
+	@PostMapping("/sacarUsuarioVO")
+	public UsuarioVO sacarUsuarioVO(@RequestParam String sessionID){
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
+		
+		if (usuarioID == null) {
+			return new UsuarioVO();
+		} else {
+			return UsuarioDAO.getUsuario(sessionID);
+		}
+    }
+	
+	
 	/**
 	 * Función a la que llamar para sacar el listado de las partidas que ha terminado el
 	 * usuario, junto a los datos de cada participante humano que jugó cada una.
@@ -226,23 +233,7 @@ public class ApiRestController {
 		}
 		return lp;
 	}
-	
-	/**
-	 * Función a la que llamar para sacar el listado de participantes con sus resultados en
-	 * la partida, de los datos de la cuenta del participante solo se extrae su id.
-	 * @param sessionID		contiene el id de sesión del usuario.
-	 * @param partida		contiene el id de la partida que interesa al usuario.
-	 * @return				una lista de participantes que indica si la sesión ha expirado,
-	 * 						si ha habido un error y la lista de participantes que haya podido
-     * 						extraer.
-	 */
-	/*@PostMapping("/sacarParticipantes")
-	public ListaParticipantes sacarPartidasJugadas(@RequestParam String sessionID,
-															@RequestParam String partida){
-		ListaParticipantes lp = null;
-		//T-ODO
-		return lp;
-	}*/
+		
 	
 	/**
 	 * Función a la que llamar para borrar la cuenta del usuario activo.
@@ -267,6 +258,7 @@ public class ApiRestController {
 		}
 		return resultado;
 	}
+	
 	
 	/**
 	 * Función a la que llamar para solicitar cambiar algún dato de la cuenta. Manda
@@ -313,6 +305,7 @@ public class ApiRestController {
         return error;
     }
 	
+	
 	/**
 	 * Función a la que llamar para confirmar el código y aplicar el cambio. 
 	 * @param idSesion	id de la sesión del usuario.
@@ -333,6 +326,7 @@ public class ApiRestController {
 		}
 		return error;
     }
+	
 	
 	/**
 	 * Función a la que llamar cuando se cancela una actualización. Para evitar boicoteos mejor que
@@ -355,6 +349,9 @@ public class ApiRestController {
     }
 	
 
+	
+	
+	
 	/**************************************************************************/
 	// Amigos
 	/**************************************************************************/
@@ -380,6 +377,7 @@ public class ApiRestController {
 		return lu;
 	}
 	
+	
 	/**
 	 * Método al que llamar para sacar las solicitudes de amistad que ha hecho el usuario
 	 * y que aún no se han aceptado.
@@ -400,6 +398,7 @@ public class ApiRestController {
 		return lu;
 	}
 	
+	
 	/**
 	 * Método al que llamar para sacar los amigos que tiene el usuario.
 	 * @param idSesion 	contiene el id de la sesion del usuario;
@@ -419,28 +418,7 @@ public class ApiRestController {
 		return lu;
 	}
 	
-	/**
-	 * Método al que llamar para enviar una solicitud de amistad a otro usuario. Si ya se había recibido una
-	 * solicitud de dicho usuario, se toma como si se aceptase.
-	 * @param idSesion 	contiene el id de la sesion del usuario.
-	 * @param amigo		contiene el id de la cuenta del amigo.
-	 * @return			Devuelve null si todo ha ido bien.
-	 * 					Devuelve "SESION_EXPIRADA" si la sesión ha expirado.
-	 * 					Devuelve un mensaje de error en otro caso.	
-	 */
-//	@PostMapping("/mandarPeticionAmistad")
-//	public String mandarPeticionAmistad(@RequestParam String sessionID, 
-//															@RequestParam String amigo) {
-//		String error = null;
-//		UUID _amigo = Serializar.deserializar(amigo, UUID.class);		//USA ESTE
-//		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
-//		if(usuarioID != null) {
-//			error = UsuarioDAO.mandarPeticion(usuarioID,_amigo);		
-//		} else {
-//			error = "SESION_EXPIRADA";
-//		}
-//		return error;
-//	}
+	
 	/**
 	 * Método al que llamar para aceptar la solicitud de amistad a otro usuario.
 	 * @param idSesion 	contiene el id de la sesion del usuario.
@@ -462,6 +440,7 @@ public class ApiRestController {
 		}
 		return error;
 	}
+	
 	
 	/**
 	 * Método al que llamar para buscar a un amigo por correo, (no tienen por qué estar 
@@ -491,6 +470,10 @@ public class ApiRestController {
 			}
 			return usuario;
 	}
+	
+	
+	
+	
 	
 	
 	/**************************************************************************/
@@ -524,17 +507,19 @@ public class ApiRestController {
 	 * unirse, pues para ello solo es necesario el salaID
 	 * @param sesionID			id de seisón del usuario
 	 * @param salaID			(clase UUID) id de la sala
-	 * @return					sala buscada
-	 * 							"null" si no es pública, está llena, o está en partida
+	 * 
+	 * @return					Sala buscada
+	 * 							Su atributo 'noExiste' estará a true si no se ha
+	 * 							encontrado ninguna.
 	 */
 	@PostMapping("/buscarSalaID")
-	public String buscarSalaID(@RequestParam String sesionID, @RequestParam String salaID){		
+	public Sala buscarSalaID(@RequestParam String sesionID, @RequestParam String salaID){		
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
 		UUID _salaID = Serializar.deserializar(salaID, UUID.class);
 		if(usuarioID != null) {
-			return Serializar.serializar(GestorSalas.buscarSalaID(_salaID));
+			return GestorSalas.buscarSalaID(_salaID);
 		} else {
-			return "null";
+			return new Sala();
 		}
     }
 	
@@ -546,20 +531,22 @@ public class ApiRestController {
 	 * 								maxParticipantes = -1 si no se quieren especificar
 	 * 								reglas = null si no se quieren especificar
 	 *							Si configuración es null, devolverá todas las salas
+	 *
 	 * @return					Salas públicas con un hueco libre y que no están
 	 * 							en partida que cumplen la configuración.
-	 * 							"null" si no se ha encontrado ninguna
+	 * 							El atributo 'exito' de RespuestaSalas estará a 
+	 * 							false si ha habido algún problema con la sesión
+	 * 							del usuario.
 	 */
 	@PostMapping("/filtrarSalas")
-	public String filtrarSalas(@RequestParam String sesionID, 
+	public RespuestaSalas filtrarSalas(@RequestParam String sesionID, 
 											@RequestParam String configuracion){		
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
 		if(usuarioID != null) {
 			ConfigSala _configuracion = Serializar.deserializar(configuracion, ConfigSala.class);
-			RespuestaSalas r = new RespuestaSalas(GestorSalas.buscarSalas(_configuracion));
-			return Serializar.serializar(r);
+			return new RespuestaSalas(GestorSalas.buscarSalas(_configuracion));
 		} else {
-			return "null";
+			return new RespuestaSalas();
 		}
     }
 	
