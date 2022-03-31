@@ -1,8 +1,6 @@
-package es.unizar.unoforall.apirest;
+package es.unizar.unoforall.model;
 
 import java.util.ArrayList;
-
-import es.unizar.unoforall.model.UsuarioVO;
 
 /**
  * <expirado> 	true si la sesión ha expirado, y false en caso contrario.

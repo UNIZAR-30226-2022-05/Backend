@@ -22,6 +22,7 @@ import es.unizar.unoforall.salas.GestorSalas;
 import es.unizar.unoforall.sesiones.GestorSesiones;
 import es.unizar.unoforall.utils.CaracteresInvalidos;
 import es.unizar.unoforall.utils.Serializar;
+import es.unizar.unoforall.model.ListaUsuarios;
 import es.unizar.unoforall.model.PartidasAcabadasVO;
 
 

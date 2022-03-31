@@ -1,4 +1,4 @@
-package es.unizar.pruebaCliente;
+package es.unizar.pruebaCliente.model;
 
 import java.sql.Date;
 import java.util.UUID;

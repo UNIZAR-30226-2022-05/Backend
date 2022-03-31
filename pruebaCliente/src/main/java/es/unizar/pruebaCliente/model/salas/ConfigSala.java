@@ -1,4 +1,4 @@
-package es.unizar.pruebaCliente.salas;
+package es.unizar.pruebaCliente.model.salas;
 
 
 public class ConfigSala {
@@ -10,15 +10,33 @@ public class ConfigSala {
 	private boolean esPublica;
 	
 	public ConfigSala() {
-		
+		this.modoJuego = ModoJuego.Undefined;
+		this.reglas = new ReglasEspeciales();
+		this.maxParticipantes = 4;
+		this.esPublica = true;
 	}
 	
 	public ConfigSala(ModoJuego modoJuego, ReglasEspeciales reglas, 
 			int maxParticipantes, boolean esPublica) {
-		super();
 		this.modoJuego = modoJuego;
 		this.reglas = reglas;
 		this.maxParticipantes = maxParticipantes;
+		this.esPublica = esPublica;
+	}
+	
+	public void setModoJuego(ModoJuego modoJuego) {
+		this.modoJuego = modoJuego;
+	}
+
+	public void setReglas(ReglasEspeciales reglas) {
+		this.reglas = reglas;
+	}
+
+	public void setMaxParticipantes(int maxParticipantes) {
+		this.maxParticipantes = maxParticipantes;
+	}
+
+	public void setEsPublica(boolean esPublica) {
 		this.esPublica = esPublica;
 	}
 

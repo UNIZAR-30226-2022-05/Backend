@@ -1,9 +1,8 @@
-package es.unizar.pruebaCliente;
+package es.unizar.pruebaCliente.model;
 
 import java.util.UUID;
 
-import es.unizar.pruebaCliente.salas.Sala;
-
+import es.unizar.pruebaCliente.model.salas.Sala;
 
 public class SalasPausadasVO {
 	private final UUID id;

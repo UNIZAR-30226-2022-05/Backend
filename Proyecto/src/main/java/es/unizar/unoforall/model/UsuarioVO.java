@@ -47,6 +47,7 @@ public class UsuarioVO {
 		this.puntos = 0;
 		this.totalPartidas = 0;
 		this.numVictorias = 0;
+		this.exito = true;
 	}
 
 

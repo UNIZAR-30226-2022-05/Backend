@@ -1,4 +1,4 @@
-package es.unizar.pruebaCliente;
+package es.unizar.pruebaCliente.model;
 
 
 import java.util.UUID;
@@ -8,6 +8,8 @@ import java.util.UUID;
  * 
  */
 public class UsuarioVO {	
+	private boolean exito;
+	
 	private UUID id;
 	private String correo;
 	private String nombre;
@@ -17,7 +19,7 @@ public class UsuarioVO {
 	private int numVictorias;
 	
 	public UsuarioVO() {
-		
+		exito = false;
 	}
 	
 	public UsuarioVO(UUID id, String correo, String nombre, String contrasenna, int puntos, int totalPartidas, int numVictorias) {
@@ -31,16 +33,21 @@ public class UsuarioVO {
 		this.puntos = puntos;
 		this.totalPartidas = totalPartidas;
 		this.numVictorias = numVictorias;
+		this.exito = true;
 	}
 	
-	public UsuarioVO(String correo, String nombre, String contrasenna) {
-		this.id = UUID.randomUUID();
+	public UsuarioVO(UUID id, String correo, String nombre, String contrasenna) {
+		if(id == null) {
+			id = UUID.randomUUID();
+		}
+		this.id = id;
 		this.correo = correo;
 		this.nombre = nombre;
 		this.contrasenna = contrasenna;
 		this.puntos = 0;
 		this.totalPartidas = 0;
 		this.numVictorias = 0;
+		this.exito = true;
 	}
 
 
@@ -112,5 +119,9 @@ public class UsuarioVO {
 	public String toString() {
 		return "UsuarioVO [id=" + id + ", correo=" + correo + ", nombre=" + nombre + ", contrasenna=" + contrasenna
 				+ ", puntos=" + puntos + ", totalPartidas=" + totalPartidas + ", numVictorias=" + numVictorias + "]";
+	}
+
+	public boolean isExito() {
+		return exito;
 	}
 }

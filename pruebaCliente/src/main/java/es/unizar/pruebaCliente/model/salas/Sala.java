@@ -1,9 +1,10 @@
-package es.unizar.pruebaCliente.salas;
+package es.unizar.pruebaCliente.model.salas;
+
 
 import java.util.HashMap;
 import java.util.UUID;
 
-import es.unizar.pruebaCliente.UsuarioVO;
+import es.unizar.pruebaCliente.model.UsuarioVO;
 
 
 public class Sala {	

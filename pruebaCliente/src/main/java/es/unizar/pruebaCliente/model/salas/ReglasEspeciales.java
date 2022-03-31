@@ -1,4 +1,6 @@
-package es.unizar.pruebaCliente.salas;
+package es.unizar.pruebaCliente.model.salas;
+
+import java.util.Objects;
 
 public class ReglasEspeciales {
 	private boolean encadenarRoboCartas;	//Encadenar +2 y +4
@@ -11,18 +13,51 @@ public class ReglasEspeciales {
 	private boolean cartaX2;				//Hacer que el siguiente jugador robe el número de cartas que posee
 	
 	public ReglasEspeciales() {
-		
+		this.encadenarRoboCartas = false;
+		this.redirigirRoboCartas = false;
+		this.jugarVariasCartas = false;
+		this.evitarEspecialFinal = false;
+		this.cartaRayosX = false;
+		this.cartaIntercambio = false;
+		this.cartaX2 = false;
 	}
-	
+
 	public ReglasEspeciales(boolean encadenarRoboCartas, boolean redirigirRoboCartas, boolean jugarVariasCartas,
 			boolean evitarEspecialFinal, boolean cartaRayosX, boolean cartaIntercambio, boolean cartaX2) {
-		super();
 		this.encadenarRoboCartas = encadenarRoboCartas;
 		this.redirigirRoboCartas = redirigirRoboCartas;
 		this.jugarVariasCartas = jugarVariasCartas;
 		this.evitarEspecialFinal = evitarEspecialFinal;
 		this.cartaRayosX = cartaRayosX;
 		this.cartaIntercambio = cartaIntercambio;
+		this.cartaX2 = cartaX2;
+	}
+	
+	public void setEncadenarRoboCartas(boolean encadenarRoboCartas) {
+		this.encadenarRoboCartas = encadenarRoboCartas;
+	}
+
+	public void setRedirigirRoboCartas(boolean redirigirRoboCartas) {
+		this.redirigirRoboCartas = redirigirRoboCartas;
+	}
+
+	public void setJugarVariasCartas(boolean jugarVariasCartas) {
+		this.jugarVariasCartas = jugarVariasCartas;
+	}
+
+	public void setEvitarEspecialFinal(boolean evitarEspecialFinal) {
+		this.evitarEspecialFinal = evitarEspecialFinal;
+	}
+
+	public void setCartaRayosX(boolean cartaRayosX) {
+		this.cartaRayosX = cartaRayosX;
+	}
+
+	public void setCartaIntercambio(boolean cartaIntercambio) {
+		this.cartaIntercambio = cartaIntercambio;
+	}
+
+	public void setCartaX2(boolean cartaX2) {
 		this.cartaX2 = cartaX2;
 	}
 
@@ -60,6 +95,27 @@ public class ReglasEspeciales {
 				+ redirigirRoboCartas + ", jugarVariasCartas=" + jugarVariasCartas + ", evitarEspecialFinal="
 				+ evitarEspecialFinal + ", cartaRayosX=" + cartaRayosX + ", cartaIntercambio=" + cartaIntercambio
 				+ ", cartaX2=" + cartaX2 + "]";
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(cartaIntercambio, cartaRayosX, cartaX2, encadenarRoboCartas, evitarEspecialFinal,
+				jugarVariasCartas, redirigirRoboCartas);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ReglasEspeciales other = (ReglasEspeciales) obj;
+		return cartaIntercambio == other.cartaIntercambio && cartaRayosX == other.cartaRayosX
+				&& cartaX2 == other.cartaX2 && encadenarRoboCartas == other.encadenarRoboCartas
+				&& evitarEspecialFinal == other.evitarEspecialFinal && jugarVariasCartas == other.jugarVariasCartas
+				&& redirigirRoboCartas == other.redirigirRoboCartas;
 	}
 	
 	

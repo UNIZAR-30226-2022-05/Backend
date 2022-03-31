@@ -1,22 +1,20 @@
 package es.unizar.pruebaCliente;
 
-import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Scanner;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import com.google.gson.reflect.TypeToken;
-
-import es.unizar.pruebaCliente.salas.ConfigSala;
-import es.unizar.pruebaCliente.salas.NotificacionSala;
-import es.unizar.pruebaCliente.salas.ReglasEspeciales;
-import es.unizar.pruebaCliente.salas.RespuestaSala;
-import es.unizar.pruebaCliente.salas.Sala;
+import es.unizar.pruebaCliente.model.ListaUsuarios;
+import es.unizar.pruebaCliente.model.RespuestaLogin;
+import es.unizar.pruebaCliente.model.UsuarioVO;
+import es.unizar.pruebaCliente.model.salas.ConfigSala;
+import es.unizar.pruebaCliente.model.salas.NotificacionSala;
+import es.unizar.pruebaCliente.model.salas.ReglasEspeciales;
+import es.unizar.pruebaCliente.model.salas.RespuestaSala;
+import es.unizar.pruebaCliente.model.salas.Sala;
 
 
 @SpringBootApplication

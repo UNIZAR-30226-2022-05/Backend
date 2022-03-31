@@ -1,4 +1,4 @@
-package es.unizar.pruebaCliente.salas;
+package es.unizar.pruebaCliente.model.salas;
 
 import java.util.UUID;
 

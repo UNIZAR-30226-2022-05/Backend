@@ -1,14 +1,16 @@
-package es.unizar.pruebaCliente.salas;
+package es.unizar.pruebaCliente.model.salas;
 
 import java.util.UUID;
 
-import es.unizar.pruebaCliente.UsuarioVO;
-
-
+import es.unizar.pruebaCliente.model.UsuarioVO;
 
 public class NotificacionSala {
 	private UUID salaID;
 	private UsuarioVO remitente;
+	
+	public NotificacionSala() {
+		
+	}
 	
 	public NotificacionSala(UUID salaID, UsuarioVO remitente) {
 		super();

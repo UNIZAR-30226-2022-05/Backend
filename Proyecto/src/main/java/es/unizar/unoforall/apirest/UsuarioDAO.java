@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.util.UUID;
 
 import es.unizar.unoforall.db.GestorPoolConexionesBD;
+import es.unizar.unoforall.model.ListaUsuarios;
 import es.unizar.unoforall.model.UsuarioVO;
 
 public class UsuarioDAO {
