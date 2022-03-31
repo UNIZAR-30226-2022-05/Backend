@@ -34,8 +34,7 @@ private final static int EXPIRACION_REGISTRO = 5*60000;
 		}*/
 		String error = "null";
 		if (!GestorRegistros.usuariosPendientes.containsKey(correoNuevo) &&
-									!peticiones.containsKey(usuarioID) && 
-									UsuarioDAO.getUsuario(correoNuevo)==null) {
+									!peticiones.containsKey(usuarioID)) {
 			UsuarioVO usuario = new UsuarioVO(usuarioID, correoNuevo,nombre,contrasenya);
 			int codigo = (int) ((Math.random() * (MAX_CODIGO - MIN_CODIGO)) + MIN_CODIGO);
 			boolean exitoMail = Mail.sendMail(correoNuevo, 
