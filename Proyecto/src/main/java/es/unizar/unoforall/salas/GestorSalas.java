@@ -1,6 +1,7 @@
 package es.unizar.unoforall.salas;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
@@ -80,7 +81,7 @@ public class GestorSalas {
 	}
 	
 	public static void eliminarParticipanteSalas(UUID usuarioID) {
-		for(Map.Entry<UUID, Sala> entry : salas.entrySet()) {
+		for(Map.Entry<UUID, Sala> entry : new HashMap<>(salas).entrySet()) {
 			UUID salaID = entry.getKey();
 			Sala sala = entry.getValue();
 			
