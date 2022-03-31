@@ -1,8 +1,6 @@
 package es.unizar.unoforall.apirest;
 
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.UUID;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +21,6 @@ import es.unizar.unoforall.sesiones.GestorSesiones;
 import es.unizar.unoforall.utils.CaracteresInvalidos;
 import es.unizar.unoforall.utils.Serializar;
 import es.unizar.unoforall.model.ListaUsuarios;
-import es.unizar.unoforall.model.PartidasAcabadasVO;
 
 
 /**
@@ -203,13 +200,13 @@ public class ApiRestController {
 	 * 						tendrá el atributo 'exito' a false
 	 */
 	@PostMapping("/sacarUsuarioVO")
-	public UsuarioVO sacarUsuarioVO(@RequestParam String sessionID){
+	public String sacarUsuarioVO(@RequestParam String sessionID){
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 		
 		if (usuarioID == null) {
-			return new UsuarioVO();
+			return Serializar.serializar(new UsuarioVO());
 		} else {
-			return UsuarioDAO.getUsuario(usuarioID);
+			return Serializar.serializar(UsuarioDAO.getUsuario(usuarioID));
 		}
     }
 	
@@ -218,12 +215,12 @@ public class ApiRestController {
 	 * Función a la que llamar para sacar el listado de las partidas que ha terminado el
 	 * usuario, junto a los datos de cada participante humano que jugó cada una.
 	 * @param sessionID		contiene el id de sesión del usuario.
-	 * @return				una lista de partidas y sus participantes que indica si la 
+	 * @return				(clase ListaPartidas) una lista de partidas y sus participantes que indica si la 
 	 * 						sesión ha expirado, si ha habido un error y la lista de 
 	 * 						partidas que haya podido extraer.
 	 */
 	@PostMapping("/sacarPartidasJugadas")
-	public ListaPartidas sacarPartidasJugadas(@RequestParam String sessionID){
+	public String sacarPartidasJugadas(@RequestParam String sessionID){
 		ListaPartidas lp = null;
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 		if(usuarioID != null) {
@@ -232,7 +229,7 @@ public class ApiRestController {
 			lp = new ListaPartidas(true);
 			lp.setError("SESION_EXPIRADA");
 		}
-		return lp;
+		return Serializar.serializar(lp);
 	}
 		
 	
@@ -361,12 +358,12 @@ public class ApiRestController {
 	 * Método al que llamar para sacar las solicitudes de amistad que ha hecho el usuario
 	 * y que aún no se han aceptado.
 	 * @param idSesion 	contiene el id de la sesion del usuario;
-	 * @return			una lista de usuarios que indica si la sesión ha expirado,
+	 * @return			(clase ListaUsuarios) una lista de usuarios que indica si la sesión ha expirado,
 	 * 					si ha habido un error y la lista de usuarios que haya podido
 	 * 					extraer.
 	 */
 	@PostMapping("/sacarPeticionesEnviadas")
-	public ListaUsuarios sacarPeticionesEnviadas(@RequestParam String sessionID) {
+	public String sacarPeticionesEnviadas(@RequestParam String sessionID) {
 		ListaUsuarios lu = null;
 		
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
@@ -375,7 +372,7 @@ public class ApiRestController {
 		} else {
 			lu = new ListaUsuarios(true);
 		}
-		return lu;
+		return Serializar.serializar(lu);
 	}
 	
 	
@@ -383,12 +380,12 @@ public class ApiRestController {
 	 * Método al que llamar para sacar las solicitudes de amistad que ha hecho el usuario
 	 * y que aún no se han aceptado.
 	 * @param idSesion 	contiene el id de la sesion del usuario;
-	 * @return			una lista de usuarios que indica si la sesión ha expirado,
+	 * @return			(clase ListaUsuarios) una lista de usuarios que indica si la sesión ha expirado,
 	 * 					si ha habido un error y la lista de usuarios que haya podido
 	 * 					extraer.
 	 */
 	@PostMapping("/sacarPeticionesRecibidas")
-	public ListaUsuarios sacarPeticionesRecibidas(@RequestParam String sessionID) {
+	public String sacarPeticionesRecibidas(@RequestParam String sessionID) {
 		ListaUsuarios lu = null;
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 		if(usuarioID != null) {
@@ -396,19 +393,19 @@ public class ApiRestController {
 		} else {
 			lu = new ListaUsuarios(true);
 		}
-		return lu;
+		return Serializar.serializar(lu);
 	}
 	
 	
 	/**
 	 * Método al que llamar para sacar los amigos que tiene el usuario.
 	 * @param idSesion 	contiene el id de la sesion del usuario;
-	 * @return			una lista de usuarios que indica si la sesión ha expirado,
+	 * @return			(clase ListaUsuarios) una lista de usuarios que indica si la sesión ha expirado,
 	 * 					si ha habido un error y la lista de usuarios que haya podido
 	 * 					extraer.
 	 */
 	@PostMapping("/sacarAmigos")
-	public ListaUsuarios sacarAmigos(@RequestParam String sessionID) {
+	public String sacarAmigos(@RequestParam String sessionID) {
 		ListaUsuarios lu = null;
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 		if(usuarioID != null) {
@@ -416,7 +413,7 @@ public class ApiRestController {
 		} else {
 			lu = new ListaUsuarios(true);
 		}
-		return lu;
+		return Serializar.serializar(lu);
 	}
 	
 	
@@ -448,12 +445,12 @@ public class ApiRestController {
 	 * registrados como amigos, es para el punto de buscar usuario por correo).
 	 * @param idSesion 	contiene el id de la sesion del usuario.
 	 * @param amigo		contiene el correo de la cuenta del amigo.
-	 * @return			Devuelve un objeto ListaUsuarios que indica si la sesión ha expirado, 
+	 * @return			(clase ListaUsuarios) Devuelve un objeto ListaUsuarios que indica si la sesión ha expirado, 
 	 * 					informa si ha habido algún error, y el usuario si lo ha encontrado (sin
 	 * 					su contraseña.
 	 */
 	@PostMapping("/buscarAmigo")
-	public ListaUsuarios buscarAmigo(@RequestParam String sessionID, 
+	public String buscarAmigo(@RequestParam String sessionID, 
 														@RequestParam String amigo) {
 			ListaUsuarios usuario = null;
 			UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
@@ -469,7 +466,7 @@ public class ApiRestController {
 			} else {
 				usuario = new ListaUsuarios(true);
 			}
-			return usuario;
+			return Serializar.serializar(usuario);
 	}
 	
 	
@@ -509,18 +506,18 @@ public class ApiRestController {
 	 * @param sesionID			id de seisón del usuario
 	 * @param salaID			(clase UUID) id de la sala
 	 * 
-	 * @return					Sala buscada
+	 * @return					(clase Sala) Sala buscada
 	 * 							Su atributo 'noExiste' estará a true si no se ha
 	 * 							encontrado ninguna.
 	 */
 	@PostMapping("/buscarSalaID")
-	public Sala buscarSalaID(@RequestParam String sesionID, @RequestParam String salaID){		
+	public String buscarSalaID(@RequestParam String sesionID, @RequestParam String salaID){		
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
 		UUID _salaID = Serializar.deserializar(salaID, UUID.class);
 		if(usuarioID != null) {
-			return GestorSalas.buscarSalaID(_salaID);
+			return Serializar.serializar(GestorSalas.buscarSalaID(_salaID));
 		} else {
-			return new Sala();
+			return Serializar.serializar(new Sala());
 		}
     }
 	
@@ -533,21 +530,21 @@ public class ApiRestController {
 	 * 								reglas = null si no se quieren especificar
 	 *							Si configuración es null, devolverá todas las salas
 	 *
-	 * @return					Salas públicas con un hueco libre y que no están
-	 * 							en partida que cumplen la configuración.
+	 * @return					(RespuestaSalas) Salas públicas con un hueco libre 
+	 * 							y que no están en partida que cumplen la configuración.
 	 * 							El atributo 'exito' de RespuestaSalas estará a 
 	 * 							false si ha habido algún problema con la sesión
 	 * 							del usuario.
 	 */
 	@PostMapping("/filtrarSalas")
-	public RespuestaSalas filtrarSalas(@RequestParam String sesionID, 
+	public String filtrarSalas(@RequestParam String sesionID, 
 											@RequestParam String configuracion){		
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
 		if(usuarioID != null) {
 			ConfigSala _configuracion = Serializar.deserializar(configuracion, ConfigSala.class);
-			return new RespuestaSalas(GestorSalas.buscarSalas(_configuracion));
+			return Serializar.serializar(new RespuestaSalas(GestorSalas.buscarSalas(_configuracion)));
 		} else {
-			return new RespuestaSalas();
+			return Serializar.serializar(new RespuestaSalas());
 		}
     }
 	
