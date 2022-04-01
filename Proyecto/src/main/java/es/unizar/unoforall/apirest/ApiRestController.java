@@ -53,8 +53,13 @@ public class ApiRestController {
 		} else if (!usuario.getContrasenna().equals(contrasenna))  {
 			return new RespuestaLogin(false, "Contraseña incorrecta", null, null);
 		} else {
-			UUID claveInicio = GestorSesiones.nuevaClaveInicio(usuario.getId());	
-			return new RespuestaLogin(true, "", claveInicio, usuario.getId());
+			UUID claveInicio = GestorSesiones.nuevaClaveInicio(usuario.getId());
+			if (claveInicio == null) {
+				return new RespuestaLogin(false, "El usuario ya tiene una sesión iniciada, o ya está iniciando una", null, null);
+			} else {
+				return new RespuestaLogin(true, "", claveInicio, usuario.getId());
+			}
+			
 		}
     }
 	

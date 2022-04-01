@@ -20,9 +20,13 @@ public class GestorSesiones {
 	}
 	
 	public static UUID nuevaClaveInicio(UUID usuarioID) {
-		UUID claveInicio = UUID.randomUUID();
-		clavesInicio.put(claveInicio, usuarioID);
-		return claveInicio;
+		if (sesiones.containsValue(usuarioID) || clavesInicio.containsValue(usuarioID))  {
+			return null;
+		} else {
+			UUID claveInicio = UUID.randomUUID();
+			clavesInicio.put(claveInicio, usuarioID);
+			return claveInicio;
+		}
 	}
 	
 	public static boolean iniciarSesion(UUID claveInicio, String sesionID) {
