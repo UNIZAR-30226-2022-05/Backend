@@ -14,36 +14,47 @@ public class GestorSesiones {
 	// Relación   clave inicio sesión - usuarioID
 	private static HashMap<UUID, UUID> clavesInicio;
 	
+	private static final Object LOCK;
+	
 	static {
 		sesiones = new HashMap<>();
 		clavesInicio = new HashMap<>();
+		LOCK = new Object();
 	}
 	
 	public static UUID nuevaClaveInicio(UUID usuarioID) {
-		if (sesiones.containsValue(usuarioID) || clavesInicio.containsValue(usuarioID))  {
-			return null;
-		} else {
-			UUID claveInicio = UUID.randomUUID();
-			clavesInicio.put(claveInicio, usuarioID);
-			return claveInicio;
+		synchronized (LOCK) {
+			if (sesiones.containsValue(usuarioID) || clavesInicio.containsValue(usuarioID))  {
+				return null;
+			} else {
+				UUID claveInicio = UUID.randomUUID();
+				clavesInicio.put(claveInicio, usuarioID);
+				return claveInicio;
+			}
 		}
 	}
 	
 	public static boolean iniciarSesion(UUID claveInicio, String sesionID) {
-		if (clavesInicio.containsKey(claveInicio)) {
-			sesiones.put(sesionID, clavesInicio.get(claveInicio));
-			clavesInicio.remove(claveInicio);
-			return true;
-		} else {
-			return false;
+		synchronized (LOCK) {
+			if (clavesInicio.containsKey(claveInicio)) {
+				sesiones.put(sesionID, clavesInicio.get(claveInicio));
+				clavesInicio.remove(claveInicio);
+				return true;
+			} else {
+				return false;
+			}
 		}
 	}
 	
 	public static UUID obtenerUsuarioID(String sesionID) {
-		return sesiones.get(sesionID);
+		synchronized (LOCK) {
+			return sesiones.get(sesionID);
+		}
 	}
 	
 	public static void eliminarSesion(String sesionID) {
-		sesiones.remove(sesionID);
+		synchronized (LOCK) {
+			sesiones.remove(sesionID);
+		}
 	}
 }

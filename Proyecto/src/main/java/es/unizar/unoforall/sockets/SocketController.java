@@ -37,7 +37,7 @@ public class SocketController {
 							@Header("simpSessionId") String sesionID, 
 							Object vacio) throws Exception {
 				
-		boolean exito = GestorSesiones.iniciarSesion(claveInicio, sesionID);
+		boolean exito = GestorSesiones.iniciarSesion(claveInicio, sesionID); 
 		if (exito) {
 			System.out.println("Nueva sesión: " + sesionID);
 			return sesionID;
