@@ -115,10 +115,10 @@ public class SocketController {
 							Object vacio) throws Exception {
 		
 		if (GestorSalas.obtenerSala(salaID) == null) {
-			return Serializar.serializar(new Sala());
+			return Serializar.serializar(new Sala("La sala ya no existe"));
 		}
 		if (GestorSesiones.obtenerUsuarioID(sesionID) == null) {
-			return Serializar.serializar(new Sala());
+			return Serializar.serializar(new Sala("La sesión ha caducado. Vuelva a iniciar sesión"));
 		}
 		
 		System.out.println(sesionID + " se une a la sala " + salaID);
@@ -146,10 +146,10 @@ public class SocketController {
 							Object vacio) throws Exception {
 		
 		if (GestorSalas.obtenerSala(salaID) == null) {
-			return Serializar.serializar(new Sala());
+			return Serializar.serializar(new Sala("La sala ya no existe"));
 		}
 		if (GestorSesiones.obtenerUsuarioID(sesionID) == null) {
-			return Serializar.serializar(new Sala());
+			return Serializar.serializar(new Sala("La sesión ha caducado. Vuelva a iniciar sesión"));
 		}
 		GestorSalas.obtenerSala(salaID).
 			nuevoParticipanteListo(GestorSesiones.obtenerUsuarioID(sesionID));
@@ -174,16 +174,16 @@ public class SocketController {
 							Object vacio) throws Exception {
 		
 		if (GestorSalas.obtenerSala(salaID) == null) {
-			return Serializar.serializar(new Sala());
+			return Serializar.serializar(new Sala("La sala ya no existe"));
 		}
 		if (GestorSesiones.obtenerUsuarioID(sesionID) == null) {
-			return Serializar.serializar(new Sala());
+			return Serializar.serializar(new Sala("La sesión ha caducado. Vuelva a iniciar sesión"));
 		}		
 		Sala s = GestorSalas.eliminarParticipanteSala(salaID, 
 				GestorSesiones.obtenerUsuarioID(sesionID));
 		
 		if (s == null) {
-			return Serializar.serializar(new Sala());
+			return Serializar.serializar(new Sala("La sala se ha eliminado"));
 		} else {
 			return Serializar.serializar(s);
 		}

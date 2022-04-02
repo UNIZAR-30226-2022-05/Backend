@@ -522,7 +522,7 @@ public class ApiRestController {
 		if(usuarioID != null) {
 			return Serializar.serializar(GestorSalas.buscarSalaID(_salaID));
 		} else {
-			return Serializar.serializar(new Sala());
+			return Serializar.serializar(new Sala("No se ha encontrado la sala"));
 		}
     }
 	

@@ -9,6 +9,7 @@ import es.unizar.unoforall.model.UsuarioVO;
 public class Sala {	
 	//Para devolver una sala que no existe
 	private boolean noExiste;
+	private String error;
 	
 	private ConfigSala configuracion;
 	
@@ -19,14 +20,15 @@ public class Sala {
 	//Conjunto de participantes con el indicador de si están listos o no
 	private HashMap<UUID, Boolean> participantes_listos;
 	
-	public Sala() {
+	public Sala(String mensajeError) {
 		participantes = new HashMap<>();
 		participantes_listos = new HashMap<>();
 		noExiste = true;
+		setError(mensajeError);
 	}
 	
 	public Sala(ConfigSala configuracion) {
-		this();
+		this("");
 		this.configuracion = configuracion;
 		this.setEnPartida(false);
 		this.noExiste = false;
@@ -106,5 +108,13 @@ public class Sala {
 
 	public boolean isNoExiste() {
 		return noExiste;
+	}
+
+	public String getError() {
+		return error;
+	}
+
+	public void setError(String error) {
+		this.error = error;
 	}
 }
