@@ -12,6 +12,8 @@ public class ReglasEspeciales {
 	private boolean cartaIntercambio;		//Intercambiar mano por la del siguiente jugador
 	private boolean cartaX2;				//Hacer que el siguiente jugador robe el número de cartas que posee
 	
+	private boolean reglasValidas;			//Indica si se van a especificar o se van a dejar indefinidas
+	
 	public ReglasEspeciales() {
 		this.encadenarRoboCartas = false;
 		this.redirigirRoboCartas = false;
@@ -20,6 +22,7 @@ public class ReglasEspeciales {
 		this.cartaRayosX = false;
 		this.cartaIntercambio = false;
 		this.cartaX2 = false;
+		this.setReglasValidas(false);
 	}
 
 	public ReglasEspeciales(boolean encadenarRoboCartas, boolean redirigirRoboCartas, boolean jugarVariasCartas,
@@ -116,6 +119,14 @@ public class ReglasEspeciales {
 				&& cartaX2 == other.cartaX2 && encadenarRoboCartas == other.encadenarRoboCartas
 				&& evitarEspecialFinal == other.evitarEspecialFinal && jugarVariasCartas == other.jugarVariasCartas
 				&& redirigirRoboCartas == other.redirigirRoboCartas;
+	}
+
+	public boolean isReglasValidas() {
+		return reglasValidas;
+	}
+
+	public void setReglasValidas(boolean reglasValidas) {
+		this.reglasValidas = reglasValidas;
 	}
 	
 	

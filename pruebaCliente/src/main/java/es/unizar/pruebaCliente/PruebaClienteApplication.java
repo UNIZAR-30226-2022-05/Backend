@@ -185,7 +185,7 @@ public class PruebaClienteApplication {
 				} else if (orden.equals("filtrar")) {
 					apirest = new RestAPI("/api/filtrarSalas");
 					apirest.addParameter("sesionID", sesionID);
-					apirest.addParameter("configuracion", config);
+					apirest.addParameter("configuracion", new ConfigSala(ConfigSala.ModoJuego.Original, new ReglasEspeciales(), 4, true));
 					apirest.setOnError(e -> {System.out.println(e);});
 			    	
 					apirest.openConnection();

@@ -64,7 +64,7 @@ public class GestorSalas {
 						(configuracion.getMaxParticipantes() == -1
 						|| configuracion.getMaxParticipantes() == sala.getConfiguracion().getMaxParticipantes())	
 							&&
-						(configuracion.getReglas().equals(null)
+						(!configuracion.getReglas().isReglasValidas()
 						|| configuracion.getReglas().equals(sala.getConfiguracion().getReglas()))
 						){
 						result.put(salaID, sala);

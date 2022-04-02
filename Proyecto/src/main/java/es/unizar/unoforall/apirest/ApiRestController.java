@@ -532,7 +532,8 @@ public class ApiRestController {
 	 * @param configuracion		(clase ConfigSala) Configuración a buscar
 	 * 								modoJuego Undefined si no se quiere especificar
 	 * 								maxParticipantes = -1 si no se quieren especificar
-	 * 								reglas = null si no se quieren especificar
+	 * 								reglas -> su campo reglasValidas a false si no se 
+	 * 										  quieren especificar
 	 *							Si configuración es null, devolverá todas las salas
 	 *
 	 * @return					(RespuestaSalas) Salas públicas con un hueco libre 
