@@ -118,5 +118,18 @@ public class ReglasEspeciales {
 				&& redirigirRoboCartas == other.redirigirRoboCartas;
 	}
 	
-	
+	@Override
+	public ReglasEspeciales clone() {
+		ReglasEspeciales copy = new ReglasEspeciales();
+		copy.encadenarRoboCartas = this.encadenarRoboCartas;
+		copy.redirigirRoboCartas = this.redirigirRoboCartas;
+		copy.jugarVariasCartas = this.jugarVariasCartas;
+		copy.evitarEspecialFinal = this.evitarEspecialFinal;
+		copy.cartaRayosX = this.cartaRayosX;
+		copy.cartaIntercambio = this.cartaIntercambio;
+		copy.cartaX2 = this.cartaX2;
+
+		return copy;
+	}
+    
 }

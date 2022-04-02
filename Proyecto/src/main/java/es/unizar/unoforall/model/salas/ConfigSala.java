@@ -62,5 +62,15 @@ public class ConfigSala {
 				+ ", esPublica=" + esPublica + "]";
 	}
 	
-	
+	@Override
+	public ConfigSala clone() {
+		ConfigSala copy = new ConfigSala();
+		copy.modoJuego = this.modoJuego;
+		copy.esPublica = this.esPublica;
+		copy.maxParticipantes = this.maxParticipantes;
+		copy.reglas = this.reglas == null ? null : this.reglas.clone();
+
+		return copy;
+	}
+    
 }
