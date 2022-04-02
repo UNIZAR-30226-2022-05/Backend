@@ -49,7 +49,7 @@ public class GestorSalas {
 	public static HashMap<UUID,Sala> buscarSalas(ConfigSala configuracion) {
 		synchronized (LOCK) {
 			if (configuracion == null) {
-				return salas;
+				return new HashMap<UUID,Sala>();
 			} else {
 				HashMap<UUID,Sala> result = new HashMap<>();
 				for(Map.Entry<UUID, Sala> entry : salas.entrySet()) {
