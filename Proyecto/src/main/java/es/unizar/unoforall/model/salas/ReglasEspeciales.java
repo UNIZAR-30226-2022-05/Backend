@@ -22,7 +22,7 @@ public class ReglasEspeciales {
 		this.cartaRayosX = false;
 		this.cartaIntercambio = false;
 		this.cartaX2 = false;
-		this.setReglasValidas(false);
+		this.reglasValidas = false;
 	}
 
 	public ReglasEspeciales(boolean encadenarRoboCartas, boolean redirigirRoboCartas, boolean jugarVariasCartas,
@@ -34,6 +34,7 @@ public class ReglasEspeciales {
 		this.cartaRayosX = cartaRayosX;
 		this.cartaIntercambio = cartaIntercambio;
 		this.cartaX2 = cartaX2;
+        this.reglasValidas = false;
 	}
 	
 	public void setEncadenarRoboCartas(boolean encadenarRoboCartas) {
@@ -139,6 +140,8 @@ public class ReglasEspeciales {
 		copy.cartaRayosX = this.cartaRayosX;
 		copy.cartaIntercambio = this.cartaIntercambio;
 		copy.cartaX2 = this.cartaX2;
+        
+        copy.reglasValidas = this.reglasValidas;
 
 		return copy;
 	}
