@@ -69,13 +69,13 @@ public class ApiRestController {
 	 * @param correo		correo del usuario
 	 * @param contrasenna	hash de la contraseña del usuario
 	 * @param nombre		nombre del usuario
-	 * @return				null si no ha habido ningún error
+	 * @return				"nulo" si no ha habido ningún error
 	 * 						mensaje de error si se ha producido alguno
 	 */
 	@PostMapping("/registerStepOne")
 	public String registerStepOne(@RequestParam String correo, 
 				@RequestParam String contrasenna, @RequestParam String nombre){
-		String error = "null";
+		String error = "nulo";
 		if (!CaracteresInvalidos.hayCaracteresInvalidos(correo)
 				&& !CaracteresInvalidos.hayCaracteresInvalidos(contrasenna)
 				&& !CaracteresInvalidos.hayCaracteresInvalidos(nombre)) {
@@ -130,12 +130,12 @@ public class ApiRestController {
 	 * Función a la que llamar para solicitar reestablecer la contraseña. Manda
 	 * un código al correo, con el que se pasa al paso dos
 	 * @param correo 	correo de la cuenta a cambiar la contraseña
-	 * @return 			un String con un mensaje de error que es null si todo va bien.
+	 * @return 			un String con un mensaje de error que es "nulo" si todo va bien.
 	 * 		   			Si ocurre algo, la información estará contenida en el String.
 	 */
 	@PostMapping("/reestablecerContrasennaStepOne")
 	public String reestablecercontrasennaStepOne(@RequestParam String correo){
-		String error = "null";
+		String error = "nulo";
 		if (!CaracteresInvalidos.hayCaracteresInvalidos(correo)) { //Esto cuando esté definida la clase CaracteresInvalidos
 			UsuarioVO user = UsuarioDAO.getUsuario(correo);
 			
@@ -174,14 +174,14 @@ public class ApiRestController {
 	 * especificada por el correo del usuario.
 	 * @param correo 		contiene el correo de la cuenta a cambiar la contraseña.
 	 * @param contrasenna 	contiene la nueva contrasenna de la cuenta (hash).
-	 * @return 				un String null si todo va bien.
+	 * @return 				un String "nulo"si todo va bien.
 	 * 		   				Si ocurre algo, la información estará contenida en el String.
 	 */
 	@PostMapping("/reestablecerContrasennaStepThree")
 	public String reestablecercontrasennaStepThree(@RequestParam String correo,
 												 @RequestParam String contrasenna){		
 		UsuarioVO user = UsuarioDAO.getUsuario(correo);
-		String error = "null";
+		String error = "nulo";
 		if (user!=null) {
 			error = UsuarioDAO.cambiarContrasenna(user.getId(), contrasenna);
 		} else {
@@ -271,14 +271,14 @@ public class ApiRestController {
 	 * 		 			  	que correoViejo.
 	 * @param nombre 		nuevo nombre para la cuenta
 	 * @param contrasenna 	nuevo valor para la contraseña de la cuenta. 
-	 * @return 				un String con un mensaje de error que es null si todo va bien.
+	 * @return 				un String con un mensaje de error que es "nulo" si todo va bien.
 	 * 						En caso de que no haya una sesión asignada a al id dado, devuelve "SESION_EXPIRADA".
 	 * 		   				En cualquier otro caso, la información estará contenida en el String.
 	 */
 	@PostMapping("/actualizarCuentaStepOne")
 	public String actualizarCuentaStepOne(@RequestParam String sessionID,
 								String correoNuevo, String nombre, String contrasenna){
-		String error = "null";
+		String error = "nulo";
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 		if(usuarioID != null) {
 			if (!CaracteresInvalidos.hayCaracteresInvalidos(correoNuevo) &&
@@ -313,14 +313,14 @@ public class ApiRestController {
 	 * Función a la que llamar para confirmar el código y aplicar el cambio. 
 	 * @param idSesion	id de la sesión del usuario.
 	 * @param codigo	código enviado al correo pasado por parámetro.
-	 * @return			null si no ha habido ningún error.
+	 * @return			"nulo" si no ha habido ningún error.
 	 * 					En caso de que no haya una sesión asignada a al id dado, devuelve "SESION_EXPIRADA". 		   				
 	 * 					Devuelve un mensaje con información del error si se ha producido alguno.
 	 */
 	@PostMapping("/actualizarCuentaStepTwo")
 	public String actualizarCuentaStepTwo(@RequestParam String sessionID,
 												 @RequestParam Integer codigo){		
-		String error = "null";
+		String error = "nulo";
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 		if(usuarioID != null) {
 			error = GestorActualizaCuentas.confirmarCodigo(usuarioID, codigo);
@@ -335,13 +335,13 @@ public class ApiRestController {
 	 * Función a la que llamar cuando se cancela una actualización. Para evitar boicoteos mejor que
 	 * solo se pueda llamar desde la ventana de confirmación de código.
 	 * @param correo 	contiene el nuevo correo que se había planteado para la actualización.
-	 * @return 			null en caso de que se haya podido cancelar la petición de registro.
+	 * @return 			"nulo" en caso de que se haya podido cancelar la petición de registro.
 	 * 		   			"SESION_EXPIRADA" en caso de que la sesión del usuario haya caducado.
 	 * 					un String especificando el error que haya sucedido.
 	 */
 	@PostMapping("/actualizarCancel")
 	public String actualizarCancel(@RequestParam String sessionID){
-		String error = "null";
+		String error = "nulo";
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 		if(usuarioID != null) {
 			error = GestorActualizaCuentas.cancelarActualizacion(usuarioID);
@@ -426,14 +426,14 @@ public class ApiRestController {
 	 * Método al que llamar para aceptar la solicitud de amistad a otro usuario.
 	 * @param idSesion 	contiene el id de la sesion del usuario.
 	 * @param amigo		contiene el id de la cuenta del amigo.
-	 * @return			Devuelve null si todo ha ido bien.
+	 * @return			Devuelve "nulo" si todo ha ido bien.
 	 * 					Devuelve "SESION_EXPIRADA" si la sesión ha expirado.
 	 * 					Devuelve un mensaje de error en otro caso.	 
 	 */
 	@PostMapping("/aceptarPeticionAmistad")
 	public String aceptarPeticionAmistad(@RequestParam String sessionID,
 															 @RequestParam String amigo) {
-		String error = "null";
+		String error = "nulo";
 		UUID _amigo = Serializar.deserializar(amigo, UUID.class);
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 		if(usuarioID != null) {

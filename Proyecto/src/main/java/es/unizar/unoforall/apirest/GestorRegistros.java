@@ -32,12 +32,12 @@ public class GestorRegistros {
 	 * Añade al Map el usuario <<user>> si no hay uno que ya tenga el mismo correo
 	 * @param user 	Contiene el correo, nombre y contraseña (hash) a introducir 
 	 * 				en la base de datos.
-	 * @return 		null si no se ha producido ningún error, y el motivo del 
+	 * @return 		"nulo" si no se ha producido ningún error, y el motivo del 
 	 * 				error en caso contrario
 	 */
 	public static String anadirUsuario(UsuarioVO user) {
 		synchronized (LOCK) {
-			String error = "null";
+			String error = "nulo";
 			if (!usuariosPendientes.containsKey(user.getCorreo()) &&
 					!GestorActualizaCuentas.peticiones.containsKey(user.getCorreo())) {
 				int codigo = (int) ((Math.random() * (MAX_CODIGO - MIN_CODIGO)) + MIN_CODIGO);
@@ -70,12 +70,12 @@ public class GestorRegistros {
 	 * Verifica que el código es el que está asociado al correo del map
 	 * @param correo	correo del usuario
 	 * @param codigo	código recibido
-	 * @return			null si no se ha producido ningún error, y el motivo del 
+	 * @return			"nulo" si no se ha producido ningún error, y el motivo del 
 	 * 					error en caso contrario
 	 */
 	public static String confirmarRegistro(String correo, Integer codigo) {
 		synchronized (LOCK) {
-			String error = "null";
+			String error = "nulo";
 			if (usuariosPendientes.containsKey(correo)) {
 				if (usuariosPendientes.get(correo).getCodigo()==codigo) {
 					UsuarioDAO.registrarUsuario(usuariosPendientes.get(correo).getUsuario());
@@ -96,12 +96,12 @@ public class GestorRegistros {
 	 * Verifica que el código es el que está asociado al correo del map
 	 * @param correo	correo del usuario
 	 * @param codigo	código recibido
-	 * @return			null si no se ha producido ningún error, y el motivo del 
+	 * @return			"nulo" si no se ha producido ningún error, y el motivo del 
 	 * 					error en caso contrario
 	 */
 	public static String cancelarRegistro(String correo) {
 		synchronized (LOCK) {
-			String error = "null";
+			String error = "nulo";
 			if (usuariosPendientes.containsKey(correo)) {
 				GestorRegistros.usuariosPendientes.get(correo).getTimer().stop();
 				usuariosPendientes.remove(correo);

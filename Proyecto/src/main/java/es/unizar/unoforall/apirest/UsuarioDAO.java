@@ -151,10 +151,10 @@ public class UsuarioDAO {
 	 * Método para actualizar la contraseña de un usuario dado su identificador
 	 * @param idUsuario contiene el identificador de la cuenta en la base de datos.
 	 * @param contrasenna contiene la nueva contraseña
-	 * @return Un String que contiene el error en caso de error, y null si hay éxito.
+	 * @return Un String que contiene el error en caso de error, y "nulo" si hay éxito.
 	 */
 	public static String cambiarContrasenna(UUID idUsuario, String contrasenna) {
-		String result = "null";
+		String result = "nulo";
 		Connection conn = null;
 		try {
 			conn = GestorPoolConexionesBD.getConnection();
@@ -182,10 +182,10 @@ public class UsuarioDAO {
 	 * @param correoNuevo contiene el nuevo correo para la cuenta.
 	 * @param usuario contiene los nuevos valores de nombre y contraseña. Además del antiguo
 	 * 					  correo de la cuenta.
-	 * @return null si tiene éxito, o un String en caso de error.
+	 * @return "nulo" si tiene éxito, o un String en caso de error.
 	 */
 	public static String actualizarCuenta(UsuarioVO usuario) {
-		String result = "null";
+		String result = "nulo";
 		Connection conn = null;
 		try {
 			conn = GestorPoolConexionesBD.getConnection();
@@ -390,10 +390,10 @@ public class UsuarioDAO {
 	/**
 	 * Dado el id del usuario, devuelve la lista de usuarios a los que ha aceptado la solicitud de amistad.
 	 * @param idUsuario	contiene el id de la cuenta del usuario
-	 * @return			devuelve null si todo va bien. En caso contrario devuelve un mensaje de error.
+	 * @return			devuelve "nulo" si todo va bien. En caso contrario devuelve un mensaje de error.
 	 */
 	public static String mandarPeticion(UUID idUsuario, UUID amigo) {
-		String error = "null";
+		String error = "nulo";
 		Connection conn = null;
 		
 		try {

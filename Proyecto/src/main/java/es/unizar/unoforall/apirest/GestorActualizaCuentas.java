@@ -36,7 +36,7 @@ private final static int EXPIRACION_REGISTRO = 5*60000;
 				peticiones.get(correo).getTimer().stop();
 				peticiones.remove(correo);
 			}*/
-			String error = "null";
+			String error = "nulo";
 			if (!GestorRegistros.usuariosPendientes.containsKey(correoNuevo) &&
 										!peticiones.containsKey(usuarioID)) {
 				UsuarioVO usuario = new UsuarioVO(usuarioID, correoNuevo,nombre,contrasenya);
@@ -66,7 +66,7 @@ private final static int EXPIRACION_REGISTRO = 5*60000;
 	
 	public static String confirmarCodigo(UUID usuarioID, Integer codigo) {
 		synchronized (LOCK) {
-			String error = "null";
+			String error = "nulo";
 			if (peticiones.containsKey(usuarioID)) {
 				if (peticiones.get(usuarioID).getCodigo()==codigo) {
 					peticiones.get(usuarioID).getTimer().stop();
@@ -84,7 +84,7 @@ private final static int EXPIRACION_REGISTRO = 5*60000;
 	
 	public static String cancelarActualizacion(UUID usuarioID) {
 		synchronized (LOCK) {
-			String error = "null";
+			String error = "nulo";
 			if (peticiones.containsKey(usuarioID)) {
 				peticiones.get(usuarioID).getTimer().stop();
 				peticiones.remove(usuarioID);
