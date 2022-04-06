@@ -42,7 +42,7 @@ public class SocketController {
 			System.out.println("Nueva sesión: " + sesionID);
 			return sesionID;
 		} else {
-			return "null";
+			return "nulo";
 		}
 	}
 		
