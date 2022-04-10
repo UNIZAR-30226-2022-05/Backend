@@ -190,6 +190,14 @@ public class SocketController {
 	}
 	
 	
+	/**************************************************************************/
+	// Partidas
+	/**************************************************************************/
+	
+	
+	
+	
+	
 	
 	
 	@EventListener
@@ -199,6 +207,6 @@ public class SocketController {
 		GestorSalas.eliminarParticipanteSalas(GestorSesiones.obtenerUsuarioID(sesionID));
 		GestorSesiones.eliminarSesion(sesionID);		
 		
-		System.err.println("Client disconnected with session id:" + sesionID);
+		System.err.println("Client disconnected with session id: " + sesionID);
 	}
 }

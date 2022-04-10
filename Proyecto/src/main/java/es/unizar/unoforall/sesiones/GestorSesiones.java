@@ -8,7 +8,7 @@ import es.unizar.unoforall.model.UsuarioVO;
 
 public class GestorSesiones {
 	
-	// Relación  sesionID (websockets) - UsuarioID
+	// Relación  sesionID (websockets) - usuarioID
 	private static HashMap<String, UUID> sesiones;
 	
 	// Relación   clave inicio sesión - usuarioID

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import es.unizar.unoforall.model.UsuarioVO;
+import es.unizar.unoforall.model.partidas.Partida;
 
 public class Sala {	
 	//Para devolver una sala que no existe
@@ -14,6 +15,7 @@ public class Sala {
 	private ConfigSala configuracion;
 	
 	private boolean enPartida;
+	private Partida partida;
 	
 	//Identificador de cada usuario con su VO
 	private HashMap<UUID, UsuarioVO> participantes;
@@ -25,6 +27,7 @@ public class Sala {
 		participantes_listos = new HashMap<>();
 		noExiste = true;
 		setError(mensajeError);
+		setPartida(null);
 	}
 	
 	public Sala(ConfigSala configuracion) {
@@ -116,5 +119,13 @@ public class Sala {
 
 	public void setError(String error) {
 		this.error = error;
+	}
+
+	public Partida getPartida() {
+		return partida;
+	}
+
+	public void setPartida(Partida partida) {
+		this.partida = partida;
 	}
 }
