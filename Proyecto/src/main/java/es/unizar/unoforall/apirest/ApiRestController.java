@@ -448,7 +448,11 @@ public class ApiRestController {
 		UUID _amigo = Serializar.deserializar(amigo, UUID.class);
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
 		if(usuarioID != null) {
-			error = UsuarioDAO.mandarPeticion(usuarioID,_amigo); //Acepta porque ya existe la petición.		
+			if (!_amigo.equals(usuarioID)) {
+				error = UsuarioDAO.mandarPeticion(usuarioID,_amigo); //Acepta porque ya existe la petición.		
+			} else {
+				error = "No puedes enviarte una petición de amistad a ti mismo";
+			}
 		} else {
 			error = "SESION_EXPIRADA";
 		}
@@ -471,11 +475,7 @@ public class ApiRestController {
 		UUID _amigo = Serializar.deserializar(amigo, UUID.class);
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
 		if(usuarioID != null) {
-			if (!_amigo.equals(usuarioID)) {
-				error = UsuarioDAO.cancelarPeticion(usuarioID,_amigo); 
-			} else {
-				error = "No puedes enviarte una petición de amistad a ti mismo";
-			}
+			error = UsuarioDAO.cancelarPeticion(usuarioID,_amigo); 
 		} else {
 			error = "SESION_EXPIRADA";
 		}

@@ -64,9 +64,13 @@ public class SocketController {
 							@Header("simpSessionId") String sesionID, 
 							Object vacio) throws Exception {
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
-		String error = UsuarioDAO.mandarPeticion(usuarioID,usrDestino);	
-		System.err.println(error);
-		return Serializar.serializar(UsuarioDAO.getUsuario(usuarioID));
+		if (usuarioID.equals(usrDestino)) {
+			return "nulo";
+		} else {
+			String error = UsuarioDAO.mandarPeticion(usuarioID,usrDestino);	
+			System.err.println(error);
+			return Serializar.serializar(UsuarioDAO.getUsuario(usuarioID));
+		}
 	}
 	
 	/**
