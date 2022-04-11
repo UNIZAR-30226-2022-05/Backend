@@ -38,7 +38,7 @@ public class Partida {
 		for(Carta.Color color : Carta.Color.values()) {
 			if (color != Carta.Color.comodin) {
 				for(Carta.Tipo tipo : Carta.Tipo.values()) {
-					if (tipo == Carta.Tipo.n0) {
+					if (tipo.equals(Carta.Tipo.n0)) {
 						this.mazo.add(new Carta(tipo,color));
 					} else if (tipo != Carta.Tipo.cambioColor &&  tipo != Carta.Tipo.mas4) {	//dos veces
 						this.mazo.add(new Carta(tipo,color));
@@ -172,7 +172,7 @@ public class Partida {
 				this.jugadores.get(turno).getJugadorID().equals(jugadorID)) {
 			
 			if(jugada.robar) {
-				if (configuracion.getModoJuego() == ConfigSala.ModoJuego.Attack) {
+				if (configuracion.getModoJuego().equals(ConfigSala.ModoJuego.Attack)) {
 					int random_robo = (int)Math.floor(Math.random()*(MAX_ROBO_ATTACK)+1);
 					for (int i = 0; i < random_robo; i++) {
 						this.jugadores.get(turno).getMano().add(robarCarta());
