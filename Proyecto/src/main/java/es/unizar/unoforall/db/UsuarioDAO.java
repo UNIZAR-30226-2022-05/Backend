@@ -1,11 +1,10 @@
-package es.unizar.unoforall.apirest;
+package es.unizar.unoforall.db;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.UUID;
 
-import es.unizar.unoforall.db.GestorPoolConexionesBD;
 import es.unizar.unoforall.model.ListaUsuarios;
 import es.unizar.unoforall.model.UsuarioVO;
 

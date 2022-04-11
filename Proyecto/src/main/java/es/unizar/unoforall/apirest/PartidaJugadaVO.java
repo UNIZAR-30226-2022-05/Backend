@@ -5,12 +5,12 @@ import java.util.ArrayList;
 import es.unizar.unoforall.model.HaJugadoVO;
 import es.unizar.unoforall.model.PartidasAcabadasVO;
 
-public class Partida {
+public class PartidaJugadaVO {
 
 	private PartidasAcabadasVO partida;
 	private ArrayList<HaJugadoVO> participantes = null;
 	
-	public Partida (PartidasAcabadasVO partida, ArrayList<HaJugadoVO> participantes) {
+	public PartidaJugadaVO (PartidasAcabadasVO partida, ArrayList<HaJugadoVO> participantes) {
 		this.partida=partida;
 		this.participantes=participantes;
 	}

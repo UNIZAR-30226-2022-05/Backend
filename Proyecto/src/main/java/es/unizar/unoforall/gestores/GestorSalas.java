@@ -1,7 +1,6 @@
-package es.unizar.unoforall.salas;
+package es.unizar.unoforall.gestores;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 

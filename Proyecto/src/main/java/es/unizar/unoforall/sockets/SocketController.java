@@ -12,12 +12,12 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import com.google.gson.Gson;
 
-import es.unizar.unoforall.apirest.UsuarioDAO;
+import es.unizar.unoforall.db.UsuarioDAO;
+import es.unizar.unoforall.gestores.GestorSalas;
+import es.unizar.unoforall.gestores.GestorSesiones;
 import es.unizar.unoforall.model.UsuarioVO;
 import es.unizar.unoforall.model.salas.NotificacionSala;
 import es.unizar.unoforall.model.salas.Sala;
-import es.unizar.unoforall.salas.GestorSalas;
-import es.unizar.unoforall.sesiones.GestorSesiones;
 import es.unizar.unoforall.utils.Serializar;
 
 @Controller

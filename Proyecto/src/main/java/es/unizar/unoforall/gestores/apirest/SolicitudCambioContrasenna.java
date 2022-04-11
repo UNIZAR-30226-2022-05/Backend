@@ -1,4 +1,4 @@
-package es.unizar.unoforall.apirest;
+package es.unizar.unoforall.gestores.apirest;
 
 import javax.swing.Timer;
 

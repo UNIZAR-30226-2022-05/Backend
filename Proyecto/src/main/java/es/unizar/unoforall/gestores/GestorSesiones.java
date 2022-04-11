@@ -1,10 +1,7 @@
-package es.unizar.unoforall.sesiones;
+package es.unizar.unoforall.gestores;
 
 import java.util.HashMap;
-import javax.swing.Timer;
 import java.util.UUID;
-
-import es.unizar.unoforall.model.UsuarioVO;
 
 public class GestorSesiones {
 	

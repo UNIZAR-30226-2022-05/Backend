@@ -1,4 +1,4 @@
-package es.unizar.unoforall.apirest;
+package es.unizar.unoforall.gestores.apirest;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -6,7 +6,7 @@ import java.util.Map;
 
 import javax.swing.Timer;
 
-import es.unizar.unoforall.apirest.UsuarioDAO;
+import es.unizar.unoforall.db.UsuarioDAO;
 import es.unizar.unoforall.model.UsuarioVO;
 import es.unizar.unoforall.utils.Mail;
 
@@ -19,7 +19,7 @@ public class GestorRegistros {
 	private final static int MAX_CODIGO = 999999;
 	private final static int MIN_CODIGO = 100000;
 	
-	static Map<String,RegistroTemporal> usuariosPendientes;
+	public static Map<String,RegistroTemporal> usuariosPendientes;
 	
 	private static final Object LOCK;
 	

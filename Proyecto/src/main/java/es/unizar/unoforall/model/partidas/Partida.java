@@ -166,6 +166,7 @@ public class Partida {
 							
 						case rayosX:
 							//llamada a websockets
+							//TODO
 							break;
 							
 						case reversa:
@@ -193,6 +194,7 @@ public class Partida {
 			}
 		}
 		
+		//TODO
 		//eventos asíncronos: la carta rayosX, emojis, botón de UNO, tiempo, votación pausa
 	}
 	
@@ -248,19 +250,24 @@ public class Partida {
 	public List<Jugador> ranking() {
 		if (this.estaTerminada()) {
 			List<Jugador> resultado = new ArrayList<>(this.jugadores);
-			Collections.sort(resultado, new Comparator<Jugador>() {
-			  @Override
-			  public int compare(Jugador j1, Jugador j2) {
-				  if (j1.getMano().size() == j2.getMano().size()) {
-					  return 0;
-				  } else if (j1.getMano().size() < j2.getMano().size()) {
-					  return -1;
-				  } else {
-					  return 1;  
+			if(this.configuracion.getModoJuego().equals(ConfigSala.ModoJuego.Parejas)) {
+				return null;
+				//TODO
+			} else {
+				Collections.sort(resultado, new Comparator<Jugador>() {
+				  @Override
+				  public int compare(Jugador j1, Jugador j2) {
+					  if (j1.getMano().size() == j2.getMano().size()) {
+						  return 0;
+					  } else if (j1.getMano().size() < j2.getMano().size()) {
+						  return -1;
+					  } else {
+						  return 1;  
+					  }
 				  }
-			  }
-			});
-			return resultado;
+				});
+				return resultado;
+			}
 		} else {
 			return null;
 		}

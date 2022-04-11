@@ -1,4 +1,4 @@
-package es.unizar.unoforall.apirest;
+package es.unizar.unoforall.gestores.apirest;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import javax.swing.Timer;
 
+import es.unizar.unoforall.db.UsuarioDAO;
 import es.unizar.unoforall.model.UsuarioVO;
 import es.unizar.unoforall.utils.Mail;
 
