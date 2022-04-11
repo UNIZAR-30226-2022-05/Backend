@@ -1,0 +1,3 @@
+
+
+- los cambios de color se deben enviar especificando en el campo 'color' el color elegido

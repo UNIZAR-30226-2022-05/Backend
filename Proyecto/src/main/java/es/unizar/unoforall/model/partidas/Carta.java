@@ -16,6 +16,16 @@ public class Carta {
 	}
 
 
+	public boolean esCompatible(Carta carta) {
+		if (this.color == Color.comodin || carta.color == Color.comodin) {
+			return true;
+		} else if (this.color == carta.color || this.tipo == carta.tipo) {
+			return true;
+		} else {			
+			return false;
+		}
+	}
+	
 	public Tipo getTipo() {
 		return tipo;
 	}
@@ -34,6 +44,4 @@ public class Carta {
 	public void setColor(Color color) {
 		this.color = color;
 	}
-	
-	
 }

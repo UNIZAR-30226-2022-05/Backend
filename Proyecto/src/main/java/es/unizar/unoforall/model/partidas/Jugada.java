@@ -1,5 +1,36 @@
 package es.unizar.unoforall.model.partidas;
 
-public class Jugada {
+import java.util.List;
 
+public class Jugada {
+	List<Carta> cartas;		//En el orden en el que se quieren tirar
+	boolean robar;
+	
+	// La jugada es robar
+	public Jugada() {
+		this.cartas = null;
+		this.robar = true;
+	}
+	
+	public Jugada(List<Carta> cartas) {
+		this.cartas = cartas;
+		this.robar = false;
+	}
+
+	
+	public List<Carta> getCartas() {
+		return cartas;
+	}
+
+	public void setCartas(List<Carta> cartas) {
+		this.cartas = cartas;
+	}
+
+	public boolean isRobar() {
+		return robar;
+	}
+
+	public void setRobar(boolean robar) {
+		this.robar = robar;
+	}
 }
