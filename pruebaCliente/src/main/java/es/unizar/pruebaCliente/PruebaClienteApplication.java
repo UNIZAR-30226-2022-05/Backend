@@ -50,9 +50,12 @@ public class PruebaClienteApplication {
 		String contrasenna = scanner.nextLine();
 		
 		///LOGIN
+		String contrasennaHash = HashUtils.cifrarContrasenna(contrasenna);
+		System.out.println("El hash de la contraseña es: " + contrasennaHash);
+		
 		RestAPI apirest = new RestAPI("/api/login");
 		apirest.addParameter("correo", correo);
-		apirest.addParameter("contrasenna", HashUtils.cifrarContrasenna(contrasenna));
+		apirest.addParameter("contrasenna", contrasennaHash);
 		apirest.setOnError(e -> {System.out.println(e);});
     	
 		apirest.openConnection();
