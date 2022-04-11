@@ -471,7 +471,7 @@ public class ApiRestController {
 		UUID _amigo = Serializar.deserializar(amigo, UUID.class);
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
 		if(usuarioID != null) {
-			if (_amigo.equals(usuarioID)) {
+			if (!_amigo.equals(usuarioID)) {
 				error = UsuarioDAO.cancelarPeticion(usuarioID,_amigo); 
 			} else {
 				error = "No puedes enviarte una petición de amistad a ti mismo";
