@@ -19,6 +19,7 @@ import es.unizar.unoforall.gestores.apirest.GestorContrasennas;
 import es.unizar.unoforall.gestores.apirest.GestorRegistros;
 import es.unizar.unoforall.model.RespuestaLogin;
 import es.unizar.unoforall.model.UsuarioVO;
+import es.unizar.unoforall.model.partidas.ListaPartidas;
 import es.unizar.unoforall.model.salas.ConfigSala;
 import es.unizar.unoforall.model.salas.RespuestaSala;
 import es.unizar.unoforall.model.salas.RespuestaSalas;

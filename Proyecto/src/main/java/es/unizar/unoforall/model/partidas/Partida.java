@@ -31,7 +31,7 @@ public class Partida {
 				for(Carta.Tipo tipo : Carta.Tipo.values()) {
 					if (tipo == Carta.Tipo.n0) {
 						this.mazo.add(new Carta(tipo,color));
-					} else {	//dos veces
+					} else if (tipo != Carta.Tipo.cambioColor &&  tipo != Carta.Tipo.mas4) {	//dos veces
 						this.mazo.add(new Carta(tipo,color));
 						this.mazo.add(new Carta(tipo,color));
 					}
@@ -42,12 +42,14 @@ public class Partida {
 					this.mazo.add(new Carta(Carta.Tipo.mas4,Carta.Color.comodin));
 				}
 			}
+			//TODO meter solo las cartas especiales que estén en configuración
 		}
 		Collections.shuffle(this.mazo);
 		
 		
 		// Cartas jugadas
 		this.cartasJugadas = new ArrayList<>();
+		// TODO poner primera carta
 		
 		
 		// Jugadores
@@ -56,6 +58,7 @@ public class Partida {
 			this.jugadores.add(new Jugador(jID));
 		}
 			// Se crean las IA
+		//TODO calcular numIAs aquí dentro
 		for(int i = 0; i < numIAs; i++) {
 			this.jugadores.add(new Jugador());
 		}
@@ -110,7 +113,7 @@ public class Partida {
 	}
 	
 	private Carta robarCarta() {
-		
+		//TODO cuando no haya para robar, coger todas las jugadas menos la última, shuffle, y meterlas en el mazo
 		Carta c = this.mazo.get(0);
 		this.mazo.remove(0);
 		return c;
@@ -165,7 +168,6 @@ public class Partida {
 							break;
 							
 						case rayosX:
-							//llamada a websockets
 							//TODO
 							break;
 							
@@ -190,23 +192,29 @@ public class Partida {
 			for (Jugador j : this.jugadores) {
 				if (j.getMano().size() == 0) {
 					this.terminada = true;
+					//TODO meter partida en la BD
 				}
 			}
+			
+			
 		}
 		
-		//TODO
-		//eventos asíncronos: la carta rayosX, emojis, botón de UNO, tiempo, votación pausa
+		
+		//eventos asíncronos: emojis, botón de UNO, tiempo, votación pausa
 	}
 	
 	public void ejecutarJugadaIA() {
-		
+		//TODO
 	}
 	
 	public void expulsarJugador(UUID jugador) {
 		//se sustituye por IA
+		//TODO
 	}
 	
-	
+	public void pulsarBotonUNO(UUID jugador) {
+		//TODO
+	}
 	
 	/**************************************************************************/
 	// Para los FRONTENDs
@@ -238,6 +246,7 @@ public class Partida {
 				anterior = c;
 			}
 			return valida;
+			//TODO verificar si se hace bien la escalera... (igual mejor en los frontend)
 		}
 	}
 	
@@ -268,6 +277,7 @@ public class Partida {
 				});
 				return resultado;
 			}
+			//TODO asignar los puntos a cada jugador
 		} else {
 			return null;
 		}

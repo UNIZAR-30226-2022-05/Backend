@@ -8,12 +8,14 @@ public class Jugador {
 	private boolean esIA;
 	private UUID jugadorID;
 	private List<Carta> mano;
+	private boolean protegido_UNO;
 	
 	// Para crear un jugador IA
 	public Jugador() {
 		this.esIA = true;
 		this.jugadorID = null;
 		this.mano = new ArrayList<>();
+		this.protegido_UNO = false;
 	}
 	
 	// Para crear un jugador real
@@ -21,6 +23,7 @@ public class Jugador {
 		this.esIA = false;
 		this.jugadorID = jugadorID;
 		this.mano = new ArrayList<>();
+		this.protegido_UNO = false;
 	}
 
 	public boolean isEsIA() {

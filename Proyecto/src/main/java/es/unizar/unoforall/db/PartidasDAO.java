@@ -6,10 +6,10 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.UUID;
 
-import es.unizar.unoforall.apirest.ListaPartidas;
-import es.unizar.unoforall.apirest.PartidaJugadaVO;
-import es.unizar.unoforall.model.HaJugadoVO;
 import es.unizar.unoforall.model.PartidasAcabadasVO;
+import es.unizar.unoforall.model.partidas.HaJugadoVO;
+import es.unizar.unoforall.model.partidas.ListaPartidas;
+import es.unizar.unoforall.model.partidas.PartidaJugadaVO;
 
 public class PartidasDAO {
 

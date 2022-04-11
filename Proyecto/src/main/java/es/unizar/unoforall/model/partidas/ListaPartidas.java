@@ -1,4 +1,4 @@
-package es.unizar.unoforall.apirest;
+package es.unizar.unoforall.model.partidas;
 
 import java.util.ArrayList;
 
