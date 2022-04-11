@@ -401,7 +401,7 @@ public class UsuarioDAO {
 			
 			//Sacar si 'idUsuario' ya ha mandado una petición a 'amigo' (la haya aceptado o no)
 			PreparedStatement getRequest1 = 
-					conn.prepareStatement("SELECT * FROM amigo_de WHERE emisor = ? and receptor = ?");
+					conn.prepareStatement("SELECT * FROM amigo_de WHERE emisor = ? and receptor = ?;");
 			getRequest1.setObject(1,idUsuario);
 			getRequest1.setObject(2, amigo);
 			ResultSet rs = getRequest1.executeQuery();
@@ -411,7 +411,7 @@ public class UsuarioDAO {
 			} else {
 				//Sacar si había una petición por parte de 'amigo' (aceptada o no)
 				PreparedStatement getRequest2 = 
-						conn.prepareStatement("SELECT * FROM amigo_de WHERE emisor = ? and receptor = ?");
+						conn.prepareStatement("SELECT * FROM amigo_de WHERE emisor = ? and receptor = ?;");
 				getRequest2.setObject(1,amigo);
 				getRequest2.setObject(2, idUsuario);
 				rs = getRequest2.executeQuery();
@@ -431,7 +431,7 @@ public class UsuarioDAO {
 					}
 					
 				} else { 	//No había ninguna petición ni eran amigos -> Se crea la solicitud de amistad
-					PreparedStatement insertRequest = conn.prepareStatement("INSERT INTO amigo_de VALUES(?,?,false)");
+					PreparedStatement insertRequest = conn.prepareStatement("INSERT INTO amigo_de VALUES(?,?,false);");
 					insertRequest.setObject(1, idUsuario);
 					insertRequest.setObject(2,amigo);
 					insertRequest.execute();
@@ -462,10 +462,10 @@ public class UsuarioDAO {
 			
 			// Se cancela la solicitud de amistad si la había
 			PreparedStatement getRequest = 
-					conn.prepareStatement("DELETE FROM amigo_de WHERE emisor = ? and receptor = ? and aceptada=false");
+					conn.prepareStatement("DELETE FROM amigo_de WHERE emisor = ? and receptor = ? and aceptada=false;");
 			getRequest.setObject(1,amigo);
 			getRequest.setObject(2, idUsuario);
-			getRequest.executeQuery();
+			getRequest.execute();
 			
 		} catch(Exception ex) {
 			ex.printStackTrace();
