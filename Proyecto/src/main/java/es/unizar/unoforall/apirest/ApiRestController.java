@@ -457,6 +457,33 @@ public class ApiRestController {
 	
 	
 	/**
+	 * Método al que llamar para cancelar la solicitud de amistad a otro usuario.
+	 * @param idSesion 	contiene el id de la sesion del usuario.
+	 * @param amigo		contiene el id de la cuenta del amigo.
+	 * @return			Devuelve "nulo" si todo ha ido bien.
+	 * 					Devuelve "SESION_EXPIRADA" si la sesión ha expirado.
+	 * 					Devuelve un mensaje de error en otro caso.	 
+	 */
+	@PostMapping("/cancelarPeticionAmistad")
+	public String cancelarPeticionAmistad(@RequestParam String sesionID,
+															 @RequestParam String amigo) {
+		String error = "nulo";
+		UUID _amigo = Serializar.deserializar(amigo, UUID.class);
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
+		if(usuarioID != null) {
+			if (_amigo != usuarioID) {
+				error = UsuarioDAO.cancelarPeticion(usuarioID,_amigo); 
+			} else {
+				error = "No puedes enviarte una petición de amistad a ti mismo";
+			}
+		} else {
+			error = "SESION_EXPIRADA";
+		}
+		return error;
+	}
+	
+	
+	/**
 	 * Método al que llamar para buscar a un amigo por correo, (no tienen por qué estar 
 	 * registrados como amigos, es para el punto de buscar usuario por correo).
 	 * @param idSesion 	contiene el id de la sesion del usuario.

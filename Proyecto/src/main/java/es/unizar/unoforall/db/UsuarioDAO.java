@@ -387,6 +387,7 @@ public class UsuarioDAO {
 	}
 	
 	/**
+	 * TODO cambiar esta descripción
 	 * Dado el id del usuario, devuelve la lista de usuarios a los que ha aceptado la solicitud de amistad.
 	 * @param idUsuario	contiene el id de la cuenta del usuario
 	 * @return			devuelve "nulo" si todo va bien. En caso contrario devuelve un mensaje de error.
@@ -397,28 +398,74 @@ public class UsuarioDAO {
 		
 		try {
 			conn = GestorPoolConexionesBD.getConnection();
-			//Sacar los amigos que me solicitaron.
+			
+			//Sacar si 'idUsuario' ya ha mandado una petición a 'amigo' (la haya aceptado o no)
+			PreparedStatement getRequest1 = 
+					conn.prepareStatement("SELECT * FROM amigo_de WHERE emisor = ? and receptor = ?");
+			getRequest1.setObject(1,idUsuario);
+			getRequest1.setObject(2, amigo);
+			ResultSet rs = getRequest1.executeQuery();
+			
+			if (rs.next()) {
+				error = "Ya se ha enviado una petición a ese usuario (puede haberla aceptado)";
+			} else {
+				//Sacar si había una petición por parte de 'amigo' (aceptada o no)
+				PreparedStatement getRequest2 = 
+						conn.prepareStatement("SELECT * FROM amigo_de WHERE emisor = ? and receptor = ?");
+				getRequest2.setObject(1,amigo);
+				getRequest2.setObject(2, idUsuario);
+				rs = getRequest2.executeQuery();
+				
+				if(rs.next()) { 
+					if (rs.getBoolean("aceptada")) {	// Ya eran amigos
+						error = "Los usuarios ya eran amigos";
+					} else {							//Ya había una petición de amistad -> se acepta y no se crea ninguna
+						PreparedStatement updateRequest = 
+								conn.prepareStatement("UPDATE amigo_de SET aceptada = true WHERE emisor = ? and receptor = ?;");
+						updateRequest.setObject(1,amigo);
+						updateRequest.setObject(2, idUsuario);
+						int rows = updateRequest.executeUpdate();
+						if(rows != 1) {
+							error = "Ha habido un error con la solicitud de amistad. Solicitudes acpetadas: " + Integer.toString(rows)+".";
+						}
+					}
+					
+				} else { 	//No había ninguna petición ni eran amigos -> Se crea la solicitud de amistad
+					PreparedStatement insertRequest = conn.prepareStatement("INSERT INTO amigo_de VALUES(?,?,false)");
+					insertRequest.setObject(1, idUsuario);
+					insertRequest.setObject(2,amigo);
+					insertRequest.execute();
+				}
+			}
+			
+		} catch(Exception ex) {
+			ex.printStackTrace();
+			error = "Ha surgido un problema con la base de datos.";
+		}finally {
+			GestorPoolConexionesBD.releaseConnection(conn);
+		}
+		return error;
+	}
+	
+	/**
+	 * TODO cambiar esta descripción
+	 * Dado el id del usuario, devuelve la lista de usuarios a los que ha aceptado la solicitud de amistad.
+	 * @param idUsuario	contiene el id de la cuenta del usuario
+	 * @return			devuelve "nulo" si todo va bien. En caso contrario devuelve un mensaje de error.
+	 */
+	public static String cancelarPeticion(UUID idUsuario, UUID amigo) {
+		String error = "nulo";
+		Connection conn = null;
+		
+		try {
+			conn = GestorPoolConexionesBD.getConnection();
+			
+			// Se cancela la solicitud de amistad si la había
 			PreparedStatement getRequest = 
-					conn.prepareStatement("SELECT * FROM amigo_de WHERE emisor = ? and receptor = ? and aceptada=false");
+					conn.prepareStatement("DELETE FROM amigo_de WHERE emisor = ? and receptor = ? and aceptada=false");
 			getRequest.setObject(1,amigo);
 			getRequest.setObject(2, idUsuario);
-			ResultSet rs = getRequest.executeQuery();
-			
-			if(rs.next()) { //Ya había una petición de amistado
-				PreparedStatement updateRequest = 
-						conn.prepareStatement("UPDATE amigo_de SET aceptada = true WHERE emisor = ? and receptor = ?;");
-				updateRequest.setObject(1,amigo);
-				updateRequest.setObject(2, idUsuario);
-				int rows = updateRequest.executeUpdate();
-				if(rows != 1) {
-					error = "Ha habido un error con la solicitud de amistad. Solicitudes acpetadas: " + Integer.toString(rows)+".";
-				}
-			} else { //Se crea la solicitud de amistad
-				PreparedStatement insertRequest = conn.prepareStatement("INSERT INTO amigo_de VALUES(?,?,false)");
-				insertRequest.setObject(1, idUsuario);
-				insertRequest.setObject(2,amigo);
-				insertRequest.execute();
-			}
+			getRequest.executeQuery();
 			
 		} catch(Exception ex) {
 			ex.printStackTrace();
