@@ -427,6 +427,8 @@ public class UsuarioDAO {
 						int rows = updateRequest.executeUpdate();
 						if(rows != 1) {
 							error = "Ha habido un error con la solicitud de amistad. Solicitudes acpetadas: " + Integer.toString(rows)+".";
+						} else {
+							error = "Solicitud pendiente aceptada; no se va a enviar una nueva";
 						}
 					}
 					

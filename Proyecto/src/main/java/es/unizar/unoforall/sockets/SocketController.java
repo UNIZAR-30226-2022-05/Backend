@@ -56,6 +56,7 @@ public class SocketController {
 	 * @param sesionID		Automático
 	 * @param vacio			Cualquier objeto no nulo
 	 * @return				(Clase UsuarioVO) El usuario de destino recibirá el VO del emisor
+	 * 						o null si la petición se la envía a sí mismo
 	 * @throws Exception
 	 */
 	@MessageMapping("/notifAmistad/{usrDestino}")
@@ -69,7 +70,11 @@ public class SocketController {
 		} else {
 			String error = UsuarioDAO.mandarPeticion(usuarioID,usrDestino);	
 			System.err.println(error);
-			return Serializar.serializar(UsuarioDAO.getUsuario(usuarioID));
+			if (error.equals("nulo")) {
+				return Serializar.serializar(UsuarioDAO.getUsuario(usuarioID));
+			} else {
+				return "nulo";
+			}
 		}
 	}
 	
