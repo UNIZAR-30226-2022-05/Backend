@@ -387,6 +387,7 @@ public class UsuarioDAO {
 	}
 	
 	/**
+	 * TODO cambiar esta descripción
 	 * Dado el id del usuario, devuelve la lista de usuarios a los que ha aceptado la solicitud de amistad.
 	 * @param idUsuario	contiene el id de la cuenta del usuario
 	 * @return			devuelve "nulo" si todo va bien. En caso contrario devuelve un mensaje de error.
@@ -419,6 +420,35 @@ public class UsuarioDAO {
 				insertRequest.setObject(2,amigo);
 				insertRequest.execute();
 			}
+			
+		} catch(Exception ex) {
+			ex.printStackTrace();
+			error = "Ha surgido un problema con la base de datos.";
+		}finally {
+			GestorPoolConexionesBD.releaseConnection(conn);
+		}
+		return error;
+	}
+	
+	/**
+	 * TODO cambiar esta descripción
+	 * Dado el id del usuario, devuelve la lista de usuarios a los que ha aceptado la solicitud de amistad.
+	 * @param idUsuario	contiene el id de la cuenta del usuario
+	 * @return			devuelve "nulo" si todo va bien. En caso contrario devuelve un mensaje de error.
+	 */
+	public static String cancelarPeticion(UUID idUsuario, UUID amigo) {
+		String error = "nulo";
+		Connection conn = null;
+		
+		try {
+			conn = GestorPoolConexionesBD.getConnection();
+			
+			// Se cancela la solicitud de amistad si la había
+			PreparedStatement getRequest = 
+					conn.prepareStatement("DELETE FROM amigo_de WHERE emisor = ? and receptor = ? and aceptada=false");
+			getRequest.setObject(1,amigo);
+			getRequest.setObject(2, idUsuario);
+			getRequest.executeQuery();
 			
 		} catch(Exception ex) {
 			ex.printStackTrace();
