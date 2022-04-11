@@ -464,14 +464,18 @@ public class ApiRestController {
 	 * 					Devuelve "SESION_EXPIRADA" si la sesión ha expirado.
 	 * 					Devuelve un mensaje de error en otro caso.	 
 	 */
-	@PostMapping("/aceptarPeticionAmistad")
+	@PostMapping("/cancelarPeticionAmistad")
 	public String cancelarPeticionAmistad(@RequestParam String sesionID,
 															 @RequestParam String amigo) {
 		String error = "nulo";
 		UUID _amigo = Serializar.deserializar(amigo, UUID.class);
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
 		if(usuarioID != null) {
-			error = UsuarioDAO.cancelarPeticion(usuarioID,_amigo); 
+			if (_amigo != usuarioID) {
+				error = UsuarioDAO.cancelarPeticion(usuarioID,_amigo); 
+			} else {
+				error = "No puedes enviarte una petición de amistad a ti mismo";
+			}
 		} else {
 			error = "SESION_EXPIRADA";
 		}
