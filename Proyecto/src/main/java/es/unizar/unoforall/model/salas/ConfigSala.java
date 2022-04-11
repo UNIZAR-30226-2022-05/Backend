@@ -43,7 +43,7 @@ public class ConfigSala {
 	public ModoJuego getModoJuego() {
 		return modoJuego;
 	}
-
+	
 	public ReglasEspeciales getReglas() {
 		return reglas;
 	}

@@ -49,4 +49,25 @@ public class Jugador {
 	public void setMano(List<Carta> mano) {
 		this.mano = mano;
 	}
+
+	public boolean isProtegido_UNO() {
+		return protegido_UNO;
+	}
+
+	public void setProtegido_UNO(boolean protegido_UNO) {
+		this.protegido_UNO = protegido_UNO;
+	}
+	
+	//Saca los puntos correspondientes a la mano actual
+	public int sacarPuntos() {
+		int puntuacion = 0;
+		for (Carta c : mano) {  //Caso cartas numéricas
+			if(c.getTipo().ordinal()>=0 && c.getTipo().ordinal()<10) {
+				puntuacion += c.getTipo().ordinal();
+			} else { 			//Caso cartas especiales
+				puntuacion += 10;
+			}
+		}
+		return puntuacion;
+	}
 }

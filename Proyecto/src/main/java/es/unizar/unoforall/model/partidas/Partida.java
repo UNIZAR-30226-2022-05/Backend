@@ -1,5 +1,7 @@
 package es.unizar.unoforall.model.partidas;
 
+import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -7,6 +9,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
+import es.unizar.unoforall.db.PartidasDAO;
+import es.unizar.unoforall.model.PartidasAcabadasVO;
 import es.unizar.unoforall.model.salas.ConfigSala;
 
 public class Partida {
@@ -16,14 +20,19 @@ public class Partida {
 	private List<Jugador> jugadores;
 	private int turno;
 	private boolean sentidoHorario;
+	private int numIAs;
 	
 	private ConfigSala configuracion;
 	private boolean terminada;	
+	private Date fechaInicio; //Fecha de inicio de la partida (Ya en formato sql porque no la necesita el frontend en este punto). 
 	
 	private static final int MAX_ROBO_ATTACK = 10;
 	
 		
-	public Partida(List<UUID> jugadoresID, int numIAs, ConfigSala configuracion) {
+	public Partida(List<UUID> jugadoresID, ConfigSala configuracion) {
+		//Marcamos fecha de inicio
+		fechaInicio = new Date(System.currentTimeMillis()); //Fecha actual.
+		
 		//Mazo
 		this.mazo = new LinkedList<>();
 		for(Carta.Color color : Carta.Color.values()) {
@@ -58,7 +67,7 @@ public class Partida {
 			this.jugadores.add(new Jugador(jID));
 		}
 			// Se crean las IA
-		//TODO calcular numIAs aquí dentro
+		numIAs = configuracion.getMaxParticipantes() - this.jugadores.size();
 		for(int i = 0; i < numIAs; i++) {
 			this.jugadores.add(new Jugador());
 		}
@@ -117,6 +126,40 @@ public class Partida {
 		Carta c = this.mazo.get(0);
 		this.mazo.remove(0);
 		return c;
+	}
+	
+	private String insertarPartidaEnBd() {
+		String error = null;
+		PartidasAcabadasVO pa = new PartidasAcabadasVO(null,fechaInicio,new Date(System.currentTimeMillis()),numIAs,configuracion.getModoJuego().ordinal());
+		ArrayList<HaJugadoVO> participantes = new ArrayList<HaJugadoVO>(); 
+		
+		ArrayList<Integer> puntos = new ArrayList<Integer>();
+		for (Jugador j : this.jugadores) {
+			puntos.add(j.sacarPuntos()); //puntos.size()==configuracion.getMaxParticipantes()
+		}
+		int i = 0; //indice del jugador que estamos comprobando
+		for (Jugador j : this.jugadores) {
+			if (!j.isEsIA()) {
+				int usuariosDebajo = 0;
+				boolean haGanado = false;
+				if (puntos.get(i)==0) {
+					haGanado = true;
+					usuariosDebajo = configuracion.getMaxParticipantes()-1;
+				} else {
+					for(Integer p : puntos) {
+						if(p>puntos.get(i)) { //En caso de usuarios empatados ninguno está por debajo de otro.
+							usuariosDebajo++; //No es necesario preocuparse por compararse consigo mismo porque
+						}					  //cuenta como empate.
+					}
+				}
+				participantes.add(new HaJugadoVO(j.getJugadorID(),pa.getId(),usuariosDebajo,haGanado));				
+			}
+			i++;
+		}
+		//participantes.size()==configuracion.getMaxParticipantes()-numIAs
+		PartidaJugada pj = new PartidaJugada(pa,participantes);
+		error = PartidasDAO.insertarPartidaAcabada(pj);
+		return error;
 	}
 	
 
@@ -195,7 +238,12 @@ public class Partida {
 					//TODO meter partida en la BD
 				}
 			}
-			
+			if (this.terminada) {
+				String error = insertarPartidaEnBd();
+				if (!error.equals("nulo")) {
+					//TODO Tratamiento de error al insertar en base de datos
+				}
+			}
 			
 		}
 		

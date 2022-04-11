@@ -11,11 +11,11 @@ import java.util.ArrayList;
 public class ListaPartidas {
 	private boolean expirado;
 	private String error = "nulo";
-	private ArrayList<PartidaJugadaVO> partidas = null;
+	private ArrayList<PartidaJugada> partidas = null;
 	
 	public ListaPartidas(boolean expirado) {
 		this.expirado = expirado;	
-		partidas = new ArrayList<PartidaJugadaVO>();
+		partidas = new ArrayList<PartidaJugada>();
 	}
 
 	public boolean isExpirado() {
@@ -26,11 +26,11 @@ public class ListaPartidas {
 		this.expirado = expirado;
 	}
 
-	public ArrayList<PartidaJugadaVO> getPartidas() {
+	public ArrayList<PartidaJugada> getPartidas() {
 		return partidas;
 	}
 
-	public void setPartidas(ArrayList<PartidaJugadaVO> partidas) {
+	public void setPartidas(ArrayList<PartidaJugada> partidas) {
 		this.partidas = partidas;
 	}
 

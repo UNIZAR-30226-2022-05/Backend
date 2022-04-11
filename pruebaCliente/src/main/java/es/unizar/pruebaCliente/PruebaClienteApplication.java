@@ -411,6 +411,13 @@ public class PruebaClienteApplication {
 					apirest.openConnection();
 			    	String retorno = apirest.receiveObject(String.class);
 			    	System.out.println(retorno);	
+				} else if (orden.equals("insertarPartidaAcabada")) {
+					
+					apirest = new RestAPI("/api/insertarPartidaAcabadaTEST");
+					apirest.setOnError(e -> {System.out.println(e);});
+					apirest.openConnection();
+			    	String retorno = apirest.receiveObject(String.class);
+			    	System.out.println(retorno);	
 				}
 				
 				  else if (orden.equals("exit")) {
