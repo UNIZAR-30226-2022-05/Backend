@@ -1,8 +1,7 @@
 package es.unizar.unoforall.sockets;
 
+import java.util.Timer;
 import java.util.UUID;
-
-import javax.swing.Timer;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -244,8 +243,8 @@ public class SocketController {
 		
 		if (partida.turnoDeIA()) {
 			AlarmaTurnoIA alarm = new AlarmaTurnoIA(this, salaID);
-			Timer t = new Timer(DELAY_TURNO_IA,alarm);
-			t.start();
+			Timer t = new Timer();
+			t.schedule(alarm, DELAY_TURNO_IA);
 		}
 		
 		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getPartida());

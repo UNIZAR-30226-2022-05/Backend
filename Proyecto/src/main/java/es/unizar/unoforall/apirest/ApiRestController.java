@@ -315,7 +315,6 @@ public class ApiRestController {
 		} else {
 			error = "SESION_EXPIRADA";
 		}
-		System.out.println("error: ");
         return error;
     }
 	

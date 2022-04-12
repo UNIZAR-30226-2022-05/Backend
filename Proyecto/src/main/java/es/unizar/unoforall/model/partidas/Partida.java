@@ -12,7 +12,6 @@ import java.util.UUID;
 import es.unizar.unoforall.db.PartidasDAO;
 import es.unizar.unoforall.model.PartidasAcabadasVO;
 import es.unizar.unoforall.model.salas.ConfigSala;
-import es.unizar.unoforall.sockets.SocketController;
 
 public class Partida {
 	private boolean hayError;

@@ -1,12 +1,11 @@
 package es.unizar.unoforall.gestores;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.util.TimerTask;
 import java.util.UUID;
 
 import es.unizar.unoforall.sockets.SocketController;
 
-public class AlarmaTurnoIA implements ActionListener {
+public class AlarmaTurnoIA extends TimerTask {
 	
 	private SocketController sController;
 	private UUID salaID;
@@ -15,9 +14,9 @@ public class AlarmaTurnoIA implements ActionListener {
 		this.sController = sController;
 		this.salaID = salaID;
 	}
-	
+
 	@Override
-	public void actionPerformed(ActionEvent e) {
+	public void run() {
 		try {
 			sController.turnoPartidaIA(salaID, "");
 		} catch (Exception e1) {
