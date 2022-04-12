@@ -12,6 +12,7 @@ import java.util.UUID;
 import es.unizar.unoforall.db.PartidasDAO;
 import es.unizar.unoforall.model.PartidasAcabadasVO;
 import es.unizar.unoforall.model.salas.ConfigSala;
+import es.unizar.unoforall.sockets.SocketController;
 
 public class Partida {
 	private boolean hayError;
@@ -177,93 +178,104 @@ public class Partida {
 	// Funciones públicas
 	/**************************************************************************/
 	
-	public void ejecutarJugada(Jugada jugada, UUID jugadorID) {
-		if (validarJugada(jugada) && 
-				this.jugadores.get(turno).getJugadorID().equals(jugadorID)) {
-			
-			if(jugada.robar) {
-				if (configuracion.getModoJuego().equals(ConfigSala.ModoJuego.Attack)) {
-					int random_robo = (int)Math.floor(Math.random()*(MAX_ROBO_ATTACK)+1);
-					for (int i = 0; i < random_robo; i++) {
-						this.jugadores.get(turno).getMano().add(robarCarta());
-					}
-				} else {
+	public void ejecutarJugada(Jugada jugada) {
+		if(jugada.robar) {
+			if (configuracion.getModoJuego().equals(ConfigSala.ModoJuego.Attack)) {
+				int random_robo = (int)Math.floor(Math.random()*(MAX_ROBO_ATTACK)+1);
+				for (int i = 0; i < random_robo; i++) {
 					this.jugadores.get(turno).getMano().add(robarCarta());
 				}
 			} else {
-				for (Carta c : jugada.cartas) {
-					switch (c.getTipo()) {
-						case intercambio:
-							List<Carta> nuevaMano = new ArrayList<>(siguienteJugador().getMano());
-							siguienteJugador().getMano().clear();
-							siguienteJugador().getMano().addAll(this.jugadores.get(turno).getMano());
-							this.jugadores.get(turno).getMano().clear();
-							this.jugadores.get(turno).getMano().addAll(nuevaMano);
-							break;
-							
-						case mas2:
-							for (int i = 0; i < 2; i++) {
-								siguienteJugador().getMano().add(robarCarta());
-							}
-							break;
-							
-						case mas4:
-							for (int i = 0; i < 4; i++) {
-								siguienteJugador().getMano().add(robarCarta());
-							}
-							break;
-							
-						case x2:
-							int numCartas = siguienteJugador().getMano().size();
-							for (int i = 0; i < numCartas; i++) {
-								siguienteJugador().getMano().add(robarCarta());
-							}
-							break;
-							
-						case rayosX:
-							//TODO
-							break;
-							
-						case reversa:
-							this.sentidoHorario = ! this.sentidoHorario;
-							break;
-							
-						case salta:
-							avanzarTurno();
-							break;
-							
-						default:
-							break;
-					}
-					this.cartasJugadas.add(0, c);
-					//TODO eliminar la carta de la mano del jugador; hacer antes de las acciones
-				}
+				this.jugadores.get(turno).getMano().add(robarCarta());
 			}
-			
-			avanzarTurno();
-			
-			// Se comprueba si se ha acabado la partida
-			for (Jugador j : this.jugadores) {
-				if (j.getMano().size() == 0) {
-					this.terminada = true;
-					//TODO meter partida en la BD
+		} else {
+			for (Carta c : jugada.cartas) {
+				switch (c.getTipo()) {
+					case intercambio:
+						List<Carta> nuevaMano = new ArrayList<>(siguienteJugador().getMano());
+						siguienteJugador().getMano().clear();
+						siguienteJugador().getMano().addAll(this.jugadores.get(turno).getMano());
+						this.jugadores.get(turno).getMano().clear();
+						this.jugadores.get(turno).getMano().addAll(nuevaMano);
+						break;
+						
+					case mas2:
+						for (int i = 0; i < 2; i++) {
+							siguienteJugador().getMano().add(robarCarta());
+						}
+						break;
+						
+					case mas4:
+						for (int i = 0; i < 4; i++) {
+							siguienteJugador().getMano().add(robarCarta());
+						}
+						break;
+						
+					case x2:
+						int numCartas = siguienteJugador().getMano().size();
+						for (int i = 0; i < numCartas; i++) {
+							siguienteJugador().getMano().add(robarCarta());
+						}
+						break;
+						
+					case rayosX:
+						//TODO
+						break;
+						
+					case reversa:
+						this.sentidoHorario = ! this.sentidoHorario;
+						break;
+						
+					case salta:
+						avanzarTurno();
+						break;
+						
+					default:
+						break;
 				}
+				this.cartasJugadas.add(0, c);
+				//TODO eliminar la carta de la mano del jugador; hacer antes de las acciones
 			}
-			if (this.terminada) {
-				String error = insertarPartidaEnBd();
-				if (!error.equals("nulo")) {
-					//TODO Tratamiento de error al insertar en base de datos
-				}
+		}
+		
+		avanzarTurno();
+		
+		// Se comprueba si se ha acabado la partida
+		for (Jugador j : this.jugadores) {
+			if (j.getMano().size() == 0) {
+				this.terminada = true;
+				//TODO meter partida en la BD
 			}
-			
+		}
+		if (this.terminada) {
+			String error = insertarPartidaEnBd();
+			if (!error.equals("nulo")) {
+				//TODO Tratamiento de error al insertar en base de datos
+			}
 		}
 		
 		
 		//eventos asíncronos: emojis, botón de UNO, tiempo, votación pausa
 	}
 	
+	public void ejecutarJugadaJugador(Jugada jugada, UUID jugadorID) {
+		if (validarJugada(jugada) && 
+				this.jugadores.get(turno).getJugadorID().equals(jugadorID)) {
+			ejecutarJugada(jugada);
+		}
+	}
+	
 	public void ejecutarJugadaIA() {
-		//TODO
+		if (this.jugadores.get(turno).isEsIA()) {
+			Jugada jugadaIA = new Jugada();
+			//TODO crear jugada según modo de juego y cartas jugables
+			
+			ejecutarJugada(jugadaIA);
+		}
+	}
+	
+	public boolean turnoDeIA() {
+		return this.jugadores.get(turno).isEsIA();
 	}
 	
 	public void expulsarJugador(UUID jugador) {

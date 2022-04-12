@@ -64,7 +64,7 @@ public class Sala {
 		return enPartida;
 	}
 	
-		// Devuelve false si no es posible añadir un nuevo participante
+	// Devuelve false si no es posible añadir un nuevo participante
 	public boolean nuevoParticipante(UsuarioVO participante) {
 		if(participantes.size() < configuracion.getMaxParticipantes()) {
 			participantes.putIfAbsent(participante.getId(), participante);
@@ -75,10 +75,14 @@ public class Sala {
 		}
 	}
 	
-	// Devuelve false si no es posible añadir un nuevo participante
+	
 	public void eliminarParticipante(UUID participanteID) {
-		participantes.remove(participanteID);
-		participantes_listos.remove(participanteID);
+		if(participantes.containsKey(participanteID)) {
+			participantes.remove(participanteID);
+			participantes_listos.remove(participanteID);
+			
+			partida.expulsarJugador(participanteID);
+		}
 	}
 	
 	// Devuelve true si todos los participantes ya están listos, y por tanto la

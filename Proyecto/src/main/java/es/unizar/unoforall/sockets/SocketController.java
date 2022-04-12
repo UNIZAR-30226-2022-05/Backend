@@ -2,6 +2,8 @@ package es.unizar.unoforall.sockets;
 
 import java.util.UUID;
 
+import javax.swing.Timer;
+
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.Header;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import es.unizar.unoforall.db.UsuarioDAO;
+import es.unizar.unoforall.gestores.AlarmaTurnoIA;
 import es.unizar.unoforall.gestores.GestorSalas;
 import es.unizar.unoforall.gestores.GestorSesiones;
 import es.unizar.unoforall.model.partidas.Jugada;
@@ -21,6 +24,8 @@ import es.unizar.unoforall.utils.Serializar;
 
 @Controller
 public class SocketController {	
+	
+	private final static int DELAY_TURNO_IA = 2*60000;  
 	
 	/**
 	 * Método para iniciar sesión
@@ -234,7 +239,14 @@ public class SocketController {
 		
 		System.out.println(sesionID + " envia un turno a la sala " + salaID);
 		
-		GestorSalas.obtenerSala(salaID).getPartida().ejecutarJugada(jugada, usuarioID);
+		Partida partida = GestorSalas.obtenerSala(salaID).getPartida();
+		partida.ejecutarJugadaJugador(jugada, usuarioID);
+		
+		if (partida.turnoDeIA()) {
+			AlarmaTurnoIA alarm = new AlarmaTurnoIA(this, salaID);
+			Timer t = new Timer(DELAY_TURNO_IA,alarm);
+			t.start();
+		}
 		
 		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getPartida());
 	}
@@ -249,13 +261,14 @@ public class SocketController {
 	 */
 	@SendTo("/topic/partidas/turnos/{salaID}")
 	public String turnoPartidaIA(@DestinationVariable UUID salaID, 
-							Partida partida) throws Exception {
+							Object vacio) throws Exception {
 		
 		if (GestorSalas.obtenerSala(salaID) == null) {
 			return Serializar.serializar(new Partida("La sala de la partida ya no existe"));
 		}
 				
 		System.out.println("Una IA envia un turno a la sala " + salaID);
+		GestorSalas.obtenerSala(salaID).getPartida().ejecutarJugadaIA();
 				
 		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getPartida());
 	}
