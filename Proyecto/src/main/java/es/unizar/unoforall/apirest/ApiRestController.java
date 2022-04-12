@@ -261,7 +261,7 @@ public class ApiRestController {
 		String resultado = "BORRADA";
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
 		if(usuarioID != null) {
-			boolean exito = UsuarioDAO.eliminarUsuario(new UsuarioVO(usuarioID,null,null,null,0,0,0));
+			boolean exito = UsuarioDAO.eliminarUsuario(new UsuarioVO(usuarioID,null,null,null,0,0,0,0,0,0));
 			if (!exito) {
 				resultado = "Ha surgido un problema al intentar borrar la cuenta.";
 			} else {

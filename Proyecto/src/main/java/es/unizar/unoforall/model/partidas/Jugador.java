@@ -8,7 +8,7 @@ public class Jugador {
 	private boolean esIA;
 	private UUID jugadorID;
 	private List<Carta> mano;
-	private boolean protegido_UNO;
+	private boolean protegido_UNO; 
 	
 	// Para crear un jugador IA
 	public Jugador() {

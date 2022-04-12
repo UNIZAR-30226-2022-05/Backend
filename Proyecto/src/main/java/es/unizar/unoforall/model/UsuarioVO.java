@@ -17,12 +17,19 @@ public class UsuarioVO {
 	private int puntos;
 	private int totalPartidas;
 	private int numVictorias;
+	private int avatar;
+	private int aspectoTablero;
+	private int aspectoCartas;
 	
+	
+
 	public UsuarioVO() {
 		exito = false;
 	}
 	
-	public UsuarioVO(UUID id, String correo, String nombre, String contrasenna, int puntos, int totalPartidas, int numVictorias) {
+	public UsuarioVO(UUID id, String correo, String nombre, String contrasenna, 
+			int puntos, int totalPartidas, int numVictorias, int avatar,
+			int aspectoTablero, int aspectoCartas) {
 		if(id == null) {
 			id = UUID.randomUUID();
 		}
@@ -34,6 +41,9 @@ public class UsuarioVO {
 		this.totalPartidas = totalPartidas;
 		this.numVictorias = numVictorias;
 		this.exito = true;
+		this.avatar = avatar;
+		this.aspectoTablero = aspectoTablero;
+		this.aspectoCartas = aspectoCartas;
 	}
 	
 	public UsuarioVO(UUID id, String correo, String nombre, String contrasenna) {
@@ -48,6 +58,9 @@ public class UsuarioVO {
 		this.totalPartidas = 0;
 		this.numVictorias = 0;
 		this.exito = true;
+		this.avatar = 0;
+		this.aspectoTablero = 0;
+		this.aspectoCartas = 0;
 	}
 
 
@@ -123,5 +136,29 @@ public class UsuarioVO {
 
 	public boolean isExito() {
 		return exito;
+	}
+	
+	public int getAvatar() {
+		return avatar;
+	}
+
+	public void setAvatar(int avatar) {
+		this.avatar = avatar;
+	}
+
+	public int getAspectoTablero() {
+		return aspectoTablero;
+	}
+
+	public void setAspectoTablero(int aspectoTablero) {
+		this.aspectoTablero = aspectoTablero;
+	}
+
+	public int getAspectoCartas() {
+		return aspectoCartas;
+	}
+
+	public void setAspectoCartas(int aspectoCartas) {
+		this.aspectoCartas = aspectoCartas;
 	}
 }

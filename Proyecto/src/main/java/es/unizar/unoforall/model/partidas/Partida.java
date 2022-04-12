@@ -226,6 +226,7 @@ public class Partida {
 							break;
 					}
 					this.cartasJugadas.add(0, c);
+					//TODO eliminar la carta de la mano del jugador; hacer antes de las acciones
 				}
 			}
 			

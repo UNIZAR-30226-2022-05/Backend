@@ -30,6 +30,9 @@ public class UsuarioDAO {
 			int puntos = usuario.getPuntos();
 			int totalPartidas = usuario.getTotalPartidas();
 			int numVictorias = usuario.getNumVictorias();
+			int avatar = usuario.getAvatar();
+			int aspectoTablero = usuario.getAspectoTablero();
+			int aspectoCartas = usuario.getAspectoCartas();
 			PreparedStatement addUser = 
 					conn.prepareStatement("INSERT INTO usuarios VALUES(?, ?, ?, ?, ?, ?, ?)"
 											+ "ON CONFLICT(id) DO UPDATE "
@@ -38,7 +41,10 @@ public class UsuarioDAO {
 											+ "		nombre=EXCLUDED.nombre,"
 											+ "		puntos=EXCLUDED.puntos,"
 											+ "		total_partidas=EXCLUDED.total_partidas,"
-											+ "		num_victorias=EXCLUDED.num_victorias;");
+											+ "		num_victorias=EXCLUDED.num_victorias,"
+											+ "		avatar=EXCLUDED.avatar,"
+											+ "		aspectoTablero=EXCLUDED.aspectoTablero,"
+											+ "		aspectoCartas=EXCLUDED.aspectoCartas;");
 			addUser.setObject(1, idUsuario);
 			addUser.setString(2, correo);
 			addUser.setString(3, password);
@@ -46,6 +52,9 @@ public class UsuarioDAO {
 			addUser.setInt(5, puntos);
 			addUser.setInt(6, totalPartidas);
 			addUser.setInt(7, numVictorias);
+			addUser.setInt(8, avatar);
+			addUser.setInt(9, aspectoTablero);
+			addUser.setInt(10, aspectoCartas);
 			addUser.execute();
 			
 			result = true;
@@ -77,6 +86,9 @@ public class UsuarioDAO {
 			int puntos = usuario.getPuntos();
 			int totalPartidas = usuario.getTotalPartidas();
 			int numVictorias = usuario.getNumVictorias();
+			int avatar = usuario.getAvatar();
+			int aspectoTablero = usuario.getAspectoTablero();
+			int aspectoCartas = usuario.getAspectoCartas();
 			
 			PreparedStatement updateUser = 
 					conn.prepareStatement("UPDATE usuarios SET "
@@ -86,6 +98,9 @@ public class UsuarioDAO {
 											+ "puntos=?, "
 											+ "total_partidas=? "
 											+ "num_victorias=? "
+											+ "avatar=? "
+											+ "aspectoTablero=? "
+											+ "aspectoCartas=? "
 											+ "WHERE id=?;");
 			
 			updateUser.setString(1, nombre);
@@ -95,6 +110,9 @@ public class UsuarioDAO {
 			updateUser.setInt(5, totalPartidas);
 			updateUser.setInt(6, numVictorias);
 			updateUser.setObject(7, idUsuario);
+			updateUser.setInt(8, avatar);
+			updateUser.setInt(9, aspectoTablero);
+			updateUser.setInt(10, aspectoCartas);
 			updateUser.execute();
 			
 			result = true;
@@ -133,9 +151,13 @@ public class UsuarioDAO {
 				int puntos = rs.getInt("puntos");
 				int totalPartidas = rs.getInt("total_partidas");
 				int numVictorias = rs.getInt("num_victorias");
+				int avatar = rs.getInt("avatar");
+				int aspectoTablero = rs.getInt("aspectoTablero");
+				int aspectoCartas = rs.getInt("aspectoCartas");
 				
 				result = new UsuarioVO(idUsuario, correo, nombre, 
-						password, puntos, totalPartidas, numVictorias);
+						password, puntos, totalPartidas, numVictorias, 
+						avatar, aspectoTablero, aspectoCartas);
 			}
 		}catch(Exception ex) {
 			ex.printStackTrace();
@@ -233,9 +255,13 @@ public class UsuarioDAO {
 				int puntos = rs.getInt("puntos");
 				int totalPartidas = rs.getInt("total_partidas");
 				int numVictorias = rs.getInt("num_victorias");
+				int avatar = rs.getInt("avatar");
+				int aspectoTablero = rs.getInt("aspectoTablero");
+				int aspectoCartas = rs.getInt("aspectoCartas");
 				
 				result = new UsuarioVO(idUsuario, correo, nombre, password, 
-						puntos, totalPartidas, numVictorias);
+						puntos, totalPartidas, numVictorias, avatar, 
+						aspectoTablero, aspectoCartas);
 			}
 		}catch(Exception ex) {
 			ex.printStackTrace();
