@@ -34,7 +34,7 @@ public class UsuarioDAO {
 			int aspectoTablero = usuario.getAspectoTablero();
 			int aspectoCartas = usuario.getAspectoCartas();
 			PreparedStatement addUser = 
-					conn.prepareStatement("INSERT INTO usuarios VALUES(?, ?, ?, ?, ?, ?, ?)"
+					conn.prepareStatement("INSERT INTO usuarios VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 											+ "ON CONFLICT(id) DO UPDATE "
 											+ "SET	correo=EXCLUDED.correo,"
 											+ "		contrasenna=EXCLUDED.contrasenna,"
