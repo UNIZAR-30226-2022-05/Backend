@@ -5,7 +5,8 @@ CREATE TABLE IF NOT EXISTS usuarios(
 			nombre VARCHAR(200) NOT NULL,
 			puntos INT NOT NULL,
 			total_partidas INT NOT NULL,
-			num_victorias INT NOT NULL);
+			num_victorias INT NOT NULL
+			avatar INT NOT NULL);
 
 CREATE TABLE IF NOT EXISTS amigo_de(
 			emisor UUID NOT NULL,
