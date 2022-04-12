@@ -13,6 +13,8 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import es.unizar.unoforall.db.UsuarioDAO;
 import es.unizar.unoforall.gestores.GestorSalas;
 import es.unizar.unoforall.gestores.GestorSesiones;
+import es.unizar.unoforall.model.partidas.Jugada;
+import es.unizar.unoforall.model.partidas.Partida;
 import es.unizar.unoforall.model.salas.NotificacionSala;
 import es.unizar.unoforall.model.salas.Sala;
 import es.unizar.unoforall.utils.Serializar;
@@ -122,7 +124,11 @@ public class SocketController {
 		
 		if (GestorSalas.obtenerSala(salaID) == null) {
 			return Serializar.serializar(new Sala("La sala ya no existe"));
+		} else if (GestorSalas.obtenerSala(salaID).isEnPartida()) {
+			return Serializar.serializar(new Sala("La sala ya está en partida"));
 		}
+		
+		
 		if (GestorSesiones.obtenerUsuarioID(sesionID) == null) {
 			return Serializar.serializar(new Sala("La sesión ha caducado. Vuelva a iniciar sesión"));
 		}
@@ -157,6 +163,7 @@ public class SocketController {
 		if (GestorSesiones.obtenerUsuarioID(sesionID) == null) {
 			return Serializar.serializar(new Sala("La sesión ha caducado. Vuelva a iniciar sesión"));
 		}
+		
 		GestorSalas.obtenerSala(salaID).
 			nuevoParticipanteListo(GestorSesiones.obtenerUsuarioID(sesionID));
 		
@@ -196,11 +203,62 @@ public class SocketController {
 	}
 	
 	
+	
 	/**************************************************************************/
 	// Partidas
 	/**************************************************************************/
 	
+	/**
+	 * Método para realizar una jugada en una partida
+	 * @param salaID		En la URL: id de la sala
+	 * @param sesionID		Automático
+	 * @param jugada		Jugada realizada
+	 * @return				(Clase Partida) La partida actualizada tras cada turno
+	 * 						Partida con 'error' = true si la sala no existe o 
+	 * 						el usuario no está logueado
+	 * @throws Exception
+	 */
+	@MessageMapping("/partidas/turnos/{salaID}")
+	@SendTo("/topic/partidas/turnos/{salaID}")
+	public String turnoPartida(@DestinationVariable UUID salaID, 
+							@Header("simpSessionId") String sesionID, 
+							Jugada jugada) throws Exception {
+		
+		if (GestorSalas.obtenerSala(salaID) == null) {
+			return Serializar.serializar(new Partida("La sala de la partida ya no existe"));
+		}
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
+		if (usuarioID == null) {
+			return Serializar.serializar(new Partida("La sesión ha caducado. Vuelva a iniciar sesión"));
+		}
+		
+		System.out.println(sesionID + " envia un turno a la sala " + salaID);
+		
+		GestorSalas.obtenerSala(salaID).getPartida().ejecutarJugada(jugada, usuarioID);
+		
+		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getPartida());
+	}
 	
+	/**
+	 * (EXCLUSIVO BACKEND) Método para avisar de un turno generado por la IA
+	 * @param salaID		En la URL: id de la sala
+	 * @param vacio			Cualquier objeto no nulo
+	 * @return				(Clase Partida) La partida actualizada tras cada turno
+	 * 						Partida con 'error' = true si la sala no existe
+	 * @throws Exception
+	 */
+	@SendTo("/topic/partidas/turnos/{salaID}")
+	public String turnoPartidaIA(@DestinationVariable UUID salaID, 
+							Partida partida) throws Exception {
+		
+		if (GestorSalas.obtenerSala(salaID) == null) {
+			return Serializar.serializar(new Partida("La sala de la partida ya no existe"));
+		}
+				
+		System.out.println("Una IA envia un turno a la sala " + salaID);
+				
+		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getPartida());
+	}
 	
 	
 	

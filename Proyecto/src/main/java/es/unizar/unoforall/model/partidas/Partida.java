@@ -14,6 +14,9 @@ import es.unizar.unoforall.model.PartidasAcabadasVO;
 import es.unizar.unoforall.model.salas.ConfigSala;
 
 public class Partida {
+	private boolean hayError;
+	private String error;
+	
 	private List<Carta> mazo;
 	private List<Carta> cartasJugadas;
 	
@@ -28,8 +31,15 @@ public class Partida {
 	
 	private static final int MAX_ROBO_ATTACK = 10;
 	
+	public Partida(String error) {			//Para construir una partida con error = true
+		this.setHayEror(true);
+		this.setError(error);
+	}
 		
 	public Partida(List<UUID> jugadoresID, ConfigSala configuracion) {
+		this.setHayEror(false);
+		this.setError("");
+		
 		//Marcamos fecha de inicio
 		fechaInicio = new Date(System.currentTimeMillis()); //Fecha actual.
 		
@@ -330,5 +340,23 @@ public class Partida {
 		} else {
 			return null;
 		}
+	}
+
+
+	public boolean isHayError() {
+		return hayError;
+	}
+
+
+	public void setHayEror(boolean hayError) {
+		this.hayError = hayError;
+	}
+
+	public String getError() {
+		return error;
+	}
+
+	public void setError(String error) {
+		this.error = error;
 	}
 }
