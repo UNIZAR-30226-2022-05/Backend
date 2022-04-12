@@ -271,10 +271,11 @@ public class PruebaClienteApplication {
 			    	ListaUsuarios retorno = apirest.receiveObject(ListaUsuarios.class);
 			    	if(retorno.isExpirado()) {
 			    		System.out.println("La sesión ha expirado.");
-			    	} else if (retorno.getError()!=null) {
+			    	} else if (retorno.isExpirado()) {
 			    		System.out.println("Ha sucedido el siguiente error:"+retorno.getError());
 			    	} else {
 			    		System.out.println("Datos del usuario: ");
+			    		System.out.println("Correo: "+ retorno.getUsuarios().get(0).getId());
 			    		System.out.println("Correo: "+ retorno.getUsuarios().get(0).getCorreo());
 			    		System.out.println("Nombre: "+ retorno.getUsuarios().get(0).getNombre());
 			    		System.out.println("Puntos: "+ retorno.getUsuarios().get(0).getPuntos());
