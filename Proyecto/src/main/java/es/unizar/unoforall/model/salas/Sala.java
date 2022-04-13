@@ -81,7 +81,9 @@ public class Sala {
 			participantes.remove(participanteID);
 			participantes_listos.remove(participanteID);
 			
-			partida.expulsarJugador(participanteID);
+			if (this.enPartida)	 {
+				partida.expulsarJugador(participanteID);
+			}
 		}
 	}
 	
