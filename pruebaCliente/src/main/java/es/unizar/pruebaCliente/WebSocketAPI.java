@@ -17,11 +17,9 @@ import org.springframework.web.socket.client.WebSocketClient;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 
-import com.google.gson.Gson;
-
 public class WebSocketAPI {
 	
-	private static final String SERVER_IP = "ws://localhost/unoforall";
+	private static String SERVER_URL = "ws://localhost/unoforall";
 
     public static final int GLOBAL_ERROR = 0;
     public static final int SUBSCRIPTION_ERROR = 1;
@@ -41,12 +39,8 @@ public class WebSocketAPI {
         this.onError = onError;
     }
     
-    private Gson gson = null;
-    private Gson getGson(){
-        if(gson == null){
-            gson = new Gson();
-        }
-        return gson;
+    public static void setServerIP(String serverIP){
+        WebSocketAPI.SERVER_URL = "ws://" + serverIP + "/unoforall";
     }
 
     
@@ -60,7 +54,7 @@ public class WebSocketAPI {
         client.setMessageConverter(new MappingJackson2MessageConverter());
         sesion = null;
         closed = false;
-        onError = t -> t.printStackTrace();
+        onError = t -> {t.printStackTrace(); close();};
     }
     
     public void openConnection() throws InterruptedException, ExecutionException{
@@ -92,7 +86,7 @@ public class WebSocketAPI {
 					Type tipo = receptores.get(topic);
 					Consumer consumidor = consumidores.get(topic);
 					
-					Object objeto = getGson().fromJson(message, tipo);
+					Object objeto = Serializar.deserializar(message, tipo);
 					
 					consumidor.accept(objeto);
 				} else {
@@ -105,7 +99,7 @@ public class WebSocketAPI {
 			}
 		};
     	
-    	sesion = client.connect(SERVER_IP, sessionHandler).get();
+    	sesion = client.connect(SERVER_URL, sessionHandler).get();
 		
 		while(!sesion.isConnected()) {
 			synchronized (LOCK) {

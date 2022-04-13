@@ -6,7 +6,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -14,10 +13,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import com.google.gson.Gson;
-
 public class RestAPI{
-    private static final String SERVER_IP = "http://localhost";
+    private static String SERVER_URL = "http://localhost";
     private static final int HTTP_OK = 200;
     private static final int CONNECTION_TIMEOUT_MS = 3000;
 
@@ -26,18 +23,14 @@ public class RestAPI{
     private HttpURLConnection conexion;
     private boolean closed;
     private Consumer<Exception> onError = ex -> {ex.printStackTrace(); close();};
-
-    private Gson gson = null;
-    private Gson getGson(){
-        if(gson == null){
-            gson = new Gson();
-        }
-        return gson;
+    
+    public static void setServerIP(String serverIP){
+        RestAPI.SERVER_URL = "http://" + serverIP;
     }
 
     public RestAPI(String seccion){
         parameters = new HashMap<>();
-        fullIP = SERVER_IP + seccion;
+        fullIP = SERVER_URL + seccion;
         conexion = null;
         closed = false;
     }
@@ -47,11 +40,7 @@ public class RestAPI{
     }
 
     public <T> void addParameter(String key, T value){
-    	if (value instanceof String) {
-    		parameters.put(key, (String)value);
-    	} else {
-    		parameters.put(key, getGson().toJson(value));
-    	}
+    	parameters.put(key, Serializar.serializar(value));
     }
 
     private static String getDataString(Map<String, String> params) throws UnsupportedEncodingException{
@@ -75,7 +64,7 @@ public class RestAPI{
         }
         try{
             String data = getDataString(parameters);
-            //System.out.println(data + "holi");
+            
             URL url = new URL(fullIP);
             conexion = (HttpURLConnection) url.openConnection();
             conexion.setRequestMethod( "POST" );
@@ -95,37 +84,30 @@ public class RestAPI{
                         conexion.getResponseCode(),
                         fullIP));
             }
-        }catch(IOException ex){
+        }catch(Exception ex){
             onError.accept(ex);
-        }
-    }
-
-    public <T> T receiveObject(Class<T> requestedClass){
-        if(closed){
-            return null;
-        }
-        try {
-            InputStream responseBody = conexion.getInputStream();
-            InputStreamReader responseBodyReader = new InputStreamReader(responseBody, "UTF-8");
-            return getGson().fromJson(responseBodyReader, requestedClass);
-        }catch(IOException ex){
-            onError.accept(ex);
-            return null;
         }
     }
     
-    public <T> T receiveObject(Type requestedClass){
+    public <T> T receiveObject(Class<T> requestedClass, boolean autoClose){
         if(closed){
             return null;
         }
         try {
             InputStream responseBody = conexion.getInputStream();
-            InputStreamReader responseBodyReader = new InputStreamReader(responseBody, "UTF-8");
-            return getGson().fromJson(responseBodyReader, requestedClass);
-        }catch(IOException ex){
+            T dato = Serializar.deserializar(responseBody, requestedClass);
+            if(autoClose){
+                close();
+            }
+            
+            return dato;
+        }catch(Exception ex){
             onError.accept(ex);
             return null;
         }
+    }
+    public <T> T receiveObject(Class<T> requestedClass){
+        return receiveObject(requestedClass, true);
     }
 
     public void close(){
@@ -142,8 +124,7 @@ public class RestAPI{
         try{
             conexion.disconnect();
         }catch(Exception ex){}
-
-        gson = null;
+        
         closed = true;
     }
 

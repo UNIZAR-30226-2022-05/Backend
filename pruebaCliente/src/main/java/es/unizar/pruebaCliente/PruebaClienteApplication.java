@@ -15,6 +15,7 @@ import es.unizar.pruebaCliente.model.salas.NotificacionSala;
 import es.unizar.pruebaCliente.model.salas.ReglasEspeciales;
 import es.unizar.pruebaCliente.model.salas.RespuestaSala;
 import es.unizar.pruebaCliente.model.salas.Sala;
+import es.unizar.pruebaCliente.utils.HashUtils;
 
 
 @SpringBootApplication
@@ -49,9 +50,12 @@ public class PruebaClienteApplication {
 		String contrasenna = scanner.nextLine();
 		
 		///LOGIN
+		String contrasennaHash = HashUtils.cifrarContrasenna(contrasenna);
+		System.out.println("El hash de la contraseña es: " + contrasennaHash);
+		
 		RestAPI apirest = new RestAPI("/api/login");
 		apirest.addParameter("correo", correo);
-		apirest.addParameter("contrasenna", contrasenna);
+		apirest.addParameter("contrasenna", contrasennaHash);
 		apirest.setOnError(e -> {System.out.println(e);});
     	
 		apirest.openConnection();
@@ -219,7 +223,7 @@ public class PruebaClienteApplication {
 					String nuevoCorreo = scanner.nextLine();
 					
 					apirest = new RestAPI("/api/actualizarCuentaStepOne");
-					apirest.addParameter("sessionID",sesionID);
+					apirest.addParameter("sesionID",sesionID);
 					apirest.addParameter("correoNuevo",nuevoCorreo);
 					apirest.addParameter("nombre",nuevoNombre);
 					apirest.addParameter("contrasenna",nuevaContrasenna);
@@ -232,7 +236,7 @@ public class PruebaClienteApplication {
 						Integer codigo = Integer.valueOf(scanner.nextLine());
 						
 						apirest = new RestAPI("/api/actualizarCuentaStepTwo");
-						apirest.addParameter("sessionID",sesionID);
+						apirest.addParameter("sesionID",sesionID);
 						apirest.addParameter("codigo",codigo);
 						apirest.setOnError(e -> {System.out.println(e);});
 						
@@ -247,12 +251,19 @@ public class PruebaClienteApplication {
 			    		System.out.println(retorno);
 			    	}
 			    	
+				} else if (orden.equals("sacarID")) {
+					apirest = new RestAPI("/api/sacarUsuarioVO");
+					apirest.addParameter("sesionID", sesionID);
+					apirest.openConnection();
+					UsuarioVO usuario = apirest.receiveObject(UsuarioVO.class);
+					System.out.println("Tu ID de usuario es: " + usuario.getId());
+					
 				} else if (orden.equals("buscarAmigo")) {
 					System.out.println("Introduce correo usuario amigo:");
 					String correoAmigo = scanner.nextLine();
 					
 					apirest = new RestAPI("/api/buscarAmigo");
-					apirest.addParameter("sessionID", sesionID);
+					apirest.addParameter("sesionID", sesionID);
 					apirest.addParameter("amigo", correoAmigo);
 					apirest.setOnError(e -> {System.out.println(e);});
 					
@@ -260,10 +271,11 @@ public class PruebaClienteApplication {
 			    	ListaUsuarios retorno = apirest.receiveObject(ListaUsuarios.class);
 			    	if(retorno.isExpirado()) {
 			    		System.out.println("La sesión ha expirado.");
-			    	} else if (retorno.getError()!=null) {
+			    	} else if (retorno.isExpirado()) {
 			    		System.out.println("Ha sucedido el siguiente error:"+retorno.getError());
 			    	} else {
 			    		System.out.println("Datos del usuario: ");
+			    		System.out.println("Correo: "+ retorno.getUsuarios().get(0).getId());
 			    		System.out.println("Correo: "+ retorno.getUsuarios().get(0).getCorreo());
 			    		System.out.println("Nombre: "+ retorno.getUsuarios().get(0).getNombre());
 			    		System.out.println("Puntos: "+ retorno.getUsuarios().get(0).getPuntos());
@@ -271,7 +283,7 @@ public class PruebaClienteApplication {
 			    		
 				} else if (orden.equals("aceptarPeticion")) {
 				    apirest = new RestAPI("/api/sacarPeticionesRecibidas");
-					apirest.addParameter("sessionID", sesionID);
+					apirest.addParameter("sesionID", sesionID);
 					apirest.setOnError(e -> {System.out.println(e);});
 					
 					apirest.openConnection();
@@ -287,7 +299,7 @@ public class PruebaClienteApplication {
 			    		}
 			    		String identificador = scanner.nextLine();
 			    		apirest = new RestAPI("/api/aceptarPeticionAmistad");
-						apirest.addParameter("sessionID", sesionID);
+						apirest.addParameter("sesionID", sesionID);
 						apirest.addParameter("amigo", identificador);
 						apirest.setOnError(e -> {System.out.println(e);});
 						
@@ -299,10 +311,21 @@ public class PruebaClienteApplication {
 				    		System.out.println("Ha surgido un error: " + error);
 				    	}
 			    	}
+				} else if (orden.equals("cancelarPeticion")) {
+					System.out.println("Introduce el ID del usuario de la petición:");
+					String idAmigoPeticion = scanner.nextLine();
+					
+				    apirest = new RestAPI("/api/cancelarPeticionAmistad");
+					apirest.addParameter("sesionID", sesionID);
+					apirest.addParameter("amigo", idAmigoPeticion);
+					apirest.setOnError(e -> {System.out.println(e);});
+					apirest.openConnection();
+					String error = apirest.receiveObject(String.class);
+					System.out.println("error: " + error);
 				} else if (orden.equals("peticionesEnviadas")) {
 					
 					apirest = new RestAPI("/api/sacarPeticionesEnviadas");
-					apirest.addParameter("sessionID", sesionID);
+					apirest.addParameter("sesionID", sesionID);
 					apirest.setOnError(e -> {System.out.println(e);});
 					
 					apirest.openConnection();
@@ -322,7 +345,7 @@ public class PruebaClienteApplication {
 				} else if (orden.equals("peticionesRecibidas")) {
 					
 					apirest = new RestAPI("/api/sacarPeticionesRecibidas");
-					apirest.addParameter("sessionID", sesionID);
+					apirest.addParameter("sesionID", sesionID);
 					apirest.setOnError(e -> {System.out.println(e);});
 					
 					apirest.openConnection();
@@ -341,7 +364,7 @@ public class PruebaClienteApplication {
 			    	}
 				} else if (orden.equals("sacarAmigos")) {
 					apirest = new RestAPI("/api/sacarAmigos");
-					apirest.addParameter("sessionID", sesionID);
+					apirest.addParameter("sesionID", sesionID);
 					apirest.setOnError(e -> {System.out.println(e);});
 					
 					apirest.openConnection();
@@ -405,7 +428,7 @@ public class PruebaClienteApplication {
 				} else if (orden.equals("borrarCuenta")) {
 					
 					apirest = new RestAPI("/api/borrarCuenta");
-					apirest.addParameter("sessionID",sesionID);
+					apirest.addParameter("sesionID",sesionID);
 					apirest.setOnError(e -> {System.out.println(e);});
 					
 					apirest.openConnection();
