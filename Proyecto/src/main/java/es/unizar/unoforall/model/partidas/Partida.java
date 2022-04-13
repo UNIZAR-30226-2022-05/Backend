@@ -9,7 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-import es.unizar.unoforall.db.PartidasDAO;
+//import es.unizar.unoforall.db.PartidasDAO;
 import es.unizar.unoforall.model.PartidasAcabadasVO;
 import es.unizar.unoforall.model.salas.ConfigSala;
 
@@ -158,7 +158,7 @@ public class Partida {
 		}
 		//participantes.size()==configuracion.getMaxParticipantes()-numIAs
 		PartidaJugada pj = new PartidaJugada(pa,participantes);
-		error = PartidasDAO.insertarPartidaAcabada(pj);
+		error = "no se ha hecho";// PartidasDAO.insertarPartidaAcabada(pj);
 		return error;
 	}
 	
