@@ -1,5 +1,6 @@
 package es.unizar.unoforall.gestores.apirest;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -94,5 +95,19 @@ private final static int EXPIRACION_REGISTRO = 5*60000;
 			}
 			return error;
 		}
+	}
+	
+	/**
+	 * Método que devuelve true si algún elemento del map <peticiones> contiene el correo <correo>.
+	 * False en caso contrario.
+	 */
+	public static boolean contieneCorreo(String correo) {
+		Collection<RegistroTemporal> pet = peticiones.values();
+		for (RegistroTemporal r : pet) {
+			if (r.getUsuario().getCorreo().equals(correo)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }
