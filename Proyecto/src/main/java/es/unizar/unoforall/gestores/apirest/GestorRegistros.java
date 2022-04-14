@@ -39,7 +39,7 @@ public class GestorRegistros {
 		synchronized (LOCK) {
 			String error = "nulo";
 			if (!usuariosPendientes.containsKey(user.getCorreo()) &&
-					!GestorActualizaCuentas.peticiones.containsKey(user.getCorreo())) {
+					!GestorActualizaCuentas.contieneCorreo(user.getCorreo())) {
 				int codigo = (int) ((Math.random() * (MAX_CODIGO - MIN_CODIGO)) + MIN_CODIGO);
 				
 				
