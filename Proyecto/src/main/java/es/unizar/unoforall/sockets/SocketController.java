@@ -240,8 +240,12 @@ public class SocketController {
 		
 		Partida partida = GestorSalas.obtenerSala(salaID).getPartida();
 		partida.ejecutarJugadaJugador(jugada, usuarioID);
-		
-		if (partida.turnoDeIA()) {
+		if(partida.estaTerminada()) {
+			String error = GestorSalas.insertarPartidaEnBd(partida.getFechaInicio(),partida.getNumIAs(),partida.getConfiguracion(),partida.getJugadores());
+			if (!error.equals("nulo")) {
+				//TODO Tratamiento de error al insertar en base de datos
+			}			
+		} else if (partida.turnoDeIA()) {
 			AlarmaTurnoIA alarm = new AlarmaTurnoIA(this, salaID);
 			Timer t = new Timer();
 			t.schedule(alarm, DELAY_TURNO_IA);
@@ -268,6 +272,16 @@ public class SocketController {
 				
 		System.out.println("Una IA envia un turno a la sala " + salaID);
 		GestorSalas.obtenerSala(salaID).getPartida().ejecutarJugadaIA();
+		if(GestorSalas.obtenerSala(salaID).getPartida().estaTerminada()) {
+			String error = GestorSalas.insertarPartidaEnBd(
+					GestorSalas.obtenerSala(salaID).getPartida().getFechaInicio(),
+					GestorSalas.obtenerSala(salaID).getPartida().getNumIAs(),
+					GestorSalas.obtenerSala(salaID).getPartida().getConfiguracion(),
+					GestorSalas.obtenerSala(salaID).getPartida().getJugadores());
+			if (!error.equals("nulo")) {
+				//TODO Tratamiento de error al insertar en base de datos
+			}			
+		}
 				
 		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getPartida());
 	}

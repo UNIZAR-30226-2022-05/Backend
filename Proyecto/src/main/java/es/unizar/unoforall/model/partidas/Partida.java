@@ -32,12 +32,12 @@ public class Partida {
 	private static final int MAX_ROBO_ATTACK = 10;
 	
 	public Partida(String error) {			//Para construir una partida con error = true
-		this.setHayEror(true);
+		this.setHayError(true);
 		this.setError(error);
 	}
 		
 	public Partida(List<UUID> jugadoresID, ConfigSala configuracion) {
-		this.setHayEror(false);
+		this.setHayError(false);
 		this.setError("");
 		
 		//Marcamos fecha de inicio
@@ -137,41 +137,9 @@ public class Partida {
 		this.mazo.remove(0);
 		return c;
 	}
+	/*
 	
-	private String insertarPartidaEnBd() {
-		String error = null;
-		PartidasAcabadasVO pa = new PartidasAcabadasVO(null,fechaInicio,new Date(System.currentTimeMillis()),numIAs,configuracion.getModoJuego().ordinal());
-		ArrayList<HaJugadoVO> participantes = new ArrayList<HaJugadoVO>(); 
-		
-		ArrayList<Integer> puntos = new ArrayList<Integer>();
-		for (Jugador j : this.jugadores) {
-			puntos.add(j.sacarPuntos()); //puntos.size()==configuracion.getMaxParticipantes()
-		}
-		int i = 0; //indice del jugador que estamos comprobando
-		for (Jugador j : this.jugadores) {
-			if (!j.isEsIA()) {
-				int usuariosDebajo = 0;
-				boolean haGanado = false;
-				if (puntos.get(i)==0) {
-					haGanado = true;
-					usuariosDebajo = configuracion.getMaxParticipantes()-1;
-				} else {
-					for(Integer p : puntos) {
-						if(p>puntos.get(i)) { //En caso de usuarios empatados ninguno está por debajo de otro.
-							usuariosDebajo++; //No es necesario preocuparse por compararse consigo mismo porque
-						}					  //cuenta como empate.
-					}
-				}
-				participantes.add(new HaJugadoVO(j.getJugadorID(),pa.getId(),usuariosDebajo,haGanado));				
-			}
-			i++;
-		}
-		//participantes.size()==configuracion.getMaxParticipantes()-numIAs
-		PartidaJugada pj = new PartidaJugada(pa,participantes);
-		error = "no se ha hecho";// PartidasDAO.insertarPartidaAcabada(pj);
-		return error;
-	}
-	
+	*/
 
 	/**************************************************************************/
 	// Funciones públicas
@@ -244,12 +212,6 @@ public class Partida {
 			if (j.getMano().size() == 0) {
 				this.terminada = true;
 				//TODO meter partida en la BD
-			}
-		}
-		if (this.terminada) {
-			String error = insertarPartidaEnBd();
-			if (!error.equals("nulo")) {
-				//TODO Tratamiento de error al insertar en base de datos
 			}
 		}
 		
@@ -359,7 +321,7 @@ public class Partida {
 	}
 
 
-	public void setHayEror(boolean hayError) {
+	public void setHayError(boolean hayError) {
 		this.hayError = hayError;
 	}
 
@@ -370,4 +332,21 @@ public class Partida {
 	public void setError(String error) {
 		this.error = error;
 	}
+
+	public int getNumIAs() {
+		return numIAs;
+	}
+
+	public void setNumIAs(int numIAs) {
+		this.numIAs = numIAs;
+	}
+
+	public Date getFechaInicio() {
+		return fechaInicio;
+	}
+
+	public ConfigSala getConfiguracion() {
+		return configuracion;
+	}
+	
 }
