@@ -50,7 +50,7 @@ public class Partida {
 				for(Carta.Tipo tipo : Carta.Tipo.values()) {
 					if (tipo.equals(Carta.Tipo.n0)) {
 						this.mazo.add(new Carta(tipo,color));
-					} else if (compruebaAceptar(tipo)) {	//dos veces si tienen color y están aceptadas por la configuración
+					} else if (compruebaIncluir(tipo)) {	//dos veces si tienen color y están aceptadas por la configuración
 						this.mazo.add(new Carta(tipo,color));
 						this.mazo.add(new Carta(tipo,color));
 					}
@@ -61,7 +61,6 @@ public class Partida {
 					this.mazo.add(new Carta(Carta.Tipo.mas4,Carta.Color.comodin));
 				}
 			}
-			//TODO meter solo las cartas especiales que estén en configuración
 		}
 		Collections.shuffle(this.mazo);
 		
@@ -69,6 +68,7 @@ public class Partida {
 		// Cartas jugadas
 		this.cartasJugadas = new ArrayList<>();
 		// TODO poner primera carta
+		this.cartasJugadas.add(getCartaValida());
 		
 		
 		// Jugadores
@@ -101,7 +101,19 @@ public class Partida {
 	// Funciones privadas
 	/**************************************************************************/
 	
-	private boolean compruebaAceptar(Carta.Tipo tipo) {
+	private Carta getCartaValida() {
+		Carta carta = this.mazo.get(0);
+		while(carta.getTipo()==Carta.Tipo.cambioColor && carta.getTipo()==Carta.Tipo.mas2 && carta.getTipo()==Carta.Tipo.mas4 &&
+				carta.getTipo()==Carta.Tipo.x2 && carta.getTipo()==Carta.Tipo.rayosX && carta.getTipo()==Carta.Tipo.salta &&
+				carta.getTipo()==Carta.Tipo.intercambio && carta.getTipo()==Carta.Tipo.reversa) {
+			Collections.shuffle(this.mazo);
+			carta = this.mazo.get(0);
+		}
+		this.mazo.remove(0);
+		return carta;
+	}
+	
+	private boolean compruebaIncluir(Carta.Tipo tipo) {
 		if (tipo == Carta.Tipo.rayosX && configuracion.getReglas().isCartaRayosX()) {
 			return true;
 		} else if (tipo == Carta.Tipo.intercambio && configuracion.getReglas().isCartaIntercambio()) {
@@ -275,7 +287,7 @@ public class Partida {
 	}
 	
 	public Carta getUltimaCartaJugada() {
-		return this.cartasJugadas.get(0);
+		return this.cartasJugadas.get(this.cartasJugadas.size()-1);
 	}
 	
 	public boolean validarJugada(Jugada jugada) {
