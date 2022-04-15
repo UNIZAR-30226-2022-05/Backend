@@ -233,7 +233,8 @@ public class PruebaClienteApplication {
 			    	String retorno = apirest.receiveObject(String.class);
 			    	if (retorno == null) {
 			    		System.out.println("Introduzca el código:");
-						Integer codigo = Integer.valueOf(scanner.nextLine());
+						//Integer codigo = Integer.valueOf(scanner.nextLine());
+			    		String codigo = scanner.nextLine();
 						
 						apirest = new RestAPI("/api/actualizarCuentaStepTwo");
 						apirest.addParameter("sesionID",sesionID);

@@ -59,7 +59,11 @@ private final static int EXPIRACION_REGISTRO = 5*60000;
 					t.start();
 				}
 			} else {
-				error = "El nuevo correo ya está en uso por otra cuenta o registro.";
+				if (peticiones.containsKey(usuarioID)) {
+					error = "Ya tiene una modificación de cuenta pendiente. Complétela o espere un tiempo para volver a intentarlo";
+				} else {
+					error = "El nuevo correo ya está en uso por otra cuenta o en proceso de estarlo.";
+				}
 			}
 			return error;
 		}
