@@ -29,6 +29,10 @@ public class Partida {
 	private boolean terminada;	
 	private Date fechaInicio; //Fecha de inicio de la partida (Ya en formato sql porque no la necesita el frontend en este punto). 
 	
+	//Variables para extraer resultados de efectos
+	private Carta vistaPorRayosX;
+	private boolean efectoRayosX;
+	
 	private static final int MAX_ROBO_ATTACK = 10;
 	
 	public Partida(String error) {			//Para construir una partida con error = true
@@ -224,6 +228,10 @@ public class Partida {
 						
 					case rayosX:
 						//TODO
+						List<Carta> mano = siguienteJugador().getMano();
+						Collections.shuffle(mano);
+						vistaPorRayosX = mano.get(0);
+						efectoRayosX = true;
 						break;
 						
 					case reversa:
@@ -384,6 +392,21 @@ public class Partida {
 
 	public ConfigSala getConfiguracion() {
 		return configuracion;
+	}
+	
+	/**
+	 * @return			null si no se ha jugado una carta de rayosX el turno anterior o no eres quien la jugó.
+	 * 					la carta vista si se ha jugado por el jugador.
+	 */
+	public Carta getRayosX(Jugador jugador) {
+		//Caso sentido horario 0->max y anti-horario max->0
+		if((sentidoHorario && (efectoRayosX && (this.turno==0 && jugadores.indexOf(jugador)==configuracion.getMaxParticipantes()-1 
+				|| jugadores.indexOf(jugador)==this.turno-1))) ||
+				(!sentidoHorario && (efectoRayosX && (this.turno==configuracion.getMaxParticipantes()-1 && jugadores.indexOf(jugador)==0 
+						|| jugadores.indexOf(jugador)==this.turno+1)))) {
+			return vistaPorRayosX; //Si el jugador ha jugado una rayosX en el turno anterior
+		}
+		return null; //Si el jugador no ha jugado una rayosX en el turno anterior.
 	}
 	
 }
