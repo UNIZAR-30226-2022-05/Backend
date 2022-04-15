@@ -227,7 +227,6 @@ public class Partida {
 						break;
 						
 					case rayosX:
-						//TODO
 						List<Carta> mano = siguienteJugador().getMano();
 						Collections.shuffle(mano);
 						vistaPorRayosX = mano.get(0);
@@ -245,8 +244,8 @@ public class Partida {
 					default:
 						break;
 				}
-				this.cartasJugadas.add(0, c);
-				//TODO eliminar la carta de la mano del jugador; hacer antes de las acciones
+				this.cartasJugadas.add(c); //La añade al final (por implementaciones de rellenar y robar del mazo);
+				this.jugadores.get(turno).getMano().remove(c);
 			}
 		}
 		
