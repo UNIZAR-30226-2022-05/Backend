@@ -3,7 +3,6 @@ package es.unizar.unoforall.gestores;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -11,6 +10,7 @@ import es.unizar.unoforall.db.PartidasDAO;
 import es.unizar.unoforall.model.PartidasAcabadasVO;
 import es.unizar.unoforall.model.partidas.HaJugadoVO;
 import es.unizar.unoforall.model.partidas.Jugador;
+import es.unizar.unoforall.model.partidas.Partida;
 import es.unizar.unoforall.model.partidas.PartidaJugada;
 import es.unizar.unoforall.model.salas.ConfigSala;
 import es.unizar.unoforall.model.salas.ConfigSala.ModoJuego;
@@ -116,23 +116,28 @@ public class GestorSalas {
 		}
 	}
 	
-	public static String insertarPartidaEnBd(Date fechaInicio, int numIAs, ConfigSala configuracion, List<Jugador> jugadores) {
+	public static String insertarPartidaEnBd(Partida partida) {
 		String error = null;
-		PartidasAcabadasVO pa = new PartidasAcabadasVO(null,fechaInicio,new Date(System.currentTimeMillis()),numIAs,configuracion.getModoJuego().ordinal());
+		PartidasAcabadasVO pa = new PartidasAcabadasVO(null, 
+				partida.getFechaInicio(), 
+				new Date(System.currentTimeMillis()), 
+				partida.getNumIAs(),
+				partida.getConfiguracion().getModoJuego().ordinal());
+		
 		ArrayList<HaJugadoVO> participantes = new ArrayList<HaJugadoVO>(); 
 		
 		ArrayList<Integer> puntos = new ArrayList<Integer>();
-		for (Jugador j : jugadores) {
+		for (Jugador j : partida.getJugadores()) {
 			puntos.add(j.sacarPuntos()); //puntos.size()==configuracion.getMaxParticipantes()
 		}
 		int i = 0; //indice del jugador que estamos comprobando
-		for (Jugador j : jugadores) {
+		for (Jugador j : partida.getJugadores()) {
 			if (!j.isEsIA()) {
 				int usuariosDebajo = 0;
 				boolean haGanado = false;
 				if (puntos.get(i)==0) {
 					haGanado = true;
-					usuariosDebajo = configuracion.getMaxParticipantes()-1;
+					usuariosDebajo = partida.getConfiguracion().getMaxParticipantes()-1;
 				} else {
 					for(Integer p : puntos) {
 						if(p>puntos.get(i)) { //En caso de usuarios empatados ninguno está por debajo de otro.

@@ -99,10 +99,6 @@ public class Partida {
 	// Funciones privadas
 	/**************************************************************************/
 	
-	private int getNumIAs() {
-		return configuracion.getMaxParticipantes() - this.jugadores.size();
-	}
-	
 	private Carta getCartaValida() {
 		Carta carta = this.mazo.get(0);
 		while(carta.getTipo()==Carta.Tipo.cambioColor && carta.getTipo()==Carta.Tipo.mas2 && carta.getTipo()==Carta.Tipo.mas4 &&
@@ -289,6 +285,10 @@ public class Partida {
 	
 	public void pulsarBotonUNO(UUID jugador) {
 		//TODO
+	}
+	
+	public int getNumIAs() {
+		return configuracion.getMaxParticipantes() - this.jugadores.size();
 	}
 	
 	/**************************************************************************/
