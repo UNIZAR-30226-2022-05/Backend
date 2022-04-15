@@ -1,7 +1,6 @@
 package es.unizar.unoforall.model.partidas;
 
 import java.sql.Date;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -9,8 +8,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-//import es.unizar.unoforall.db.PartidasDAO;
-import es.unizar.unoforall.model.PartidasAcabadasVO;
 import es.unizar.unoforall.model.salas.ConfigSala;
 
 public class Partida {
@@ -23,7 +20,6 @@ public class Partida {
 	private List<Jugador> jugadores;
 	private int turno;
 	private boolean sentidoHorario;
-	private int numIAs;
 	
 	private ConfigSala configuracion;
 	private boolean terminada;	
@@ -80,8 +76,7 @@ public class Partida {
 			this.jugadores.add(new Jugador(jID));
 		}
 			// Se crean las IA
-		numIAs = configuracion.getMaxParticipantes() - this.jugadores.size();
-		for(int i = 0; i < numIAs; i++) {
+		for(int i = 0; i < getNumIAs(); i++) {
 			this.jugadores.add(new Jugador());
 		}
 			// Se crean las manos de todos los jugadores
@@ -103,6 +98,10 @@ public class Partida {
 	/**************************************************************************/
 	// Funciones privadas
 	/**************************************************************************/
+	
+	private int getNumIAs() {
+		return configuracion.getMaxParticipantes() - this.jugadores.size();
+	}
 	
 	private Carta getCartaValida() {
 		Carta carta = this.mazo.get(0);
@@ -375,14 +374,6 @@ public class Partida {
 
 	public void setError(String error) {
 		this.error = error;
-	}
-
-	public int getNumIAs() {
-		return numIAs;
-	}
-
-	public void setNumIAs(int numIAs) {
-		this.numIAs = numIAs;
 	}
 
 	public Date getFechaInicio() {
