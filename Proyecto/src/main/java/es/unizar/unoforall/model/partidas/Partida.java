@@ -67,7 +67,6 @@ public class Partida {
 		
 		// Cartas jugadas
 		this.cartasJugadas = new ArrayList<>();
-		// TODO poner primera carta
 		this.cartasJugadas.add(getCartaValida());
 		
 		
@@ -157,9 +156,22 @@ public class Partida {
 	}
 	
 	private Carta robarCarta() {
-		//TODO cuando no haya para robar, coger todas las jugadas menos la última, shuffle, y meterlas en el mazo
+		if (this.mazo.isEmpty()) {
+			while(this.cartasJugadas.size()!=1) {
+				this.mazo.add(this.cartasJugadas.get(0));
+				this.cartasJugadas.remove(0);
+			}
+			Collections.shuffle(this.mazo);
+		}
 		Carta c = this.mazo.get(0);
 		this.mazo.remove(0);
+		if (this.mazo.isEmpty()) {
+			while(this.cartasJugadas.size()!=1) {
+				this.mazo.add(this.cartasJugadas.get(0));
+				this.cartasJugadas.remove(0);
+			}
+			Collections.shuffle(this.mazo);
+		}
 		return c;
 	}
 	/*
