@@ -50,7 +50,7 @@ public class Partida {
 				for(Carta.Tipo tipo : Carta.Tipo.values()) {
 					if (tipo.equals(Carta.Tipo.n0)) {
 						this.mazo.add(new Carta(tipo,color));
-					} else if (tipo != Carta.Tipo.cambioColor &&  tipo != Carta.Tipo.mas4) {	//dos veces
+					} else if (compruebaAceptar(tipo)) {	//dos veces si tienen color y están aceptadas por la configuración
 						this.mazo.add(new Carta(tipo,color));
 						this.mazo.add(new Carta(tipo,color));
 					}
@@ -100,6 +100,19 @@ public class Partida {
 	/**************************************************************************/
 	// Funciones privadas
 	/**************************************************************************/
+	
+	private boolean compruebaAceptar(Carta.Tipo tipo) {
+		if (tipo == Carta.Tipo.rayosX && configuracion.getReglas().isCartaRayosX()) {
+			return true;
+		} else if (tipo == Carta.Tipo.intercambio && configuracion.getReglas().isCartaIntercambio()) {
+			return true;
+		} else if (tipo == Carta.Tipo.x2 && configuracion.getReglas().isCartaX2()){
+			return true;
+		} else if (tipo != Carta.Tipo.cambioColor &&  tipo != Carta.Tipo.mas4) {
+			return true;
+		}
+		return false;
+	}
 	
 	private void avanzarTurno() {
 		if (this.sentidoHorario) {
