@@ -37,6 +37,18 @@ public class Partida {
 		this.setHayError(true);
 		this.setError(error);
 	}
+	
+	private class PosiblesTiposJugadas {
+		public boolean esEscalera;
+		public boolean esIguales;
+		public boolean valida;
+		
+		public PosiblesTiposJugadas(boolean esEscalera, boolean esIguales, boolean valida) {
+			this.esEscalera = esEscalera;
+			this.esIguales = esIguales;
+			this.valida = valida;
+		}
+	}
 		
 	public Partida(List<UUID> jugadoresID, ConfigSala configuracion) {
 		this.setHayError(false);
@@ -155,6 +167,18 @@ public class Partida {
 				return this.jugadores.get(this.turno - 1);
 			}
 		}
+	}
+	
+	private PosiblesTiposJugadas evaluaJugada(Carta c1, Carta c2) {
+		PosiblesTiposJugadas pj = null;
+		if (c1.getTipo().equals(c2.getTipo())) {
+			pj = new PosiblesTiposJugadas(false,true,true);
+		} else if(c1.getTipo().ordinal()==c2.getTipo().ordinal()-1 || c1.getTipo()==Carta.Tipo.n9 && c2.getTipo()==Carta.Tipo.n0) {
+			pj = new PosiblesTiposJugadas(true,false,true);
+		} else {
+			pj = new PosiblesTiposJugadas(false,false,false);
+		}
+		return pj;
 	}
 	
 	private Carta robarCarta() {
@@ -365,15 +389,50 @@ public class Partida {
 	public boolean validarJugada(Jugada jugada) {
 		if (jugada.robar) {
 			return true;
-		} else if (jugada.cartas == null) {
+		} else if (jugada.cartas == null || jugada.cartas.isEmpty()) {
 			return false;
 		} else {
 			Carta anterior = getUltimaCartaJugada();
 			boolean valida = false;
-			for (Carta c : jugada.cartas) {
-				valida = c.esCompatible(anterior);
-				anterior = c;
+			Carta.Tipo tipo = jugada.getCartas().get(0).getTipo();
+			//Las únicas cartas que hacen "jugadas" son los números, para el resto de cartas solo se puede jugar una.
+			if(configuracion.getReglas().isJugarVariasCartas() && (tipo == Carta.Tipo.n0 || tipo == Carta.Tipo.n1 
+					|| tipo == Carta.Tipo.n2 || tipo == Carta.Tipo.n3 || tipo == Carta.Tipo.n4 || tipo == Carta.Tipo.n5 
+					|| tipo == Carta.Tipo.n6 || tipo == Carta.Tipo.n7 || tipo == Carta.Tipo.n9)) {
+				int numCartas = 0; //Se necesitan dos para definir si son escaleras o iguales
+				PosiblesTiposJugadas pj = new PosiblesTiposJugadas(false,false,false);
+				for (Carta c : jugada.cartas) {
+					if (numCartas<=1) {
+						if(numCartas==0) {
+							valida = c.getTipo().equals(anterior.getTipo()) || c.getColor().equals(colorActual);
+							anterior = c;
+						} else {
+							pj = evaluaJugada(anterior,c);
+							valida = pj.valida;
+						}
+						numCartas++;
+					} else {
+						if(pj.esEscalera) {
+							valida = anterior.getTipo().ordinal()==c.getTipo().ordinal()-1 || 
+									anterior.getTipo()==Carta.Tipo.n9 && c.getTipo()==Carta.Tipo.n0;
+						} else if(pj.esIguales){
+							valida = c.getTipo().equals(anterior.getTipo());
+						} else {
+							valida = false;
+						}
+					}
+					if(!valida) {
+						break;
+					}
+				}
+			} else { //Cartas con efecto o en general sin poder jugar varias cartas
+				if (jugada.cartas.size()>1) {
+					valida = false; //Solo se puede jugar una si no son números. (o si no se permite jugar más de una).
+				}
+				return jugada.getCartas().get(0).getTipo().equals(anterior.getTipo()) 
+						|| jugada.getCartas().get(0).getColor().equals(colorActual);
 			}
+			
 			return valida;
 			//TODO verificar si se hace bien la escalera... (igual mejor en los frontend)
 		}
