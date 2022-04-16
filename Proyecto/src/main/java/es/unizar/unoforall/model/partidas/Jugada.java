@@ -5,6 +5,7 @@ import java.util.List;
 public class Jugada {
 	List<Carta> cartas;		//En el orden en el que se quieren tirar
 	boolean robar;
+	Carta.Color nuevoColor;
 	
 	// La jugada es robar
 	public Jugada() {

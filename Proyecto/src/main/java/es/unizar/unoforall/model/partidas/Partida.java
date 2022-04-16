@@ -24,6 +24,8 @@ public class Partida {
 	private ConfigSala configuracion;
 	private boolean terminada;	
 	private Date fechaInicio; //Fecha de inicio de la partida (Ya en formato sql porque no la necesita el frontend en este punto). 
+	private Carta.Color colorActual;
+	private boolean esCambioDeColor;
 	
 	//Variables para extraer resultados de efectos
 	private Carta vistaPorRayosX;
@@ -108,6 +110,7 @@ public class Partida {
 			carta = this.mazo.get(0);
 		}
 		this.mazo.remove(0);
+		colorActual = carta.getColor();
 		return carta;
 	}
 	
@@ -186,13 +189,21 @@ public class Partida {
 			if (configuracion.getModoJuego().equals(ConfigSala.ModoJuego.Attack)) {
 				int random_robo = (int)Math.floor(Math.random()*(MAX_ROBO_ATTACK)+1);
 				for (int i = 0; i < random_robo; i++) {
+					if(this.jugadores.get(turno).getMano().size()==20) {
+						break;
+					}
 					this.jugadores.get(turno).getMano().add(robarCarta());
 				}
 			} else {
-				this.jugadores.get(turno).getMano().add(robarCarta());
+				if(this.jugadores.get(turno).getMano().size()<20) {
+					this.jugadores.get(turno).getMano().add(robarCarta());
+				}
+				
 			}
 		} else {
 			for (Carta c : jugada.cartas) {
+				esCambioDeColor = true;
+				boolean esSalto = false;
 				switch (c.getTipo()) {
 					case intercambio:
 						List<Carta> nuevaMano = new ArrayList<>(siguienteJugador().getMano());
@@ -203,22 +214,37 @@ public class Partida {
 						break;
 						
 					case mas2:
+						//TODO Poder poner otro más 2 si el siguiente jugador tiene
 						for (int i = 0; i < 2; i++) {
+							if(siguienteJugador().getMano().size()==20) {
+								break;
+							}
 							siguienteJugador().getMano().add(robarCarta());
 						}
+						esSalto=true;
 						break;
 						
 					case mas4:
 						for (int i = 0; i < 4; i++) {
+							if(siguienteJugador().getMano().size()==20) {
+								break;
+							}
 							siguienteJugador().getMano().add(robarCarta());
 						}
+						esSalto=true;
+						esCambioDeColor = true;
+						colorActual = jugada.nuevoColor;
 						break;
 						
 					case x2:
 						int numCartas = siguienteJugador().getMano().size();
 						for (int i = 0; i < numCartas; i++) {
+							if(siguienteJugador().getMano().size()==20) {
+								break;
+							}
 							siguienteJugador().getMano().add(robarCarta());
 						}
+						esSalto=true;
 						break;
 						
 					case rayosX:
@@ -233,7 +259,12 @@ public class Partida {
 						break;
 						
 					case salta:
-						avanzarTurno();
+						esSalto = true;//avanzarTurno();
+						break;
+						
+					case cambioColor:
+						esCambioDeColor = true;
+						colorActual = jugada.nuevoColor;
 						break;
 						
 					default:
@@ -241,7 +272,17 @@ public class Partida {
 				}
 				this.cartasJugadas.add(c); //La añade al final (por implementaciones de rellenar y robar del mazo);
 				this.jugadores.get(turno).getMano().remove(c);
+				if (this.jugadores.get(turno).getMano().size()!=1) {
+					this.jugadores.get(turno).setProtegido_UNO(false);
+				}
+				if (esSalto) {
+					avanzarTurno();
+				}
 			}
+			if (!esCambioDeColor) {
+				colorActual = getUltimaCartaJugada().getColor();
+			}
+			
 		}
 		
 		avanzarTurno();
@@ -250,7 +291,6 @@ public class Partida {
 		for (Jugador j : this.jugadores) {
 			if (j.getMano().size() == 0) {
 				this.terminada = true;
-				//TODO meter partida en la BD
 			}
 		}
 		
@@ -268,7 +308,7 @@ public class Partida {
 	public void ejecutarJugadaIA() {
 		if (this.jugadores.get(turno).isEsIA()) {
 			Jugada jugadaIA = new Jugada();
-			//TODO crear jugada según modo de juego y cartas jugables
+			//TODO crear jugada según modo de juego y cartas jugables. IA -> Después de uno original funcional.
 			
 			ejecutarJugada(jugadaIA);
 		}
@@ -280,11 +320,25 @@ public class Partida {
 	
 	public void expulsarJugador(UUID jugador) {
 		//se sustituye por IA
-		//TODO
+		for (Jugador j : jugadores) {
+			if(j.getJugadorID().equals(jugador)) {
+				j.setEsIA(true);
+				j.setJugadorID(null);
+				break;
+			}
+		}
 	}
 	
 	public void pulsarBotonUNO(UUID jugador) {
-		//TODO
+		for (Jugador j : this.jugadores) {
+			if (j.getJugadorID().equals(jugador)) {
+				j.setProtegido_UNO(true);
+			} else if(!j.isProtegido_UNO() && j.getMano().size()==1) { //Pillado, roba dos cartas.
+				this.jugadores.get(turno).getMano().add(robarCarta());
+				this.jugadores.get(turno).getMano().add(robarCarta());
+			}
+				
+		}
 	}
 	
 	public int getNumIAs() {
@@ -331,12 +385,14 @@ public class Partida {
 		return this.terminada;
 	}
 	
+	//Considero que esto es eliminable
+	/*
 	public List<Jugador> ranking() {
 		if (this.estaTerminada()) {
 			List<Jugador> resultado = new ArrayList<>(this.jugadores);
 			if(this.configuracion.getModoJuego().equals(ConfigSala.ModoJuego.Parejas)) {
 				return null;
-				//TODO
+				//TODO Más adelante (primero solo UNO original)
 			} else {
 				Collections.sort(resultado, new Comparator<Jugador>() {
 				  @Override
@@ -356,7 +412,7 @@ public class Partida {
 		} else {
 			return null;
 		}
-	}
+	}*/
 
 
 	public boolean isHayError() {
