@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import es.unizar.unoforall.db.PartidasDAO;
+import es.unizar.unoforall.db.UsuarioDAO;
 import es.unizar.unoforall.model.PartidasAcabadasVO;
 import es.unizar.unoforall.model.partidas.HaJugadoVO;
 import es.unizar.unoforall.model.partidas.Jugador;
@@ -145,6 +146,10 @@ public class GestorSalas {
 						}					  //cuenta como empate.
 					}
 				}
+				error = actualizarPuntosJugador(usuariosDebajo,j.getJugadorID());
+				if (!error.equals("nulo")) {
+					return error;
+				}
 				participantes.add(new HaJugadoVO(j.getJugadorID(),pa.getId(),usuariosDebajo,haGanado));				
 			}
 			i++;
@@ -152,6 +157,22 @@ public class GestorSalas {
 		//participantes.size()==configuracion.getMaxParticipantes()-numIAs
 		PartidaJugada pj = new PartidaJugada(pa,participantes);
 		error = PartidasDAO.insertarPartidaAcabada(pj);
+		return error;
+	}
+	
+	private static String actualizarPuntosJugador(int usuariosDebajo, UUID jugadorID) {
+		String error = "nulo";
+		switch(usuariosDebajo) {
+			case 1://5
+				error = UsuarioDAO.actualizarPuntos(5, jugadorID);
+				break;
+			case 2://10
+				error = UsuarioDAO.actualizarPuntos(10, jugadorID);
+				break;
+			case 3://20
+				error = UsuarioDAO.actualizarPuntos(20, jugadorID);
+				break;
+		}
 		return error;
 	}
 }

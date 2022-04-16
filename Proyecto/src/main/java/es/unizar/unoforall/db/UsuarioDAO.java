@@ -413,9 +413,10 @@ public class UsuarioDAO {
 	}
 	
 	/**
-	 * TODO cambiar esta descripción
-	 * Dado el id del usuario, devuelve la lista de usuarios a los que ha aceptado la solicitud de amistad.
+	 * Dado el id del usuario y el de otro jugador, crea una solicitud de amistad en la base de datos
+	 * del primero al segundo. En caso de que ya exista una petición en dirección opuesta, la acepta.
 	 * @param idUsuario	contiene el id de la cuenta del usuario
+	 * @param amigo		contiene el id de la cuenta del otro usuario.
 	 * @return			devuelve "nulo" si todo va bien. En caso contrario devuelve un mensaje de error.
 	 */
 	public static String mandarPeticion(UUID idUsuario, UUID amigo) {
@@ -452,7 +453,7 @@ public class UsuarioDAO {
 						updateRequest.setObject(2, idUsuario);
 						int rows = updateRequest.executeUpdate();
 						if(rows != 1) {
-							error = "Ha habido un error con la solicitud de amistad. Solicitudes acpetadas: " + Integer.toString(rows)+".";
+							error = "Ha habido un error con la solicitud de amistad. Solicitudes aceptadas: " + Integer.toString(rows)+".";
 						} else {
 							error = "Solicitud pendiente aceptada; no se va a enviar una nueva";
 						}
@@ -476,9 +477,10 @@ public class UsuarioDAO {
 	}
 	
 	/**
-	 * TODO cambiar esta descripción
-	 * Dado el id del usuario, devuelve la lista de usuarios a los que ha aceptado la solicitud de amistad.
-	 * @param idUsuario	contiene el id de la cuenta del usuario
+	 * Dado el id del usuario y el de otro usuario que le haya mandado petición, elimina la petición de
+	 * amistad de la base de datos.
+	 * @param idUsuario	contiene el id de la cuenta del usuario.
+	 * @param amigo		contiene el id de la cuenta del otro usuario.
 	 * @return			devuelve "nulo" si todo va bien. En caso contrario devuelve un mensaje de error.
 	 */
 	public static String cancelarPeticion(UUID idUsuario, UUID amigo) {
@@ -495,6 +497,30 @@ public class UsuarioDAO {
 			getRequest.setObject(2, idUsuario);
 			getRequest.execute();
 			
+		} catch(Exception ex) {
+			ex.printStackTrace();
+			error = "Ha surgido un problema con la base de datos.";
+		}finally {
+			GestorPoolConexionesBD.releaseConnection(conn);
+		}
+		return error;
+	}
+	
+	public static String actualizarPuntos(int puntos, UUID idUsuario) {
+		String error = "nulo";
+		Connection conn = null;
+		
+		try {
+			conn = GestorPoolConexionesBD.getConnection();
+			PreparedStatement getRequest = 
+					conn.prepareStatement("Update usuarios WHERE id = ? set puntos = puntos + ?;");
+			getRequest.setObject(1,idUsuario);
+			getRequest.setInt(2, puntos);
+			int rows = getRequest.executeUpdate();
+			if (rows!=1) {
+				error = "Ha surgido un error al actualizar los puntos del usuario <"+idUsuario+">. Se querían incrementar en <" +
+							puntos+"> puntos. Se han actualizado los puntos de <" + rows + "> usuarios.";
+			}
 		} catch(Exception ex) {
 			ex.printStackTrace();
 			error = "Ha surgido un problema con la base de datos.";
