@@ -244,16 +244,22 @@ public class Partida {
 	/**************************************************************************/
 	
 	public void ejecutarJugada(Jugada jugada) {
+		// Flags para el turno siguiente (sólo duran un turno)
+		esCambioDeColor = false;
+		efectoRayosX = false;
+		
 		if(jugada.robar) {
 			if(modoAcumulandoRobo) {
-				modoAcumulandoRobo=false;
-				for(int i = 0; i<roboAcumulado; i++) {
+				modoAcumulandoRobo = false;
+				
+				for(int i = 0; i < roboAcumulado; i++) {
 					if(this.jugadores.get(turno).getMano().size()==20) {
 						break;
 					}
 					this.jugadores.get(turno).getMano().add(robarCarta());
 				}
 				roboAcumulado=0;
+				
 			} else if (configuracion.getModoJuego().equals(ConfigSala.ModoJuego.Attack)) {
 				int random_robo = (int)Math.floor(Math.random()*(MAX_ROBO_ATTACK)+1);
 				for (int i = 0; i < random_robo; i++) {
@@ -262,17 +268,16 @@ public class Partida {
 					}
 					this.jugadores.get(turno).getMano().add(robarCarta());
 				}
+				
 			} else {
 				if(this.jugadores.get(turno).getMano().size()<20) {
 					this.jugadores.get(turno).getMano().add(robarCarta());
 				}
 				
 			}
+			
 		} else {
 			for (Carta c : jugada.cartas) {
-				esCambioDeColor = false;
-				efectoRayosX = false;
-				
 				boolean esSalto = false;
 				
 				switch (c.getTipo()) {
