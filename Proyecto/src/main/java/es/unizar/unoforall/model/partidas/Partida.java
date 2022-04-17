@@ -90,7 +90,7 @@ public class Partida {
 		
 		
 		// Cartas jugadas
-		this.cartasJugadas = new ArrayList<>();
+		this.cartasJugadas = new LinkedList<>();
 		this.cartasJugadas.add(getCartaInicial());
 		
 		
@@ -223,29 +223,21 @@ public class Partida {
 	}
 	
 	private Carta robarCarta() {
-		
 		if (this.mazo.isEmpty()) {
-			while(this.cartasJugadas.size()!=1) {
-				this.mazo.add(this.cartasJugadas.get(0));
-				this.cartasJugadas.remove(0);
-				
-			}
+			this.mazo.addAll(this.cartasJugadas);
+			this.mazo.remove(0);
 			Collections.shuffle(this.mazo);
+			
+			Carta ultimaCarta = this.cartasJugadas.get(0);
+			this.cartasJugadas.clear();
+			this.cartasJugadas.add(ultimaCarta);
 		}
 		Carta c = this.mazo.get(0);
 		this.mazo.remove(0);
-		if (this.mazo.isEmpty()) {
-			while(this.cartasJugadas.size()!=1) {
-				this.mazo.add(this.cartasJugadas.get(0));
-				this.cartasJugadas.remove(0);
-			}
-			Collections.shuffle(this.mazo);
-		}
 		return c;
 	}
-	/*
 	
-	*/
+
 
 	/**************************************************************************/
 	// Funciones públicas
@@ -371,8 +363,9 @@ public class Partida {
 					avanzarTurno();
 				}
 				
-				// Se añade la carta al mazo y se elimina de la mano del jugador
-				this.cartasJugadas.add(c);
+				// Se añade la carta a las cartas jugadas y se elimina de la 
+				// mano del jugador
+				this.cartasJugadas.add(0, c);
 				this.jugadores.get(turno).getMano().remove(c);
 				if (this.jugadores.get(turno).getMano().size()!=1) {
 					this.jugadores.get(turno).setProtegido_UNO(false);
@@ -458,7 +451,7 @@ public class Partida {
 	}
 	
 	public Carta getUltimaCartaJugada() {
-		return this.cartasJugadas.get(this.cartasJugadas.size()-1);
+		return this.cartasJugadas.get(0);
 	}
 	
 	public boolean validarJugada(Jugada jugada) {
