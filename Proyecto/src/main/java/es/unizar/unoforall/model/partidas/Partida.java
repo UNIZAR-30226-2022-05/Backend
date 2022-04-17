@@ -246,7 +246,8 @@ public class Partida {
 			}
 		} else {
 			for (Carta c : jugada.cartas) {
-				esCambioDeColor = true;
+				esCambioDeColor = false;
+				efectoRayosX = false;
 				boolean esSalto = false;
 				switch (c.getTipo()) {
 					case intercambio:
