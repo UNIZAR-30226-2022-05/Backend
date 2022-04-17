@@ -30,6 +30,8 @@ public class Partida {
 	//Variables para extraer resultados de efectos
 	private Carta vistaPorRayosX;
 	private boolean efectoRayosX;
+	private boolean modoAcumulandoRobo;
+	private int roboAcumulado;
 	
 	private static final int MAX_ROBO_ATTACK = 10;
 	
@@ -112,6 +114,15 @@ public class Partida {
 	/**************************************************************************/
 	// Funciones privadas
 	/**************************************************************************/
+	
+	private boolean compatibleAcumulador(Carta c) {
+		if (configuracion.getReglas().isEncadenarRoboCartas() && (c.getTipo().equals(Carta.Tipo.mas4) || c.getTipo().equals(Carta.Tipo.mas2)) 
+				|| configuracion.getReglas().isRedirigirRoboCartas() && c.getTipo().equals(Carta.Tipo.reversa) ) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 	
 	private Carta getCartaValida() {
 		Carta carta = this.mazo.get(0);
@@ -210,7 +221,16 @@ public class Partida {
 	
 	public void ejecutarJugada(Jugada jugada) {
 		if(jugada.robar) {
-			if (configuracion.getModoJuego().equals(ConfigSala.ModoJuego.Attack)) {
+				if(modoAcumulandoRobo) {
+					modoAcumulandoRobo=false;
+					for(int i = 0; i<roboAcumulado; i++) {
+						if(this.jugadores.get(turno).getMano().size()==20) {
+							break;
+						}
+						this.jugadores.get(turno).getMano().add(robarCarta());
+					}
+					roboAcumulado=0;
+				} else if (configuracion.getModoJuego().equals(ConfigSala.ModoJuego.Attack)) {
 				int random_robo = (int)Math.floor(Math.random()*(MAX_ROBO_ATTACK)+1);
 				for (int i = 0; i < random_robo; i++) {
 					if(this.jugadores.get(turno).getMano().size()==20) {
@@ -238,24 +258,41 @@ public class Partida {
 						break;
 						
 					case mas2:
-						//TODO Poder poner otro más 2 si el siguiente jugador tiene
-						for (int i = 0; i < 2; i++) {
-							if(siguienteJugador().getMano().size()==20) {
-								break;
+						if(configuracion.getReglas().isEncadenarRoboCartas() || configuracion.getReglas().isRedirigirRoboCartas()) {
+							if(!modoAcumulandoRobo) {
+								modoAcumulandoRobo = true;
+								roboAcumulado = 2;
+							} else {
+								roboAcumulado+=2;
 							}
-							siguienteJugador().getMano().add(robarCarta());
+						} else {
+							for (int i = 0; i < 2; i++) {
+								if(siguienteJugador().getMano().size()==20) {
+									break;
+								}
+								siguienteJugador().getMano().add(robarCarta());
+							}
+							esSalto=true;
 						}
-						esSalto=true;
 						break;
 						
 					case mas4:
-						for (int i = 0; i < 4; i++) {
-							if(siguienteJugador().getMano().size()==20) {
-								break;
+						if(configuracion.getReglas().isEncadenarRoboCartas() || configuracion.getReglas().isRedirigirRoboCartas()) {
+							if(!modoAcumulandoRobo) {
+								modoAcumulandoRobo = true;
+								roboAcumulado = 4;
+							} else {
+								roboAcumulado+=4;
 							}
-							siguienteJugador().getMano().add(robarCarta());
+						} else {
+							for (int i = 0; i < 4; i++) {
+								if(siguienteJugador().getMano().size()==20) {
+									break;
+								}
+								siguienteJugador().getMano().add(robarCarta());
+							}
+							esSalto=true;
 						}
-						esSalto=true;
 						esCambioDeColor = true;
 						colorActual = jugada.nuevoColor;
 						break;
@@ -391,7 +428,18 @@ public class Partida {
 			return true;
 		} else if (jugada.cartas == null || jugada.cartas.isEmpty()) {
 			return false;
-		} else {
+		} else if(modoAcumulandoRobo) {
+			Carta anterior = getUltimaCartaJugada();
+			if(jugada.getCartas().size()!=1) { //Solo se puede jugar una
+				return false;
+			} else {
+				Carta c = jugada.getCartas().get(0);
+				if(compatibleAcumulador(c) && (c.getTipo().equals(anterior.getTipo()) //Si la carta es usable según las reglas
+								|| c.getColor().equals(colorActual)  || c.getTipo().equals(Carta.Tipo.mas4))) {
+					return true;
+				}
+			}
+	    } else {
 			Carta anterior = getUltimaCartaJugada();
 			boolean valida = false;
 			Carta.Tipo tipo = jugada.getCartas().get(0).getTipo();
@@ -436,6 +484,7 @@ public class Partida {
 			return valida;
 			//TODO verificar si se hace bien la escalera... (igual mejor en los frontend)
 		}
+		return false;
 	}
 	
 	// Se debe mirar en cada turno, y cuando devuelva true ya se puede desconectar
