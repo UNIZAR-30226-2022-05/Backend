@@ -70,4 +70,12 @@ public class Jugador {
 		}
 		return puntuacion;
 	}
+
+	@Override
+	public String toString() {
+		return "Jugador [esIA=" + esIA + ", jugadorID=" + jugadorID + ", mano=" + mano + ", protegido_UNO="
+				+ protegido_UNO + "]";
+	}
+	
+	
 }
