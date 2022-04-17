@@ -1,4 +1,4 @@
-package es.unizar.unoforall.model.partidas;
+package es.unizar.pruebaCliente.model.partidas;
 
 import java.sql.Date;
 import java.util.ArrayList;
@@ -7,7 +7,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-import es.unizar.unoforall.model.salas.ConfigSala;
+import es.unizar.pruebaCliente.model.salas.ConfigSala;
+
 
 public class Partida {
 	private boolean hayError;
@@ -22,9 +23,7 @@ public class Partida {
 	
 	private ConfigSala configuracion;
 	private boolean terminada;	
-	
-	//Fecha de inicio de la partida (Ya en formato sql porque no la necesita el frontend en este punto). 
-	private Date fechaInicio; 
+	private Date fechaInicio; //Fecha de inicio de la partida (Ya en formato sql porque no la necesita el frontend en este punto). 
 	private Carta.Color colorActual;
 	private boolean esCambioDeColor;
 	
@@ -56,12 +55,7 @@ public class Partida {
 	public Partida(List<UUID> jugadoresID, ConfigSala configuracion) {
 		this.setHayError(false);
 		this.setError("");
-		this.turno = 0;
-		this.sentidoHorario = true;
-		this.configuracion = configuracion;
-		this.terminada = false;
-				
-				
+		
 		//Marcamos fecha de inicio
 		fechaInicio = new Date(System.currentTimeMillis()); //Fecha actual.
 		
@@ -72,9 +66,7 @@ public class Partida {
 				for(Carta.Tipo tipo : Carta.Tipo.values()) {
 					if (tipo.equals(Carta.Tipo.n0)) {
 						this.mazo.add(new Carta(tipo,color));
-					} else if (!tipo.equals(Carta.Tipo.cambioColor) &&
-								!tipo.equals(Carta.Tipo.mas4) &&
-								compruebaIncluirMazo(tipo)) {	//dos veces
+					} else if (compruebaIncluir(tipo)) {	//dos veces si tienen color y están aceptadas por la configuración
 						this.mazo.add(new Carta(tipo,color));
 						this.mazo.add(new Carta(tipo,color));
 					}
@@ -86,12 +78,12 @@ public class Partida {
 				}
 			}
 		}
-		//Collections.shuffle(this.mazo);
+		Collections.shuffle(this.mazo);
 		
 		
 		// Cartas jugadas
 		this.cartasJugadas = new ArrayList<>();
-		this.cartasJugadas.add(getCartaInicial());
+		this.cartasJugadas.add(getCartaValida());
 		
 		
 		// Jugadores
@@ -111,7 +103,11 @@ public class Partida {
 		}
 		
 		
-		
+		// Resto
+		this.turno = 0;
+		this.sentidoHorario = true;
+		this.configuracion = configuracion;
+		this.terminada = false;
 	}
 
 
@@ -119,10 +115,17 @@ public class Partida {
 	// Funciones privadas
 	/**************************************************************************/
 	
-	// Devuelve la primera carta de la partida
-	private Carta getCartaInicial() {
-		int indice = 0;
-		Carta carta = this.mazo.get(indice);
+	private boolean compatibleAcumulador(Carta c) {
+		if (configuracion.getReglas().isEncadenarRoboCartas() && (c.getTipo().equals(Carta.Tipo.mas4) || c.getTipo().equals(Carta.Tipo.mas2)) 
+				|| configuracion.getReglas().isRedirigirRoboCartas() && c.getTipo().equals(Carta.Tipo.reversa) ) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	private Carta getCartaValida() {
+		Carta carta = this.mazo.get(0);
 		while(carta.getTipo()==Carta.Tipo.cambioColor 
 				|| carta.getTipo()==Carta.Tipo.mas2 
 				|| carta.getTipo()==Carta.Tipo.mas4 
@@ -131,26 +134,25 @@ public class Partida {
 				|| carta.getTipo()==Carta.Tipo.salta 
 				|| carta.getTipo()==Carta.Tipo.intercambio 
 				|| carta.getTipo()==Carta.Tipo.reversa) {
-			indice++;
-			carta = this.mazo.get(indice);
+			Collections.shuffle(this.mazo);
+			carta = this.mazo.get(0);
 		}
-		this.mazo.remove(indice);
+		this.mazo.remove(0);
 		colorActual = carta.getColor();
 		return carta;
 	}
 	
-	// Comprueba si una carta especial debe incluirse en el mazo o no según las
-	// reglas
-	private boolean compruebaIncluirMazo(Carta.Tipo tipo) {
+	private boolean compruebaIncluir(Carta.Tipo tipo) {
 		if (tipo == Carta.Tipo.rayosX && configuracion.getReglas().isCartaRayosX()) {
 			return true;
 		} else if (tipo == Carta.Tipo.intercambio && configuracion.getReglas().isCartaIntercambio()) {
 			return true;
 		} else if (tipo == Carta.Tipo.x2 && configuracion.getReglas().isCartaX2()){
 			return true;
-		} else {
-			return false;
+		} else if (tipo != Carta.Tipo.cambioColor &&  tipo != Carta.Tipo.mas4) {
+			return true;
 		}
+		return false;
 	}
 	
 	private void avanzarTurno() {
@@ -199,22 +201,12 @@ public class Partida {
 		}
 	}
 	
-	private boolean compatibleAcumulador(Carta c) {
-		if ((configuracion.getReglas().isEncadenarRoboCartas() 
-				&& (c.getTipo().equals(Carta.Tipo.mas4) || c.getTipo().equals(Carta.Tipo.mas2))) 
-			|| 
-			(configuracion.getReglas().isRedirigirRoboCartas() && c.getTipo().equals(Carta.Tipo.reversa)) ) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-	
 	private PosiblesTiposJugadas evaluaJugada(Carta c1, Carta c2) {
 		PosiblesTiposJugadas pj = null;
 		if (c1.getTipo().equals(c2.getTipo())) {
 			pj = new PosiblesTiposJugadas(false,true,true);
-		} else if(c1.getTipo().ordinal()==c2.getTipo().ordinal()-1 || c1.getTipo()==Carta.Tipo.n9 && c2.getTipo()==Carta.Tipo.n0) {
+		} else if(c1.getTipo().ordinal()==c2.getTipo().ordinal()-1 
+				|| c1.getTipo()==Carta.Tipo.n9 && c2.getTipo()==Carta.Tipo.n0) {
 			pj = new PosiblesTiposJugadas(true,false,true);
 		} else {
 			pj = new PosiblesTiposJugadas(false,false,false);
@@ -223,12 +215,10 @@ public class Partida {
 	}
 	
 	private Carta robarCarta() {
-		
 		if (this.mazo.isEmpty()) {
 			while(this.cartasJugadas.size()!=1) {
 				this.mazo.add(this.cartasJugadas.get(0));
 				this.cartasJugadas.remove(0);
-				
 			}
 			Collections.shuffle(this.mazo);
 		}
@@ -253,16 +243,16 @@ public class Partida {
 	
 	public void ejecutarJugada(Jugada jugada) {
 		if(jugada.robar) {
-			if(modoAcumulandoRobo) {
-				modoAcumulandoRobo=false;
-				for(int i = 0; i<roboAcumulado; i++) {
-					if(this.jugadores.get(turno).getMano().size()==20) {
-						break;
+				if(modoAcumulandoRobo) {
+					modoAcumulandoRobo=false;
+					for(int i = 0; i<roboAcumulado; i++) {
+						if(this.jugadores.get(turno).getMano().size()==20) {
+							break;
+						}
+						this.jugadores.get(turno).getMano().add(robarCarta());
 					}
-					this.jugadores.get(turno).getMano().add(robarCarta());
-				}
-				roboAcumulado=0;
-			} else if (configuracion.getModoJuego().equals(ConfigSala.ModoJuego.Attack)) {
+					roboAcumulado=0;
+				} else if (configuracion.getModoJuego().equals(ConfigSala.ModoJuego.Attack)) {
 				int random_robo = (int)Math.floor(Math.random()*(MAX_ROBO_ATTACK)+1);
 				for (int i = 0; i < random_robo; i++) {
 					if(this.jugadores.get(turno).getMano().size()==20) {
@@ -280,9 +270,7 @@ public class Partida {
 			for (Carta c : jugada.cartas) {
 				esCambioDeColor = false;
 				efectoRayosX = false;
-				
 				boolean esSalto = false;
-				
 				switch (c.getTipo()) {
 					case intercambio:
 						List<Carta> nuevaMano = new ArrayList<>(siguienteJugador().getMano());
@@ -366,16 +354,13 @@ public class Partida {
 					default:
 						break;
 				}
-				
-				if (esSalto) {
-					avanzarTurno();
-				}
-				
-				// Se añade la carta al mazo y se elimina de la mano del jugador
-				this.cartasJugadas.add(c);
+				this.cartasJugadas.add(c); //La añade al final (por implementaciones de rellenar y robar del mazo);
 				this.jugadores.get(turno).getMano().remove(c);
 				if (this.jugadores.get(turno).getMano().size()!=1) {
 					this.jugadores.get(turno).setProtegido_UNO(false);
+				}
+				if (esSalto) {
+					avanzarTurno();
 				}
 			}
 			if (!esCambioDeColor) {
@@ -481,12 +466,10 @@ public class Partida {
 			Carta anterior = getUltimaCartaJugada();
 			boolean valida = false;
 			Carta.Tipo tipo = jugada.getCartas().get(0).getTipo();
-			
 			//Las únicas cartas que hacen "jugadas" son los números, para el resto de cartas solo se puede jugar una.
 			if(configuracion.getReglas().isJugarVariasCartas() && (tipo == Carta.Tipo.n0 || tipo == Carta.Tipo.n1 
 					|| tipo == Carta.Tipo.n2 || tipo == Carta.Tipo.n3 || tipo == Carta.Tipo.n4 || tipo == Carta.Tipo.n5 
 					|| tipo == Carta.Tipo.n6 || tipo == Carta.Tipo.n7 || tipo == Carta.Tipo.n9)) {
-				
 				int numCartas = 0; //Se necesitan dos para definir si son escaleras o iguales
 				PosiblesTiposJugadas pj = new PosiblesTiposJugadas(false,false,false);
 				for (Carta c : jugada.cartas) {
@@ -533,9 +516,40 @@ public class Partida {
 		return this.terminada;
 	}
 	
+	//Considero que esto es eliminable
+	/*
+	public List<Jugador> ranking() {
+		if (this.estaTerminada()) {
+			List<Jugador> resultado = new ArrayList<>(this.jugadores);
+			if(this.configuracion.getModoJuego().equals(ConfigSala.ModoJuego.Parejas)) {
+				return null;
+				//TODO Más adelante (primero solo UNO original)
+			} else {
+				Collections.sort(resultado, new Comparator<Jugador>() {
+				  @Override
+				  public int compare(Jugador j1, Jugador j2) {
+					  if (j1.getMano().size() == j2.getMano().size()) {
+						  return 0;
+					  } else if (j1.getMano().size() < j2.getMano().size()) {
+						  return -1;
+					  } else {
+						  return 1;  
+					  }
+				  }
+				});
+				return resultado;
+			}
+			//TODO asignar los puntos a cada jugador
+		} else {
+			return null;
+		}
+	}*/
+
+
 	public boolean isHayError() {
 		return hayError;
 	}
+
 
 	public void setHayError(boolean hayError) {
 		this.hayError = hayError;
@@ -562,15 +576,12 @@ public class Partida {
 	 * 					la carta vista si se ha jugado por el jugador.
 	 */
 	public Carta getRayosX(UUID jugadorID) {
+		//Caso sentido horario 0->max y anti-horario max->0
 		if(efectoRayosX && jugadorID.equals(anteriorJugador().getJugadorID())) {
-			//Si el jugador ha jugado una rayosX en el turno anterior
-			return vistaPorRayosX; 
+			return vistaPorRayosX; //Si el jugador ha jugado una rayosX en el turno anterior
 		}
-		return null;
+		return null; //Si el jugador no ha jugado una rayosX en el turno anterior.
 	}
-	
-	
-	
 	
 	@Override
 	public String toString() {
