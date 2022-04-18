@@ -422,7 +422,45 @@ public class Partida {
 		if (this.jugadores.get(turno).isEsIA()) {
 			Jugada jugadaIA = new Jugada();	// por defecto, robar
 			
-			
+			if (compruebaPuedeJugar()) {
+				Carta cartaCentral = getUltimaCartaJugada();
+				
+				if (modoAcumulandoRobo) {
+					for (Carta c : this.jugadores.get(turno).getMano()) {
+						if(compatibleAcumulador(c) && 
+								(c.getTipo().equals(cartaCentral.getTipo()) 	//Si la carta es usable según las reglas
+										|| c.getColor().equals(colorActual)  
+										|| c.getTipo().equals(Carta.Tipo.mas4))) {
+							
+							List<Carta> listaCartas = new ArrayList<>();
+							listaCartas.add(c);
+							jugadaIA.setCartas(listaCartas);
+							break;
+						}
+					}
+					
+					
+					
+				} else if (modoJugarCartaRobada) {		
+					List<Carta> listaCartas = new ArrayList<>();
+					listaCartas.add(cartaRobada);
+					jugadaIA.setCartas(listaCartas);
+					
+				} else {
+					for (Carta c : this.jugadores.get(turno).getMano()) {
+						if (c.esCompatible(cartaCentral)) {
+							List<Carta> listaCartas = new ArrayList<>();
+							listaCartas.add(c);
+							jugadaIA.setCartas(listaCartas);
+							break;
+						}
+					}
+				}	
+				
+				if (!validarJugada(jugadaIA)) {
+					System.err.println("ERROR: la IA ha elegido una jugada no válida");
+				}
+			}
 			
 			ejecutarJugada(jugadaIA);
 		}
