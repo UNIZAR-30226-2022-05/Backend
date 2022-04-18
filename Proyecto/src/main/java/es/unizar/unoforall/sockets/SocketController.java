@@ -207,6 +207,30 @@ public class SocketController {
 	}
 	
 	
+	/**
+	 * (EXCLUSIVO BACKEND) Método para avisar a los participantes de la salida
+	 * por desconexión de alguno de ellos
+	 * @param salaID		En la URL: id de la sala
+	 * @param vacio			Cualquier objeto no nulo
+	 * @return				(Clase Sala) La sala actualizada
+	 * @throws Exception
+	 */
+	@MessageMapping("/salas/actualizar/{salaID}")
+	@SendTo("/topic/salas/{salaID}")
+	public String actualizarSala(@DestinationVariable UUID salaID,  
+							Object vacio) throws Exception {
+		
+		Sala s = GestorSalas.obtenerSala(salaID);
+		
+		if (s == null) {
+			return Serializar.serializar(new Sala("La sala se ha eliminado"));
+		} else {
+			System.err.println("holi: " + salaID);
+			return Serializar.serializar(s);
+		}
+	}
+	
+	
 	
 	/**************************************************************************/
 	// Partidas
@@ -265,6 +289,7 @@ public class SocketController {
 	 * 						Partida con 'error' = true si la sala no existe
 	 * @throws Exception
 	 */
+	@MessageMapping("/partidas/turnosIA/{salaID}")
 	@SendTo("/topic/partidas/turnos/{salaID}")
 	public String turnoPartidaIA(@DestinationVariable UUID salaID, 
 							Object vacio) throws Exception {
@@ -292,7 +317,7 @@ public class SocketController {
 	
 	
 	@EventListener
-	public void onDisconnectEvent(SessionDisconnectEvent event) {
+	public void onDisconnectEvent(SessionDisconnectEvent event) throws Exception {
 		String sesionID = event.getSessionId();
 		
 		GestorSalas.eliminarParticipanteSalas(GestorSesiones.obtenerUsuarioID(sesionID));

@@ -2,6 +2,9 @@ package es.unizar.unoforall.gestores;
 
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+
+import es.unizar.unoforall.api.WebSocketAPI;
 
 public class GestorSesiones {
 	
@@ -11,12 +14,23 @@ public class GestorSesiones {
 	// Relación   clave inicio sesión - usuarioID
 	private static HashMap<UUID, UUID> clavesInicio;
 	
+	
+	// Conexión propia de WebSockets para llamadas desde el servidor
+	private static WebSocketAPI apiInterna;
+	
 	private static final Object LOCK;
 	
 	static {
 		sesiones = new HashMap<>();
 		clavesInicio = new HashMap<>();
 		LOCK = new Object();
+		apiInterna = new WebSocketAPI();
+		try {
+			apiInterna.openConnection();
+		} catch (InterruptedException | ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public static UUID nuevaClaveInicio(UUID usuarioID) {
@@ -54,4 +68,9 @@ public class GestorSesiones {
 			sesiones.remove(sesionID);
 		}
 	}
+
+	public static WebSocketAPI getApiInterna() {
+		return apiInterna;
+	}
+
 }

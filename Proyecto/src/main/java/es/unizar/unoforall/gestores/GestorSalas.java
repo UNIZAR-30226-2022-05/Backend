@@ -112,6 +112,8 @@ public class GestorSalas {
 				if (sala.hayParticipante(usuarioID)) {
 					System.out.println("Eliminando participante desconectado");
 					eliminarParticipanteSala(salaID, usuarioID);
+					
+					GestorSesiones.getApiInterna().sendObject("/app/salas/actualizar/" + salaID, "vacio");
 				}
 			}
 		}
