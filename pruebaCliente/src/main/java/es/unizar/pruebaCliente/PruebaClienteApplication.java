@@ -478,6 +478,7 @@ public class PruebaClienteApplication {
 			    			System.out.println(p.getError());
 			    			api.unsubscribe("/topic/partidas/turnos/" + salaID);
 			    		} else {
+			    			miPartida = p;
 			    			System.out.println("Nuevo turno: \n" + p);
 			    		}
 			    	});
@@ -486,6 +487,9 @@ public class PruebaClienteApplication {
 				} else if (orden.equals("turno")) {
 					System.out.println("Introduce id:");
 					String salaID = scanner.nextLine();
+					
+					System.out.println("Introduce la carta:");
+					Integer carta = Integer.valueOf(scanner.nextLine());
 					
 					api.sendObject("/topic/partidas/turnos/" + salaID, "vacio");
 				

@@ -3,19 +3,28 @@ package es.unizar.unoforall.model.partidas;
 import java.util.List;
 
 public class Jugada {
-	List<Carta> cartas;		//En el orden en el que se quieren tirar
-	boolean robar;
-	Carta.Color nuevoColor;
+	private List<Carta> cartas;		//En el orden en el que se quieren tirar
+	private boolean robar;
+	private Carta.Color nuevoColor;
 	
 	// La jugada es robar
 	public Jugada() {
 		this.cartas = null;
 		this.robar = true;
+		this.nuevoColor = Carta.Color.comodin;	//por ejemplo (no se va a usar)
 	}
 	
 	public Jugada(List<Carta> cartas) {
 		this.cartas = cartas;
 		this.robar = false;
+		this.nuevoColor = cartas.get(cartas.size()-1).getColor();
+	}
+	
+	// Utilizar si la última carta es un cambio de color
+	public Jugada(List<Carta> cartas, Carta.Color nuevoColor) {
+		this.cartas = cartas;
+		this.robar = false;
+		this.nuevoColor = nuevoColor;
 	}
 
 	
@@ -33,6 +42,14 @@ public class Jugada {
 
 	public void setRobar(boolean robar) {
 		this.robar = robar;
+	}
+
+	public Carta.Color getNuevoColor() {
+		return nuevoColor;
+	}
+
+	public void setNuevoColor(Carta.Color nuevoColor) {
+		this.nuevoColor = nuevoColor;
 	}
 
 	@Override
