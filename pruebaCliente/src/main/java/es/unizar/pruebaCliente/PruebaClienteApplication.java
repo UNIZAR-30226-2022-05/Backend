@@ -10,6 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import es.unizar.pruebaCliente.model.ListaUsuarios;
 import es.unizar.pruebaCliente.model.RespuestaLogin;
 import es.unizar.pruebaCliente.model.UsuarioVO;
+import es.unizar.pruebaCliente.model.partidas.Partida;
 import es.unizar.pruebaCliente.model.salas.ConfigSala;
 import es.unizar.pruebaCliente.model.salas.NotificacionSala;
 import es.unizar.pruebaCliente.model.salas.ReglasEspeciales;
@@ -23,6 +24,9 @@ public class PruebaClienteApplication {
 	
 	private static Object LOCK = new Object();
 	private static String sesionID = "EMPTY";
+	
+	private static Partida miPartida = null;
+	
 	
 	public static class RespuestaSalas {
 		private HashMap<UUID,Sala> salas;
@@ -114,8 +118,10 @@ public class PruebaClienteApplication {
 		
     	
     	ReglasEspeciales reglas = new ReglasEspeciales(false, false, false, false, false, false, false);
-    	ConfigSala config = new ConfigSala(ConfigSala.ModoJuego.Original, reglas, 4, true);
+    	ConfigSala config = new ConfigSala(ConfigSala.ModoJuego.Original, reglas, 1, true);
 		
+    	
+    	
 		//ACCIONES
 
 			while(true) {
@@ -137,34 +143,6 @@ public class PruebaClienteApplication {
 					} else {
 						System.out.println("error:" + salaID.getErrorInfo());
 					}
-					
-				} else if (orden.equals("unirse")) {
-					System.out.println("Introduce id sala:");
-					String salaID = scanner.nextLine();
-					
-			    	api.subscribe("/topic/salas/" + salaID, Sala.class, s -> {
-			    		if (s.isNoExiste()) {
-			    			System.out.println("Error al conectarse a la sala");
-			    			api.unsubscribe("/topic/salas/" + salaID);
-			    		} else {
-			    			System.out.println("Estado de la sala: " + s);
-			    		}
-			    	});
-			    	
-			    	api.sendObject("/app/salas/unirse/" + salaID, "vacio");
-			    	
-			    	
-				} else if (orden.equals("listo")) {
-					System.out.println("Introduce id sala:");
-					String salaID = scanner.nextLine();
-					api.sendObject("/app/salas/listo/" + salaID, "vacio");
-					
-					
-				} else if (orden.equals("salir")) {
-					System.out.println("Introduce id sala:");
-					String salaID = scanner.nextLine();
-					api.sendObject("/app/salas/salir/" + salaID, "vacio");
-					api.unsubscribe("/topic/salas/" + salaID);
 					
 					
 				} else if (orden.equals("buscar")) {
@@ -444,7 +422,80 @@ public class PruebaClienteApplication {
 			    	System.out.println(retorno);	
 				}
 				
-				  else if (orden.equals("exit")) {
+				
+				
+				
+				
+				
+				
+				
+				else if (orden.equals("unirse")) {
+					System.out.println("Introduce id sala:");
+					String salaID = scanner.nextLine();
+					
+			    	api.subscribe("/topic/salas/" + salaID, Sala.class, s -> {
+			    		if (s.isNoExiste()) {
+			    			System.out.println("Error al conectarse a la sala");
+			    			api.unsubscribe("/topic/salas/" + salaID);
+			    		} else {
+			    			System.out.println("Estado de la sala: " + s);
+			    			
+			    			if (s.isEnPartida() && miPartida == null) {
+			    				// acaba de comenzar la partida
+			    				
+			    				miPartida = s.getPartida();
+			    				System.out.println(miPartida);
+			    			}
+			    		}
+			    	});
+			    	
+			    	api.sendObject("/app/salas/unirse/" + salaID, "vacio");
+			    	
+			    	
+				} else if (orden.equals("listo")) {
+					System.out.println("Introduce id sala:");
+					String salaID = scanner.nextLine();
+					api.sendObject("/app/salas/listo/" + salaID, "vacio");
+					
+					
+				} else if (orden.equals("salir")) {
+					System.out.println("Introduce id sala:");
+					String salaID = scanner.nextLine();
+					api.sendObject("/app/salas/salir/" + salaID, "vacio");
+					api.unsubscribe("/topic/salas/" + salaID);
+				
+				
+				
+				
+				
+				
+				} else if (orden.equals("unirsePartida")) {
+					System.out.println("Introduce id:");
+					String salaID = scanner.nextLine();
+					
+			    	api.subscribe("/topic/partidas/turnos/" + salaID, Partida.class, p -> {
+			    		if (p.isHayError()) {
+			    			System.out.println(p.getError());
+			    			api.unsubscribe("/topic/partidas/turnos/" + salaID);
+			    		} else {
+			    			System.out.println("Nuevo turno: \n" + p);
+			    		}
+			    	});
+			    	
+			    	
+				} else if (orden.equals("turno")) {
+					System.out.println("Introduce id:");
+					String salaID = scanner.nextLine();
+					
+					api.sendObject("/topic/partidas/turnos/" + salaID, "vacio");
+				
+				
+				
+				
+				
+				
+				
+				} else if (orden.equals("exit")) {
 					break;
 				}
 		}

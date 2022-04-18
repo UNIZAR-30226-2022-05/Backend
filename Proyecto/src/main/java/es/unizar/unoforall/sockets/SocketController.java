@@ -230,6 +230,8 @@ public class SocketController {
 		
 		if (GestorSalas.obtenerSala(salaID) == null) {
 			return Serializar.serializar(new Partida("La sala de la partida ya no existe"));
+		} else if (GestorSalas.obtenerSala(salaID).isEnPartida()) {
+			return Serializar.serializar(new Partida("La partida todavía no ha comenzado"));
 		}
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
 		if (usuarioID == null) {

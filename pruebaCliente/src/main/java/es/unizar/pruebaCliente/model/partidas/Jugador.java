@@ -1,4 +1,4 @@
-package es.unizar.unoforall.model.partidas;
+package es.unizar.pruebaCliente.model.partidas;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,12 +70,4 @@ public class Jugador {
 		}
 		return puntuacion;
 	}
-
-	@Override
-	public String toString() {
-		return "Jugador [esIA=" + esIA + ", jugadorID=" + jugadorID + ", mano=" + mano + ", protegido_UNO="
-				+ protegido_UNO + "]";
-	}
-	
-	
 }

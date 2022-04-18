@@ -1,4 +1,4 @@
-package es.unizar.unoforall.model.partidas;
+package es.unizar.pruebaCliente.model.partidas;
 
 import java.util.List;
 
@@ -34,11 +34,4 @@ public class Jugada {
 	public void setRobar(boolean robar) {
 		this.robar = robar;
 	}
-
-	@Override
-	public String toString() {
-		return "Jugada [cartas=" + cartas + ", robar=" + robar + ", nuevoColor=" + nuevoColor + "]";
-	}
-	
-	
 }
