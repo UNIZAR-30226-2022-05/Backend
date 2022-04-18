@@ -61,6 +61,6 @@ public class Carta implements Comparable<Carta> {
 	
 	@Override
 	public String toString() {
-		return "Carta [tipo=" + tipo + ", color=" + color + "]";
+		return "Carta [tipo=" + tipo + ", color=" + color + "]\n";
 	}
 }
