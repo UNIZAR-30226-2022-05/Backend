@@ -273,7 +273,7 @@ public class SocketController {
 				//TODO Tratamiento de error al insertar en base de datos
 			}			
 		} else if (partida.turnoDeIA()) {
-			AlarmaTurnoIA alarm = new AlarmaTurnoIA(this, salaID);
+			AlarmaTurnoIA alarm = new AlarmaTurnoIA(salaID);
 			Timer t = new Timer();
 			t.schedule(alarm, DELAY_TURNO_IA);
 		}
