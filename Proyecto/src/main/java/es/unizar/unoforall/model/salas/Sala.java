@@ -83,6 +83,17 @@ public class Sala {
 			
 			if (this.enPartida)	 {
 				partida.expulsarJugador(participanteID);
+			} else {	//Si se va un jugador no listo, y el resto ya lo están 
+						//	-> se empieza la partida
+				boolean todosListos = true;
+				for (Map.Entry<UUID, Boolean> entry : participantes_listos.entrySet()) {
+					if (entry.getValue() == false) { 
+						todosListos = false; 
+					}
+				}
+				if (todosListos) {
+					setEnPartida(true);
+				}
 			}
 		}
 	}

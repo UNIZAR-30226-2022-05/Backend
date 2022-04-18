@@ -118,7 +118,7 @@ public class PruebaClienteApplication {
 		
     	
     	ReglasEspeciales reglas = new ReglasEspeciales(false, false, false, false, false, false, true);
-    	ConfigSala config = new ConfigSala(ConfigSala.ModoJuego.Original, reglas, 1, true);
+    	ConfigSala config = new ConfigSala(ConfigSala.ModoJuego.Original, reglas, 2, true);
 		
     	
     	
@@ -490,6 +490,7 @@ public class PruebaClienteApplication {
 					
 					System.out.println("Introduce la carta:");
 					Integer carta = Integer.valueOf(scanner.nextLine());
+					
 					
 					
 					api.sendObject("/topic/partidas/turnos/" + salaID, "vacio");

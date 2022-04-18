@@ -8,3 +8,5 @@ INSERT INTO ha_jugado VALUES('4c2a49ed-48be-4970-9010-edb1faf918f1', '4c2a49ed-4
 -- lo anterior es para el modelo viejo
 
 INSERT INTO usuarios VALUES('9661b426-b9e4-11ec-8422-0242ac120002', 'correo', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 'Pepe', 0, 0, 0, 0, 0, 0); --clave: 1234
+
+INSERT INTO usuarios VALUES('7a9b96ec-bf5e-11ec-9d64-0242ac120002', 'correo2', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 'Juan', 0, 0, 0, 0, 0, 0); --clave: 1234
