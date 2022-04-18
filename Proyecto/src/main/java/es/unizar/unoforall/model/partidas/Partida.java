@@ -244,9 +244,116 @@ public class Partida {
 		}
 		return c;
 	}
+
+	private void juegaCarta(Carta c, Jugada jugada) {
+		esCambioDeColor = false;
+		efectoRayosX = false;
+		boolean esSalto = false;
+		switch (c.getTipo()) {
+			case intercambio:
+				List<Carta> nuevaMano = new ArrayList<>(siguienteJugador().getMano());
+				siguienteJugador().getMano().clear();
+				siguienteJugador().getMano().addAll(this.jugadores.get(turno).getMano());
+				this.jugadores.get(turno).getMano().clear();
+				this.jugadores.get(turno).getMano().addAll(nuevaMano);
+				break;
+				
+			case mas2:
+				if(configuracion.getReglas().isEncadenarRoboCartas() || configuracion.getReglas().isRedirigirRoboCartas()) {
+					if(!modoAcumulandoRobo) {
+						modoAcumulandoRobo = true;
+						roboAcumulado = 2;
+					} else {
+						roboAcumulado+=2;
+					}
+				} else {
+					for (int i = 0; i < 2; i++) {
+						if(siguienteJugador().getMano().size()==20) {
+							break;
+						}
+						siguienteJugador().getMano().add(robarCarta());
+					}
+					esSalto=true;
+				}
+				break;
+				
+			case mas4:
+				if(configuracion.getReglas().isEncadenarRoboCartas() || configuracion.getReglas().isRedirigirRoboCartas()) {
+					if(!modoAcumulandoRobo) {
+						modoAcumulandoRobo = true;
+						roboAcumulado = 4;
+					} else {
+						roboAcumulado+=4;
+					}
+				} else {
+					for (int i = 0; i < 4; i++) {
+						if(siguienteJugador().getMano().size()==20) {
+							break;
+						}
+						siguienteJugador().getMano().add(robarCarta());
+					}
+					esSalto=true;
+				}
+				esCambioDeColor = true;
+				colorActual = jugada.nuevoColor;
+				break;
+				
+			case x2:
+				int numCartas = siguienteJugador().getMano().size();
+				for (int i = 0; i < numCartas; i++) {
+					if(siguienteJugador().getMano().size()==20) {
+						break;
+					}
+					siguienteJugador().getMano().add(robarCarta());
+				}
+				esSalto=true;
+				break;
+				
+			case rayosX:
+				List<Carta> mano = siguienteJugador().getMano();
+				Collections.shuffle(mano);
+				vistaPorRayosX = mano.get(0);
+				efectoRayosX = true;
+				break;
+				
+			case reversa:
+				this.sentidoHorario = ! this.sentidoHorario;
+				break;
+				
+			case salta:
+				esSalto = true;//avanzarTurno();
+				break;
+				
+			case cambioColor:
+				esCambioDeColor = true;
+				colorActual = jugada.nuevoColor;
+				break;
+				
+			default:
+				break;
+		}
+		this.cartasJugadas.add(c); //La añade al final (por implementaciones de rellenar y robar del mazo);
+		this.jugadores.get(turno).getMano().remove(c);
+		if (this.jugadores.get(turno).getMano().size()!=1) {
+			this.jugadores.get(turno).setProtegido_UNO(false);
+		}
+		if (esSalto) {
+			avanzarTurno();
+		}
+	}
 	
-
-
+	private boolean compruebaPuedeJugar() {
+		Carta anterior = getUltimaCartaJugada();
+		for(Carta c : jugadores.get(turno).getMano()) {
+			if (c.getColor().equals(colorActual) ||
+			    c.getColor().equals(Carta.Color.comodin) ||
+			    c.getTipo().equals(anterior.getTipo())) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	/**************************************************************************/
 	// Funciones públicas
 	/**************************************************************************/
