@@ -10,32 +10,32 @@ import java.util.UUID;
 import es.unizar.unoforall.model.salas.ConfigSala;
 
 public class Partida {
-	private boolean hayError;
-	private String error;
+	private boolean hayError = false;
+	private String error = null;
 	
-	private List<Carta> mazo;
-	private List<Carta> cartasJugadas;
+	private List<Carta> mazo = null;
+	private List<Carta> cartasJugadas = null;
 	
-	private List<Jugador> jugadores;
-	private int turno;
-	private boolean sentidoHorario;
+	private List<Jugador> jugadores = null;
+	private int turno = 0;
+	private boolean sentidoHorario = true;
 	
-	private ConfigSala configuracion;
-	private boolean terminada;	
+	private ConfigSala configuracion = null;
+	private boolean terminada = false;	
 	
 	//Fecha de inicio de la partida (Ya en formato sql porque no la necesita el frontend en este punto). 
-	private Date fechaInicio; 
-	private Carta.Color colorActual;
-	private boolean esCambioDeColor;
+	private Date fechaInicio = null; 
+	private Carta.Color colorActual = null;
+	private boolean esCambioDeColor = false;
 	
 	
 	//Variables para extraer resultados de efectos
-	private Carta vistaPorRayosX;
-	private boolean efectoRayosX;
-	private boolean modoAcumulandoRobo;
-	private int roboAcumulado;
-	private boolean modoJugarCartaRobada;
-	private Carta cartaRobada;
+	private Carta vistaPorRayosX = null;
+	private boolean efectoRayosX = false;
+	private boolean modoAcumulandoRobo = false;
+	private int roboAcumulado = 0;
+	private boolean modoJugarCartaRobada = false;
+	private Carta cartaRobada = null;
 	
 	private static final int MAX_ROBO_ATTACK = 10;
 	
