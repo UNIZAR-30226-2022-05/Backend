@@ -487,6 +487,9 @@ public class PruebaClienteApplication {
 					System.out.println("Introduce id:");
 					String salaID = scanner.nextLine();
 					
+					System.out.println("Elige una carta:");
+					int carta = scanner.nextLine();
+					
 					api.sendObject("/topic/partidas/turnos/" + salaID, "vacio");
 				
 				

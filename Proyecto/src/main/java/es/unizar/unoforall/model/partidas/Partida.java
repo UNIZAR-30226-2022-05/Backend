@@ -40,7 +40,7 @@ public class Partida {
 	private static final int MAX_ROBO_ATTACK = 10;
 	
 	public Partida(String error) {	//Para construir una partida con error = true
-		this.setHayError(true);
+		this.setHayError(true); 
 		this.setError(error);
 	}
 	
@@ -145,14 +145,14 @@ public class Partida {
 	// Comprueba si una carta especial debe incluirse en el mazo o no según las
 	// reglas
 	private boolean compruebaIncluirMazo(Carta.Tipo tipo) {
-		if (tipo == Carta.Tipo.rayosX && configuracion.getReglas().isCartaRayosX()) {
-			return true;
-		} else if (tipo == Carta.Tipo.intercambio && configuracion.getReglas().isCartaIntercambio()) {
-			return true;
-		} else if (tipo == Carta.Tipo.x2 && configuracion.getReglas().isCartaX2()){
-			return true;
-		} else {
+		if (tipo == Carta.Tipo.rayosX && !configuracion.getReglas().isCartaRayosX()) {
 			return false;
+		} else if (tipo == Carta.Tipo.intercambio && !configuracion.getReglas().isCartaIntercambio()) {
+			return false;
+		} else if (tipo == Carta.Tipo.x2 && !configuracion.getReglas().isCartaX2()){
+			return false;
+		} else {
+			return true;
 		}
 	}
 	
@@ -202,6 +202,22 @@ public class Partida {
 		}
 	}
 	
+	private Carta robarCarta() {
+		if (this.mazo.isEmpty()) {
+			this.mazo.addAll(this.cartasJugadas);
+			this.mazo.remove(0);
+			Collections.shuffle(this.mazo);
+			
+			Carta ultimaCarta = this.cartasJugadas.get(0);
+			this.cartasJugadas.clear();
+			this.cartasJugadas.add(ultimaCarta);
+		}
+		Carta c = this.mazo.get(0);
+		this.mazo.remove(0);
+		return c;
+	}
+	
+	
 	private boolean compatibleAcumulador(Carta c) {
 		if ((configuracion.getReglas().isEncadenarRoboCartas() 
 				&& (c.getTipo().equals(Carta.Tipo.mas4) || c.getTipo().equals(Carta.Tipo.mas2))) 
@@ -224,6 +240,7 @@ public class Partida {
 		}
 		return pj;
 	}
+<<<<<<< Updated upstream
 	
 	private Carta robarCarta() {
 		if (this.mazo.isEmpty()) {
@@ -245,6 +262,8 @@ public class Partida {
 		return c;
 	}
 	
+=======
+>>>>>>> Stashed changes
 
 
 	/**************************************************************************/
@@ -389,8 +408,10 @@ public class Partida {
 				return false;
 			} else {
 				Carta c = jugada.getCartas().get(0);
-				if(compatibleAcumulador(c) && (c.getTipo().equals(anterior.getTipo()) //Si la carta es usable según las reglas
-								|| c.getColor().equals(colorActual)  || c.getTipo().equals(Carta.Tipo.mas4))) {
+				if(compatibleAcumulador(c) && 
+						(c.getTipo().equals(anterior.getTipo()) //Si la carta es usable según las reglas
+								|| c.getColor().equals(colorActual)  
+								|| c.getTipo().equals(Carta.Tipo.mas4))) {
 					return true;
 				}
 			}
@@ -406,7 +427,7 @@ public class Partida {
 				int numCartas = 0; //Se necesitan dos para definir si son escaleras o iguales
 				PosiblesTiposJugadas pj = new PosiblesTiposJugadas(false,false,false);
 				for (Carta c : jugada.cartas) {
-					if (numCartas<=1) {
+					if (numCartas <= 1) {
 						if(numCartas==0) {
 							valida = c.getTipo().equals(anterior.getTipo()) || c.getColor().equals(colorActual);
 							anterior = c;
@@ -438,7 +459,6 @@ public class Partida {
 			}
 			
 			return valida;
-			//TODO verificar si se hace bien la escalera... (igual mejor en los frontend)
 		}
 		return false;
 	}
