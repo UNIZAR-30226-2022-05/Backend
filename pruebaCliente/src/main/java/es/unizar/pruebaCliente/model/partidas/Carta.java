@@ -2,7 +2,6 @@ package es.unizar.pruebaCliente.model.partidas;
 
 
 public class Carta implements Comparable<Carta> {
-	
 	public enum Tipo {n0(10), n1(1), n2(2), n3(3), n4(4), n5(5), n6(6), n7(7), n8(8), n9(9), mas2(11), reversa(12), salta(13), rayosX(14), intercambio(15), x2(16), cambioColor(17), mas4(18); 
 					public int valor;			
 					private Tipo(int valor) {
@@ -62,6 +61,6 @@ public class Carta implements Comparable<Carta> {
 	
 	@Override
 	public String toString() {
-		return "Carta [tipo=" + tipo + ", color=" + color + "]\n";
+		return "Carta [tipo=" + tipo + ", color=" + color + "]";
 	}
 }

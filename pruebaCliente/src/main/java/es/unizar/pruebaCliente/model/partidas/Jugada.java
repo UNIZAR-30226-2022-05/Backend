@@ -34,11 +34,4 @@ public class Jugada {
 	public void setRobar(boolean robar) {
 		this.robar = robar;
 	}
-
-	@Override
-	public String toString() {
-		return "Jugada [cartas=" + cartas + ", robar=" + robar + ", nuevoColor=" + nuevoColor + "]";
-	}
-	
-	
 }
