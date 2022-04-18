@@ -87,7 +87,7 @@ public class Partida {
 				}
 			}
 		}
-		//Collections.shuffle(this.mazo);
+		/////////Collections.shuffle(this.mazo); PARA DEBUG
 		
 		
 		// Cartas jugadas
@@ -439,12 +439,28 @@ public class Partida {
 						}
 					}
 					
-					
-					
 				} else if (modoJugarCartaRobada) {		
 					List<Carta> listaCartas = new ArrayList<>();
 					listaCartas.add(cartaRobada);
 					jugadaIA.setCartas(listaCartas);
+					
+					if (cartaRobada.getColor().equals(Carta.Color.comodin)) {
+						int random_color = (int)Math.floor(Math.random()*(4)+1);
+						switch(random_color) {
+							case 1:
+								jugadaIA.setNuevoColor(Carta.Color.amarillo);
+								break;
+							case 2:
+								jugadaIA.setNuevoColor(Carta.Color.azul);
+								break;
+							case 3:
+								jugadaIA.setNuevoColor(Carta.Color.rojo);
+								break;
+							case 4:
+								jugadaIA.setNuevoColor(Carta.Color.verde);
+								break;
+						}
+					}
 					
 				} else {
 					for (Carta c : this.jugadores.get(turno).getMano()) {
@@ -452,6 +468,24 @@ public class Partida {
 							List<Carta> listaCartas = new ArrayList<>();
 							listaCartas.add(c);
 							jugadaIA.setCartas(listaCartas);
+							
+							if (cartaRobada.getColor().equals(Carta.Color.comodin)) {
+								int random_color = (int)Math.floor(Math.random()*(4)+1);
+								switch(random_color) {
+									case 1:
+										jugadaIA.setNuevoColor(Carta.Color.amarillo);
+										break;
+									case 2:
+										jugadaIA.setNuevoColor(Carta.Color.azul);
+										break;
+									case 3:
+										jugadaIA.setNuevoColor(Carta.Color.rojo);
+										break;
+									case 4:
+										jugadaIA.setNuevoColor(Carta.Color.verde);
+										break;
+								}
+							}
 							break;
 						}
 					}
