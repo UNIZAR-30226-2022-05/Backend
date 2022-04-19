@@ -225,7 +225,6 @@ public class SocketController {
 		if (s == null) {
 			return Serializar.serializar(new Sala("La sala se ha eliminado"));
 		} else {
-			System.err.println("holi: " + salaID);
 			return Serializar.serializar(s);
 		}
 	}

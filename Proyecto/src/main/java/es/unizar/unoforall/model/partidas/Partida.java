@@ -552,8 +552,8 @@ public class Partida {
 		return jugadores;
 	}
 	
-	public UUID getIDJugadorActual() {
-		return this.jugadores.get(this.turno).getJugadorID();
+	public Jugador getJugadorActual() {
+		return this.jugadores.get(this.turno);
 	}
 	
 	public Carta getUltimaCartaJugada() {
@@ -666,7 +666,9 @@ public class Partida {
 	 * 					la carta vista si se ha jugado por el jugador.
 	 */
 	public Carta getRayosX(UUID jugadorID) {
-		if(efectoRayosX && jugadorID.equals(anteriorJugador().getJugadorID())) {
+		if (efectoRayosX 
+				&& anteriorJugador().isEsIA() 
+				&& jugadorID.equals(anteriorJugador().getJugadorID())) {
 			//Si el jugador ha jugado una rayosX en el turno anterior
 			return vistaPorRayosX; 
 		}
