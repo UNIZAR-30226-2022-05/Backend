@@ -268,9 +268,6 @@ public class Partida {
 					}
 				} else {
 					for (int i = 0; i < 2; i++) {
-						if(siguienteJugador().getMano().size()==20) {
-							break;
-						}
 						siguienteJugador().getMano().add(robarCarta());
 					}
 					esSalto=true;
@@ -287,9 +284,6 @@ public class Partida {
 					}
 				} else {
 					for (int i = 0; i < 4; i++) {
-						if(siguienteJugador().getMano().size()==20) {
-							break;
-						}
 						siguienteJugador().getMano().add(robarCarta());
 					}
 					esSalto=true;
@@ -334,6 +328,13 @@ public class Partida {
 		}
 		this.cartasJugadas.add(c); //La añade al final (por implementaciones de rellenar y robar del mazo);
 		this.jugadores.get(turno).getMano().remove(c);
+		if(	configuracion.getReglas().isEvitarEspecialFinal() && 
+				this.jugadores.get(turno).getMano().size()==1 &&
+				this.jugadores.get(turno).getMano().get(0).getColor().equals(Carta.Color.comodin)) {
+			for (int i = 0; i < 2; i++) {
+				this.jugadores.get(turno).getMano().add(robarCarta());
+			}
+		}
 		if (this.jugadores.get(turno).getMano().size()!=1) {
 			this.jugadores.get(turno).setProtegido_UNO(false);
 		}
