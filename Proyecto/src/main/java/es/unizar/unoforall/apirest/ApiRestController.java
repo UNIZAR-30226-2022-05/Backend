@@ -436,7 +436,8 @@ public class ApiRestController {
 	 * Método al que llamar para aceptar la solicitud de amistad a otro usuario.
 	 * @param idSesion 	contiene el id de la sesion del usuario.
 	 * @param amigo		contiene el id de la cuenta del amigo.
-	 * @return			Devuelve "nulo" si todo ha ido bien.
+	 * @return			Devuelve "nulo" si se ha enviado la peticion correctamente.
+	 * 					Devuelve "ACEPTADA" si había una petición pendiente y la acepta.
 	 * 					Devuelve "SESION_EXPIRADA" si la sesión ha expirado.
 	 * 					Devuelve un mensaje de error en otro caso.	 
 	 */

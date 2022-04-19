@@ -455,7 +455,7 @@ public class UsuarioDAO {
 						if(rows != 1) {
 							error = "Ha habido un error con la solicitud de amistad. Solicitudes aceptadas: " + Integer.toString(rows)+".";
 						} else {
-							error = "Solicitud pendiente aceptada; no se va a enviar una nueva";
+							error = "ACEPTADA";//"Solicitud pendiente aceptada; no se va a enviar una nueva";
 						}
 					}
 					

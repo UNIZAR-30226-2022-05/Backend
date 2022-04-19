@@ -1,5 +1,6 @@
 package es.unizar.unoforall.model.partidas;
 
+import java.util.Objects;
 
 public class Carta implements Comparable<Carta> {
 	
@@ -31,6 +32,27 @@ public class Carta implements Comparable<Carta> {
 		}
 	}
 	
+	
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(color, tipo);
+	}
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Carta other = (Carta) obj;
+		return color == other.color && tipo == other.tipo;
+	}
+
+
 	public Tipo getTipo() {
 		return tipo;
 	}
