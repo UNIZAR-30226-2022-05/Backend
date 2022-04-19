@@ -32,6 +32,14 @@ public class Carta implements Comparable<Carta> {
 		}
 	}
 	
+	public boolean esDelColor(Color color) {
+		return this.color==color;
+	}
+	
+	public boolean esDelTipo(Tipo tipo) {
+		return this.tipo==tipo;
+	}
+	
 	public static boolean esNumero(Tipo tipo) {
 		if(tipo.ordinal()<10) {
 			return true;

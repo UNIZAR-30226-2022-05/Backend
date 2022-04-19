@@ -204,9 +204,9 @@ public class Partida {
 	
 	private boolean compatibleAcumulador(Carta c) {
 		if ((configuracion.getReglas().isEncadenarRoboCartas() 
-				&& (c.getTipo().equals(Carta.Tipo.mas4) || c.getTipo().equals(Carta.Tipo.mas2))) 
+				&& (c.esDelTipo(Carta.Tipo.mas4) || c.esDelTipo(Carta.Tipo.mas2))) 
 			|| 
-			(configuracion.getReglas().isRedirigirRoboCartas() && c.getTipo().equals(Carta.Tipo.reversa)) ) {
+			(configuracion.getReglas().isRedirigirRoboCartas() && c.esDelTipo(Carta.Tipo.reversa)) ) {
 			return true;
 		} else {
 			return false;
@@ -341,7 +341,7 @@ public class Partida {
 		this.jugadores.get(turno).getMano().remove(c);
 		if(	configuracion.getReglas().isEvitarEspecialFinal() && 
 				this.jugadores.get(turno).getMano().size()==1 &&
-				this.jugadores.get(turno).getMano().get(0).getColor().equals(Carta.Color.comodin)) {
+				this.jugadores.get(turno).getMano().get(0).esDelColor(Carta.Color.comodin)) {
 			for (int i = 0; i < 2; i++) {
 				this.jugadores.get(turno).getMano().add(robarCarta());
 			}
@@ -357,9 +357,9 @@ public class Partida {
 	private boolean compruebaPuedeJugar() {
 		Carta anterior = getUltimaCartaJugada();
 		for(Carta c : jugadores.get(turno).getMano()) {
-			if (c.getColor().equals(colorActual) ||
-			    c.getColor().equals(Carta.Color.comodin) ||
-			    c.getTipo().equals(anterior.getTipo())) {
+			if (c.esDelColor(colorActual) ||
+			    c.esDelColor(Carta.Color.comodin) ||
+			    Carta.compartenTipo(c, anterior)) {
 				return true;
 			}
 		}
@@ -392,8 +392,8 @@ public class Partida {
 			} else {
 				Carta cartaRobada = robarCarta();
 				this.jugadores.get(turno).getMano().add(cartaRobada);
-				if (cartaRobada.getColor().equals(colorActual) || cartaRobada.getColor().equals(Carta.Color.comodin) 
-						|| cartaRobada.getTipo().equals(getUltimaCartaJugada().getTipo())) {
+				if (cartaRobada.esDelColor(colorActual) || cartaRobada.esDelColor(Carta.Color.comodin) 
+						|| Carta.compartenTipo(cartaRobada,getUltimaCartaJugada())) {
 					modoJugarCartaRobada=true;
 				}
 			}
@@ -440,9 +440,9 @@ public class Partida {
 				if (modoAcumulandoRobo) {
 					for (Carta c : this.jugadores.get(turno).getMano()) {
 						if(compatibleAcumulador(c) && 
-								(c.getTipo().equals(cartaCentral.getTipo()) 	//Si la carta es usable según las reglas
-										|| c.getColor().equals(colorActual)  
-										|| c.getTipo().equals(Carta.Tipo.mas4))) {
+								(Carta.compartenTipo(c, cartaCentral)) 	//Si la carta es usable según las reglas
+										|| c.esDelColor(colorActual)  
+										|| c.esDelTipo(Carta.Tipo.mas4)) {
 							
 							List<Carta> listaCartas = new ArrayList<>();
 							listaCartas.add(c);
@@ -456,7 +456,7 @@ public class Partida {
 					listaCartas.add(cartaRobada);
 					jugadaIA.setCartas(listaCartas);
 					
-					if (cartaRobada.getColor().equals(Carta.Color.comodin)) {
+					if (cartaRobada.esDelColor(Carta.Color.comodin)) {
 						int random_color = (int)Math.floor(Math.random()*(4)+1);
 						switch(random_color) {
 							case 1:
@@ -481,7 +481,7 @@ public class Partida {
 							listaCartas.add(c);
 							jugadaIA.setCartas(listaCartas);
 							
-							if (cartaRobada.getColor().equals(Carta.Color.comodin)) {
+							if (cartaRobada.esDelColor(Carta.Color.comodin)) {
 								int random_color = (int)Math.floor(Math.random()*(4)+1);
 								switch(random_color) {
 									case 1:
@@ -581,8 +581,8 @@ public class Partida {
 				return false;
 			} else {
 				Carta c = jugada.getCartas().get(0);
-				if(compatibleAcumulador(c) && (c.getTipo().equals(anterior.getTipo()) //Si la carta es usable según las reglas
-								|| c.getColor().equals(colorActual)  || c.getTipo().equals(Carta.Tipo.mas4))) {
+				if(compatibleAcumulador(c) && (Carta.compartenTipo(c, anterior) //Si la carta es usable según las reglas
+								|| c.esDelColor(colorActual)  || c.esDelTipo(Carta.Tipo.mas4))) {
 					return true;
 				}
 			}
@@ -598,7 +598,7 @@ public class Partida {
 				for (Carta c : jugada.getCartas()) {
 					if (numCartas<=1) {
 						if(numCartas==0) {
-							valida = Carta.compartenTipo(c, anterior) || c.getColor().equals(colorActual);
+							valida = Carta.compartenTipo(c, anterior) || c.esDelColor(colorActual);
 						} else {
 							pj = evaluaJugada(anterior,c);
 							valida = pj.valida;
@@ -622,8 +622,8 @@ public class Partida {
 				if (jugada.getCartas().size()>1) {
 					valida = false; //Solo se puede jugar una si no son números. (o si no se permite jugar más de una).
 				}
-				return jugada.getCartas().get(0).getTipo().equals(anterior.getTipo()) 
-						|| jugada.getCartas().get(0).getColor().equals(colorActual);
+				return Carta.compartenTipo(jugada.getCartas().get(0),anterior) 
+						|| jugada.getCartas().get(0).esDelColor(colorActual);
 			}
 			
 			return valida;
