@@ -32,7 +32,30 @@ public class Carta implements Comparable<Carta> {
 		}
 	}
 	
+	public static boolean esNumero(Tipo tipo) {
+		if(tipo.ordinal()<10) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 	
+	public static boolean compartenTipo(Carta c1, Carta c2) {
+		boolean respuesta = c1.getTipo()==c2.getTipo();
+		return respuesta;
+	}
+	
+	public static boolean compartenColor(Carta c1, Carta c2) {
+		boolean respuesta = c1.getColor()==c2.getColor();
+		return respuesta;
+	}
+	
+	//Solo para las numéricas
+	public static boolean sonConsecutivas(Carta c1, Carta c2) {
+		return compartenColor(c1,c2) &&
+				(c1.getTipo().ordinal()==c2.getTipo().ordinal()-1 || 
+				c1.getTipo().equals(Carta.Tipo.n9) && c2.getTipo().equals(Carta.Tipo.n0));
+	}
 	
 	@Override
 	public int hashCode() {

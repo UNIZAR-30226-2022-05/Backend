@@ -215,9 +215,9 @@ public class Partida {
 	
 	private PosiblesTiposJugadas evaluaJugada(Carta c1, Carta c2) {
 		PosiblesTiposJugadas pj = null;
-		if (c1.getTipo().equals(c2.getTipo())) {
+		if (Carta.compartenTipo(c1, c2)) {
 			pj = new PosiblesTiposJugadas(false,true,true);
-		} else if(c1.getTipo().ordinal()==c2.getTipo().ordinal()-1 || c1.getTipo().equals(Carta.Tipo.n9) && c2.getTipo().equals(Carta.Tipo.n0)) {
+		} else if(Carta.sonConsecutivas(c1, c2)) {
 			pj = new PosiblesTiposJugadas(true,false,true);
 		} else {
 			pj = new PosiblesTiposJugadas(false,false,false);
@@ -592,16 +592,13 @@ public class Partida {
 			Carta.Tipo tipo = jugada.getCartas().get(0).getTipo();
 			
 			//Las únicas cartas que hacen "jugadas" son los números, para el resto de cartas solo se puede jugar una.
-			if(configuracion.getReglas().isJugarVariasCartas() && (tipo.equals(Carta.Tipo.n0) || tipo.equals(Carta.Tipo.n1) 
-					|| tipo.equals(Carta.Tipo.n2) || tipo.equals(Carta.Tipo.n3) || tipo.equals(Carta.Tipo.n4) || tipo.equals(Carta.Tipo.n5) 
-					|| tipo.equals(Carta.Tipo.n6) || tipo.equals(Carta.Tipo.n7) || tipo.equals(Carta.Tipo.n9))) {
+			if(configuracion.getReglas().isJugarVariasCartas() && Carta.esNumero(tipo)) {
 				int numCartas = 0; //Se necesitan dos para definir si son escaleras o iguales
 				PosiblesTiposJugadas pj = new PosiblesTiposJugadas(false,false,false);
 				for (Carta c : jugada.getCartas()) {
 					if (numCartas<=1) {
 						if(numCartas==0) {
-							valida = c.getTipo().equals(anterior.getTipo()) || c.getColor().equals(colorActual);
-							anterior = c;
+							valida = Carta.compartenTipo(c, anterior) || c.getColor().equals(colorActual);
 						} else {
 							pj = evaluaJugada(anterior,c);
 							valida = pj.valida;
@@ -609,14 +606,14 @@ public class Partida {
 						numCartas++;
 					} else {
 						if(pj.esEscalera) {
-							valida = anterior.getTipo().ordinal()==c.getTipo().ordinal()-1 || 
-									anterior.getTipo().equals(Carta.Tipo.n9) && c.getTipo().equals(Carta.Tipo.n0);
+							valida = Carta.sonConsecutivas(anterior,c);
 						} else if(pj.esIguales){
-							valida = c.getTipo().equals(anterior.getTipo());
+							valida = Carta.compartenTipo(c, anterior);
 						} else {
 							valida = false;
 						}
 					}
+					anterior = c;
 					if(!valida) {
 						break;
 					}
