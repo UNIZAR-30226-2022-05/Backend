@@ -6,6 +6,7 @@ public class Jugada {
 	private List<Carta> cartas;		//En el orden en el que se quieren tirar
 	private boolean robar;
 	private Carta.Color nuevoColor;
+	private int jugadorObjetivo;
 	
 	// La jugada es robar
 	public Jugada() {
@@ -26,8 +27,15 @@ public class Jugada {
 		this.robar = false;
 		this.nuevoColor = nuevoColor;
 	}
-
 	
+	public int getJugadorObjetivo() {
+		return jugadorObjetivo;
+	}
+
+	public void setJugadorObjetivo(int jugadorObjetivo) {
+		this.jugadorObjetivo = jugadorObjetivo;
+	}
+
 	public List<Carta> getCartas() {
 		return cartas;
 	}

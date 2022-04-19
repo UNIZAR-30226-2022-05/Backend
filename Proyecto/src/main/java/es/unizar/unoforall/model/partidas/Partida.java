@@ -251,11 +251,11 @@ public class Partida {
 		boolean esSalto = false;
 		switch (c.getTipo()) {
 			case intercambio:
-				List<Carta> nuevaMano = new ArrayList<>(siguienteJugador().getMano());
-				siguienteJugador().getMano().clear();
-				siguienteJugador().getMano().addAll(this.jugadores.get(turno).getMano());
-				this.jugadores.get(turno).getMano().clear();
-				this.jugadores.get(turno).getMano().addAll(nuevaMano);
+				List<Carta> nuevaMano = new ArrayList<>(jugadores.get(jugada.getJugadorObjetivo()).getMano());
+				jugadores.get(jugada.getJugadorObjetivo()).getMano().clear();
+				jugadores.get(jugada.getJugadorObjetivo()).getMano().addAll(jugadores.get(turno).getMano());
+				jugadores.get(turno).getMano().clear();
+				jugadores.get(turno).getMano().addAll(nuevaMano);
 				break;
 				
 			case mas2:
@@ -310,7 +310,7 @@ public class Partida {
 				break;
 				
 			case rayosX:
-				List<Carta> mano = siguienteJugador().getMano();
+				List<Carta> mano = jugadores.get(jugada.getJugadorObjetivo()).getMano();
 				Collections.shuffle(mano);
 				vistaPorRayosX = mano.get(0);
 				efectoRayosX = true;
@@ -328,7 +328,7 @@ public class Partida {
 				esCambioDeColor = true;
 				colorActual = jugada.getNuevoColor();
 				break;
-				
+
 			default:
 				break;
 		}
