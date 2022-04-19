@@ -227,19 +227,30 @@ public class Partida {
 	
 	private Carta robarCarta() {
 		if (this.mazo.isEmpty()) {
-			while(this.cartasJugadas.size()!=1) {
+			System.err.println("Intento de robo de mazo vacío.");
+			Carta auxiliar = cartasJugadas.get(cartasJugadas.size()-1);
+			cartasJugadas.remove(cartasJugadas.size()-1);
+			this.mazo.addAll(cartasJugadas);
+			cartasJugadas.removeAll(cartasJugadas);
+			cartasJugadas.add(auxiliar);
+			/*while(this.cartasJugadas.size()!=1) {
 				this.mazo.add(this.cartasJugadas.get(0));
 				this.cartasJugadas.remove(0);
-			}
+			}*/
 			Collections.shuffle(this.mazo);
 		}
 		Carta c = this.mazo.get(0);
 		this.mazo.remove(0);
 		if (this.mazo.isEmpty()) {
-			while(this.cartasJugadas.size()!=1) {
+			Carta auxiliar = cartasJugadas.get(cartasJugadas.size()-1);
+			cartasJugadas.remove(cartasJugadas.size()-1);
+			this.mazo.addAll(cartasJugadas);
+			cartasJugadas.removeAll(cartasJugadas);
+			cartasJugadas.add(auxiliar);
+			/*while(this.cartasJugadas.size()!=1) {
 				this.mazo.add(this.cartasJugadas.get(0));
 				this.cartasJugadas.remove(0);
-			}
+			}*/
 			Collections.shuffle(this.mazo);
 		}
 		return c;
