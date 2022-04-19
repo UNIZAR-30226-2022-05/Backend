@@ -1,6 +1,8 @@
 package es.unizar.pruebaCliente;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
@@ -10,6 +12,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import es.unizar.pruebaCliente.model.ListaUsuarios;
 import es.unizar.pruebaCliente.model.RespuestaLogin;
 import es.unizar.pruebaCliente.model.UsuarioVO;
+import es.unizar.pruebaCliente.model.partidas.Carta;
+import es.unizar.pruebaCliente.model.partidas.Jugada;
 import es.unizar.pruebaCliente.model.partidas.Partida;
 import es.unizar.pruebaCliente.model.salas.ConfigSala;
 import es.unizar.pruebaCliente.model.salas.NotificacionSala;
@@ -26,6 +30,8 @@ public class PruebaClienteApplication {
 	private static String sesionID = "EMPTY";
 	
 	private static Partida miPartida = null;
+	private static UUID miID = null;
+	private static String miSala = null;
 	
 	
 	public static class RespuestaSalas {
@@ -80,6 +86,8 @@ public class PruebaClienteApplication {
         	resp = apirest.receiveObject(RespuestaLogin.class);
     	}
     	System.out.println("clave inicio: " + resp.getClaveInicio());
+    	
+    	miID = resp.getUsuarioID();
 		
 				
 		//CONEXION
@@ -432,8 +440,10 @@ public class PruebaClienteApplication {
 				else if (orden.equals("unirse")) {
 					System.out.println("Introduce id sala:");
 					String salaID = scanner.nextLine();
+					miSala = salaID;
 					
 			    	api.subscribe("/topic/salas/" + salaID, Sala.class, s -> {
+			    		System.out.println("Sala actualizada");
 			    		if (s.isNoExiste()) {
 			    			System.out.println("Error al conectarse a la sala");
 			    			api.unsubscribe("/topic/salas/" + salaID);
@@ -453,14 +463,17 @@ public class PruebaClienteApplication {
 			    	
 			    	
 				} else if (orden.equals("listo")) {
-					System.out.println("Introduce id sala:");
-					String salaID = scanner.nextLine();
+					//System.out.println("Introduce id sala:");
+					//String salaID = scanner.nextLine();
+					String salaID = miSala;
 					api.sendObject("/app/salas/listo/" + salaID, "vacio");
 					
 					
 				} else if (orden.equals("salir")) {
-					System.out.println("Introduce id sala:");
-					String salaID = scanner.nextLine();
+					//System.out.println("Introduce id sala:");
+					//String salaID = scanner.nextLine();
+					String salaID = miSala;
+					
 					api.sendObject("/app/salas/salir/" + salaID, "vacio");
 					api.unsubscribe("/topic/salas/" + salaID);
 				
@@ -470,30 +483,40 @@ public class PruebaClienteApplication {
 				
 				
 				} else if (orden.equals("unirsePartida")) {
-					System.out.println("Introduce id:");
-					String salaID = scanner.nextLine();
+					//System.out.println("Introduce id:");
+					//String salaID = scanner.nextLine();
+					String salaID = miSala;
 					
 			    	api.subscribe("/topic/partidas/turnos/" + salaID, Partida.class, p -> {
 			    		if (p.isHayError()) {
-			    			System.out.println(p.getError());
+			    			System.out.println("Error al enviar turno: " + p.getError());
 			    			api.unsubscribe("/topic/partidas/turnos/" + salaID);
 			    		} else {
 			    			miPartida = p;
-			    			System.out.println("Nuevo turno: \n" + p);
+			    			System.out.println("-------------------------- Nuevo turno\n" + p);
 			    		}
 			    	});
 			    	
 			    	
 				} else if (orden.equals("turno")) {
-					System.out.println("Introduce id:");
-					String salaID = scanner.nextLine();
+					//System.out.println("Introduce id:");
+					//String salaID = scanner.nextLine();
+					String salaID = miSala;
 					
-					System.out.println("Introduce la carta:");
-					Integer carta = Integer.valueOf(scanner.nextLine());
+					if (miPartida.getJugadorActual().getJugadorID().equals(miID)) {
+						System.out.println("Introduce la carta:");
+						Integer carta = Integer.valueOf(scanner.nextLine());
+						
+						List<Carta> lista = new ArrayList<Carta>();
+						lista.add(miPartida.getJugadorActual().getMano().get(carta));
+						Jugada j = new Jugada(lista);
+						
+						api.sendObject("/app/partidas/turnos/" + salaID, j);
+					} else {
+						System.err.println("No es tu turno");
+					}
 					
 					
-					
-					api.sendObject("/topic/partidas/turnos/" + salaID, "vacio");
 				
 				
 				

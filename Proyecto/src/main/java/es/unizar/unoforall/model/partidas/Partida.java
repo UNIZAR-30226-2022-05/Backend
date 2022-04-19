@@ -447,6 +447,7 @@ public class Partida {
 							List<Carta> listaCartas = new ArrayList<>();
 							listaCartas.add(c);
 							jugadaIA.setCartas(listaCartas);
+							jugadaIA.setRobar(false);
 							break;
 						}
 					}
@@ -455,6 +456,7 @@ public class Partida {
 					List<Carta> listaCartas = new ArrayList<>();
 					listaCartas.add(cartaRobada);
 					jugadaIA.setCartas(listaCartas);
+					jugadaIA.setRobar(false);
 					
 					if (cartaRobada.esDelColor(Carta.Color.comodin)) {
 						int random_color = (int)Math.floor(Math.random()*(4)+1);
@@ -480,8 +482,9 @@ public class Partida {
 							List<Carta> listaCartas = new ArrayList<>();
 							listaCartas.add(c);
 							jugadaIA.setCartas(listaCartas);
+							jugadaIA.setRobar(false);
 							
-							if (cartaRobada.esDelColor(Carta.Color.comodin)) {
+							if (c.esDelColor(Carta.Color.comodin)) {
 								int random_color = (int)Math.floor(Math.random()*(4)+1);
 								switch(random_color) {
 									case 1:
@@ -508,6 +511,7 @@ public class Partida {
 				}
 			}
 			
+			System.err.println("Jugada elegida por la IA: " + jugadaIA);
 			ejecutarJugada(jugadaIA);
 		}
 	}

@@ -24,7 +24,7 @@ import es.unizar.unoforall.utils.Serializar;
 @Controller
 public class SocketController {	
 	
-	private final static int DELAY_TURNO_IA = 2*60000;  
+	private final static int DELAY_TURNO_IA = 2*1000;  // 2 segundos
 	
 	/**
 	 * Método para iniciar sesión
@@ -249,11 +249,11 @@ public class SocketController {
 	@SendTo("/topic/partidas/turnos/{salaID}")
 	public String turnoPartida(@DestinationVariable UUID salaID, 
 							@Header("simpSessionId") String sesionID, 
-							Jugada jugada) throws Exception {
+							Jugada jugada) throws Exception {		
 		
 		if (GestorSalas.obtenerSala(salaID) == null) {
 			return Serializar.serializar(new Partida("La sala de la partida ya no existe"));
-		} else if (GestorSalas.obtenerSala(salaID).isEnPartida()) {
+		} else if (!GestorSalas.obtenerSala(salaID).isEnPartida()) {
 			return Serializar.serializar(new Partida("La partida todavía no ha comenzado"));
 		}
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
@@ -261,7 +261,7 @@ public class SocketController {
 			return Serializar.serializar(new Partida("La sesión ha caducado. Vuelva a iniciar sesión"));
 		}
 		
-		System.out.println(sesionID + " envia un turno a la sala " + salaID);
+		System.out.println("- - - " + sesionID + " envia un turno a la sala " + salaID);
 		
 		Partida partida = GestorSalas.obtenerSala(salaID).getPartida();
 		partida.ejecutarJugadaJugador(jugada, usuarioID);
@@ -272,6 +272,7 @@ public class SocketController {
 				//TODO Tratamiento de error al insertar en base de datos
 			}			
 		} else if (partida.turnoDeIA()) {
+			System.out.println("- - - Preparando turno de la IA");
 			AlarmaTurnoIA alarm = new AlarmaTurnoIA(salaID);
 			Timer t = new Timer();
 			t.schedule(alarm, DELAY_TURNO_IA);
