@@ -1,16 +1,10 @@
-package es.unizar.pruebaCliente.model.partidas;
+package es.unizar.unoforall.model.partidas;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class Jugador {
-	@Override
-	public String toString() {
-		return "Jugador [esIA=" + esIA + ", jugadorID=" + jugadorID + ", mano=" + mano + ", protegido_UNO="
-				+ protegido_UNO + "]";
-	}
-
 	private boolean esIA;
 	private UUID jugadorID;
 	private List<Carta> mano;
@@ -76,4 +70,12 @@ public class Jugador {
 		}
 		return puntuacion;
 	}
+
+	@Override
+	public String toString() {
+		return "Jugador [esIA=" + esIA + ", jugadorID=" + jugadorID + ", mano=" + mano + ", protegido_UNO="
+				+ protegido_UNO + "]";
+	}
+	
+	
 }

@@ -25,8 +25,6 @@ public class Partida {
 	
 	//Fecha de inicio de la partida (Ya en formato sql porque no la necesita el frontend en este punto). 
 	private Date fechaInicio = null; 
-	private Carta.Color colorActual = null;
-	private boolean esCambioDeColor = false;
 	
 	
 	//Variables para extraer resultados de efectos
@@ -675,6 +673,17 @@ public class Partida {
 	public ConfigSala getConfiguracion() {
 		return configuracion;
 	}
+
+
+	@Override
+	public String toString() {
+		return "Partida [hayError=" + hayError + ", error=" + error + ", mazo=" + mazo + ", cartasJugadas="
+				+ cartasJugadas + ", jugadores=" + jugadores + ", turno=" + turno + ", sentidoHorario=" + sentidoHorario
+				+ ", configuracion=" + configuracion + ", terminada=" + terminada + ", fechaInicio=" + fechaInicio
+				+ ", vistaPorRayosX=" + vistaPorRayosX + ", efectoRayosX=" + efectoRayosX + ", modoAcumulandoRobo="
+				+ modoAcumulandoRobo + ", roboAcumulado=" + roboAcumulado + ", modoJugarCartaRobada="
+				+ modoJugarCartaRobada + ", cartaRobada=" + cartaRobada + "]";
+	}
 	
 	/**
 	 * @return			null si no se ha jugado una carta de rayosX el turno anterior o no eres quien la jugó.
@@ -689,18 +698,5 @@ public class Partida {
 		}
 		return null;
 	}*/
-	
-	
-	
-	
-	@Override
-	public String toString() {
-		return "Partida [hayError=" + hayError + ", error=" + error + "\n\t mazo=" + mazo + "\n\n\t cartasJugadas="
-				+ cartasJugadas + "\n\n\t jugadores=" + jugadores + ", turno=" + turno + ", sentidoHorario=" + sentidoHorario
-				+ ", configuracion=" + configuracion + ", terminada=" + terminada + ", fechaInicio=" + fechaInicio
-				+ ", colorActual=" + colorActual + ", esCambioDeColor=" + esCambioDeColor + ", vistaPorRayosX="
-				+ vistaPorRayosX + ", efectoRayosX=" + efectoRayosX + ", modoAcumulandoRobo=" + modoAcumulandoRobo
-				+ ", roboAcumulado=" + roboAcumulado + "]";
-	}
 	
 }

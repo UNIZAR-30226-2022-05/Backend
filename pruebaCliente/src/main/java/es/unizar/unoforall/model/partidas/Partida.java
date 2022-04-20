@@ -1,4 +1,4 @@
-package es.unizar.pruebaCliente.model.partidas;
+package es.unizar.unoforall.model.partidas;
 
 import java.sql.Date;
 import java.util.ArrayList;
@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-import es.unizar.pruebaCliente.model.salas.ConfigSala;
+import es.unizar.unoforall.model.salas.ConfigSala;
 
 public class Partida {
 	private boolean hayError = false;
@@ -25,8 +25,6 @@ public class Partida {
 	
 	//Fecha de inicio de la partida (Ya en formato sql porque no la necesita el frontend en este punto). 
 	private Date fechaInicio = null; 
-	private Carta.Color colorActual = null;
-	private boolean esCambioDeColor = false;
 	
 	
 	//Variables para extraer resultados de efectos
@@ -136,7 +134,6 @@ public class Partida {
 			carta = this.mazo.get(indice);
 		}
 		this.mazo.remove(indice);
-		colorActual = carta.getColor();
 		return carta;
 	}
 	
@@ -240,6 +237,10 @@ public class Partida {
 			Collections.shuffle(this.mazo);
 		}
 		Carta c = this.mazo.get(0);
+		if (c.getTipo().equals(Carta.Tipo.cambioColor) || c.getTipo().equals(Carta.Tipo.mas4)) {
+			c.setColor(Carta.Color.comodin);
+		}
+		
 		this.mazo.remove(0);
 		if (this.mazo.isEmpty()) {
 			Carta auxiliar = cartasJugadas.get(cartasJugadas.size()-1);
@@ -257,7 +258,7 @@ public class Partida {
 	}
 
 	private void juegaCarta(Carta c, Jugada jugada) {
-		esCambioDeColor = false;
+		c.setOculta();
 		efectoRayosX = false;
 		boolean esSalto = false;
 		switch (c.getTipo()) {
@@ -299,8 +300,6 @@ public class Partida {
 					}
 					esSalto=true;
 				}
-				esCambioDeColor = true;
-				colorActual = jugada.getNuevoColor();
 				break;
 				
 			case x2:
@@ -315,6 +314,21 @@ public class Partida {
 				break;
 				
 			case rayosX:
+				for (int i = 0 ; i < configuracion.getMaxParticipantes() ; i++) {
+					if( i != turno ) {
+						Jugador j = jugadores.get(i);
+						List<Carta> mano = j.getMano();
+						Collections.shuffle(mano);
+						boolean hecho = false;
+						int carta = 0;
+						while(!hecho && carta<mano.size()) {
+							if(!mano.get(carta).isVisiblePor(turno)) {
+								mano.get(carta).marcarVisible(turno);
+								hecho = true;
+							}
+						}
+					}
+				}
 				List<Carta> mano = jugadores.get(jugada.getJugadorObjetivo()).getMano();
 				Collections.shuffle(mano);
 				vistaPorRayosX = mano.get(0);
@@ -330,8 +344,6 @@ public class Partida {
 				break;
 				
 			case cambioColor:
-				esCambioDeColor = true;
-				colorActual = jugada.getNuevoColor();
 				break;
 
 			default:
@@ -357,7 +369,7 @@ public class Partida {
 	private boolean compruebaPuedeJugar() {
 		Carta anterior = getUltimaCartaJugada();
 		for(Carta c : jugadores.get(turno).getMano()) {
-			if (c.esDelColor(colorActual) ||
+			if (c.esDelColor(anterior.getColor()) ||
 			    c.esDelColor(Carta.Color.comodin) ||
 			    Carta.compartenTipo(c, anterior)) {
 				return true;
@@ -392,7 +404,7 @@ public class Partida {
 			} else {
 				Carta cartaRobada = robarCarta();
 				this.jugadores.get(turno).getMano().add(cartaRobada);
-				if (cartaRobada.esDelColor(colorActual) || cartaRobada.esDelColor(Carta.Color.comodin) 
+				if (cartaRobada.esDelColor(getUltimaCartaJugada().getColor()) || cartaRobada.esDelColor(Carta.Color.comodin) 
 						|| Carta.compartenTipo(cartaRobada,getUltimaCartaJugada())) {
 					modoJugarCartaRobada=true;
 				}
@@ -401,9 +413,6 @@ public class Partida {
 		} else {
 			for (Carta c : jugada.getCartas()) {
 				juegaCarta(c, jugada);
-			}
-			if (!esCambioDeColor) {
-				colorActual = getUltimaCartaJugada().getColor();
 			}
 			
 		}
@@ -441,12 +450,13 @@ public class Partida {
 					for (Carta c : this.jugadores.get(turno).getMano()) {
 						if(compatibleAcumulador(c) && 
 								(Carta.compartenTipo(c, cartaCentral)) 	//Si la carta es usable según las reglas
-										|| c.esDelColor(colorActual)  
+										|| c.esDelColor(getUltimaCartaJugada().getColor())  
 										|| c.esDelTipo(Carta.Tipo.mas4)) {
 							
 							List<Carta> listaCartas = new ArrayList<>();
 							listaCartas.add(c);
 							jugadaIA.setCartas(listaCartas);
+							jugadaIA.setRobar(false);
 							break;
 						}
 					}
@@ -455,6 +465,7 @@ public class Partida {
 					List<Carta> listaCartas = new ArrayList<>();
 					listaCartas.add(cartaRobada);
 					jugadaIA.setCartas(listaCartas);
+					jugadaIA.setRobar(false);
 					
 					if (cartaRobada.esDelColor(Carta.Color.comodin)) {
 						int random_color = (int)Math.floor(Math.random()*(4)+1);
@@ -480,8 +491,9 @@ public class Partida {
 							List<Carta> listaCartas = new ArrayList<>();
 							listaCartas.add(c);
 							jugadaIA.setCartas(listaCartas);
+							jugadaIA.setRobar(false);
 							
-							if (cartaRobada.esDelColor(Carta.Color.comodin)) {
+							if (c.esDelColor(Carta.Color.comodin)) {
 								int random_color = (int)Math.floor(Math.random()*(4)+1);
 								switch(random_color) {
 									case 1:
@@ -508,6 +520,7 @@ public class Partida {
 				}
 			}
 			
+			System.err.println("Jugada elegida por la IA: " + jugadaIA);
 			ejecutarJugada(jugadaIA);
 		}
 	}
@@ -582,7 +595,7 @@ public class Partida {
 			} else {
 				Carta c = jugada.getCartas().get(0);
 				if(compatibleAcumulador(c) && (Carta.compartenTipo(c, anterior) //Si la carta es usable según las reglas
-								|| c.esDelColor(colorActual)  || c.esDelTipo(Carta.Tipo.mas4))) {
+								|| c.esDelColor(getUltimaCartaJugada().getColor())  || c.esDelTipo(Carta.Tipo.mas4))) {
 					return true;
 				}
 			}
@@ -598,7 +611,7 @@ public class Partida {
 				for (Carta c : jugada.getCartas()) {
 					if (numCartas<=1) {
 						if(numCartas==0) {
-							valida = Carta.compartenTipo(c, anterior) || c.esDelColor(colorActual);
+							valida = Carta.compartenTipo(c, anterior) || c.esDelColor(getUltimaCartaJugada().getColor());
 						} else {
 							pj = evaluaJugada(anterior,c);
 							valida = pj.valida;
@@ -623,7 +636,7 @@ public class Partida {
 					valida = false; //Solo se puede jugar una si no son números. (o si no se permite jugar más de una).
 				}
 				return Carta.compartenTipo(jugada.getCartas().get(0),anterior) 
-						|| jugada.getCartas().get(0).esDelColor(colorActual);
+						|| jugada.getCartas().get(0).esDelColor(getUltimaCartaJugada().getColor());
 			}
 			
 			return valida;
@@ -660,12 +673,23 @@ public class Partida {
 	public ConfigSala getConfiguracion() {
 		return configuracion;
 	}
+
+
+	@Override
+	public String toString() {
+		return "Partida [hayError=" + hayError + ", error=" + error + ", mazo=" + mazo + ", cartasJugadas="
+				+ cartasJugadas + ", jugadores=" + jugadores + ", turno=" + turno + ", sentidoHorario=" + sentidoHorario
+				+ ", configuracion=" + configuracion + ", terminada=" + terminada + ", fechaInicio=" + fechaInicio
+				+ ", vistaPorRayosX=" + vistaPorRayosX + ", efectoRayosX=" + efectoRayosX + ", modoAcumulandoRobo="
+				+ modoAcumulandoRobo + ", roboAcumulado=" + roboAcumulado + ", modoJugarCartaRobada="
+				+ modoJugarCartaRobada + ", cartaRobada=" + cartaRobada + "]";
+	}
 	
 	/**
 	 * @return			null si no se ha jugado una carta de rayosX el turno anterior o no eres quien la jugó.
 	 * 					la carta vista si se ha jugado por el jugador.
 	 */
-	public Carta getRayosX(UUID jugadorID) {
+/*	public Carta getRayosX(UUID jugadorID) { //Descontinuado por modificación del funcionamiento de rayos X
 		if (efectoRayosX 
 				&& anteriorJugador().isEsIA() 
 				&& jugadorID.equals(anteriorJugador().getJugadorID())) {
@@ -673,19 +697,6 @@ public class Partida {
 			return vistaPorRayosX; 
 		}
 		return null;
-	}
-	
-	
-	
-	
-	@Override
-	public String toString() {
-		return "Partida [hayError=" + hayError + ", error=" + error + "\n\t mazo=" + mazo + "\n\n\t cartasJugadas="
-				+ cartasJugadas + "\n\n\t jugadores=" + jugadores + ", turno=" + turno + ", sentidoHorario=" + sentidoHorario
-				+ ", configuracion=" + configuracion + ", terminada=" + terminada + ", fechaInicio=" + fechaInicio
-				+ ", colorActual=" + colorActual + ", esCambioDeColor=" + esCambioDeColor + ", vistaPorRayosX="
-				+ vistaPorRayosX + ", efectoRayosX=" + efectoRayosX + ", modoAcumulandoRobo=" + modoAcumulandoRobo
-				+ ", roboAcumulado=" + roboAcumulado + "]";
-	}
+	}*/
 	
 }

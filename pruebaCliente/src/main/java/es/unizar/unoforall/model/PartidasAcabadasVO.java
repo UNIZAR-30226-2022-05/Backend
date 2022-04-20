@@ -1,4 +1,4 @@
-package es.unizar.pruebaCliente.model;
+package es.unizar.unoforall.model;
 
 import java.sql.Date;
 import java.util.UUID;
@@ -12,7 +12,11 @@ public class PartidasAcabadasVO {
 	
 	public PartidasAcabadasVO(UUID id, Date fechaInicioPartida, Date fechaFinPartida, int numIas, int modoJuego) {
 		super();
-		this.id = id;
+		if(id == null) {
+			this.id = UUID.randomUUID();
+		} else {
+			this.id = id;
+		}
 		this.fechaInicioPartida = fechaInicioPartida;
 		this.fechaFinPartida = fechaFinPartida;
 		this.numIas = numIas;

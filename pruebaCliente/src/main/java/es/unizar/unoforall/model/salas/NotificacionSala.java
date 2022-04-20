@@ -1,8 +1,8 @@
-package es.unizar.pruebaCliente.model.salas;
+package es.unizar.unoforall.model.salas;
 
 import java.util.UUID;
 
-import es.unizar.pruebaCliente.model.UsuarioVO;
+import es.unizar.unoforall.model.UsuarioVO;
 
 public class NotificacionSala {
 	private UUID salaID;
