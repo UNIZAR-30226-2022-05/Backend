@@ -1,4 +1,4 @@
-package es.unizar.pruebaCliente.model.salas;
+package es.unizar.unoforall.model.salas;
 
 
 import java.util.ArrayList;
@@ -7,9 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import es.unizar.pruebaCliente.model.UsuarioVO;
-import es.unizar.pruebaCliente.model.partidas.Partida;
-
+import es.unizar.unoforall.model.UsuarioVO;
+import es.unizar.unoforall.model.partidas.Partida;
 
 public class Sala {	
 	//Para devolver una sala que no existe
@@ -84,6 +83,17 @@ public class Sala {
 			
 			if (this.enPartida)	 {
 				partida.expulsarJugador(participanteID);
+			} else {	//Si se va un jugador no listo, y el resto ya lo están 
+						//	-> se empieza la partida
+				boolean todosListos = true;
+				for (Map.Entry<UUID, Boolean> entry : participantes_listos.entrySet()) {
+					if (entry.getValue() == false) { 
+						todosListos = false; 
+					}
+				}
+				if (todosListos) {
+					setEnPartida(true);
+				}
 			}
 		}
 	}

@@ -1,4 +1,4 @@
-package es.unizar.pruebaCliente.model.partidas;
+package es.unizar.unoforall.model.partidas;
 
 import java.sql.Date;
 import java.util.ArrayList;
@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-import es.unizar.pruebaCliente.model.salas.ConfigSala;
+import es.unizar.unoforall.model.salas.ConfigSala;
 
 public class Partida {
 	private boolean hayError = false;
@@ -257,6 +257,7 @@ public class Partida {
 	}
 
 	private void juegaCarta(Carta c, Jugada jugada) {
+		c.setOculta();
 		esCambioDeColor = false;
 		efectoRayosX = false;
 		boolean esSalto = false;
@@ -315,6 +316,21 @@ public class Partida {
 				break;
 				
 			case rayosX:
+				for (int i = 0 ; i < configuracion.getMaxParticipantes() ; i++) {
+					if( i != turno ) {
+						Jugador j = jugadores.get(i);
+						List<Carta> mano = j.getMano();
+						Collections.shuffle(mano);
+						boolean hecho = false;
+						int carta = 0;
+						while(!hecho && carta<mano.size()) {
+							if(!mano.get(carta).isVisiblePor(turno)) {
+								mano.get(carta).marcarVisible(turno);
+								hecho = true;
+							}
+						}
+					}
+				}
 				List<Carta> mano = jugadores.get(jugada.getJugadorObjetivo()).getMano();
 				Collections.shuffle(mano);
 				vistaPorRayosX = mano.get(0);
@@ -447,6 +463,7 @@ public class Partida {
 							List<Carta> listaCartas = new ArrayList<>();
 							listaCartas.add(c);
 							jugadaIA.setCartas(listaCartas);
+							jugadaIA.setRobar(false);
 							break;
 						}
 					}
@@ -455,6 +472,7 @@ public class Partida {
 					List<Carta> listaCartas = new ArrayList<>();
 					listaCartas.add(cartaRobada);
 					jugadaIA.setCartas(listaCartas);
+					jugadaIA.setRobar(false);
 					
 					if (cartaRobada.esDelColor(Carta.Color.comodin)) {
 						int random_color = (int)Math.floor(Math.random()*(4)+1);
@@ -480,8 +498,9 @@ public class Partida {
 							List<Carta> listaCartas = new ArrayList<>();
 							listaCartas.add(c);
 							jugadaIA.setCartas(listaCartas);
+							jugadaIA.setRobar(false);
 							
-							if (cartaRobada.esDelColor(Carta.Color.comodin)) {
+							if (c.esDelColor(Carta.Color.comodin)) {
 								int random_color = (int)Math.floor(Math.random()*(4)+1);
 								switch(random_color) {
 									case 1:
@@ -508,6 +527,7 @@ public class Partida {
 				}
 			}
 			
+			System.err.println("Jugada elegida por la IA: " + jugadaIA);
 			ejecutarJugada(jugadaIA);
 		}
 	}
@@ -665,7 +685,7 @@ public class Partida {
 	 * @return			null si no se ha jugado una carta de rayosX el turno anterior o no eres quien la jugó.
 	 * 					la carta vista si se ha jugado por el jugador.
 	 */
-	public Carta getRayosX(UUID jugadorID) {
+/*	public Carta getRayosX(UUID jugadorID) { //Descontinuado por modificación del funcionamiento de rayos X
 		if (efectoRayosX 
 				&& anteriorJugador().isEsIA() 
 				&& jugadorID.equals(anteriorJugador().getJugadorID())) {
@@ -673,7 +693,7 @@ public class Partida {
 			return vistaPorRayosX; 
 		}
 		return null;
-	}
+	}*/
 	
 	
 	

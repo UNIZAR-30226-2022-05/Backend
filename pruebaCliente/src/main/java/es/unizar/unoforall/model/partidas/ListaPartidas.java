@@ -1,4 +1,4 @@
-package es.unizar.pruebaCliente.model.partidas;
+package es.unizar.unoforall.model.partidas;
 
 import java.util.ArrayList;
 

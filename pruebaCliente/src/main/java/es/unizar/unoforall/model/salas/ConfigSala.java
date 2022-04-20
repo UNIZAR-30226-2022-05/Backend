@@ -1,4 +1,4 @@
-package es.unizar.pruebaCliente.model.salas;
+package es.unizar.unoforall.model.salas;
 
 
 public class ConfigSala {
@@ -23,8 +23,8 @@ public class ConfigSala {
 		this.maxParticipantes = maxParticipantes;
 		this.esPublica = esPublica;
 	}
-	
-	public void setModoJuego(ModoJuego modoJuego) {
+    
+    public void setModoJuego(ModoJuego modoJuego) {
 		this.modoJuego = modoJuego;
 	}
 
@@ -43,7 +43,7 @@ public class ConfigSala {
 	public ModoJuego getModoJuego() {
 		return modoJuego;
 	}
-
+	
 	public ReglasEspeciales getReglas() {
 		return reglas;
 	}
@@ -62,5 +62,15 @@ public class ConfigSala {
 				+ ", esPublica=" + esPublica + "]";
 	}
 	
-	
+	@Override
+	public ConfigSala clone() {
+		ConfigSala copy = new ConfigSala();
+		copy.modoJuego = this.modoJuego;
+		copy.esPublica = this.esPublica;
+		copy.maxParticipantes = this.maxParticipantes;
+		copy.reglas = this.reglas == null ? null : this.reglas.clone();
+
+		return copy;
+	}
+    
 }

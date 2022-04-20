@@ -9,17 +9,9 @@ import java.util.concurrent.ExecutionException;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import es.unizar.pruebaCliente.model.ListaUsuarios;
-import es.unizar.pruebaCliente.model.RespuestaLogin;
-import es.unizar.pruebaCliente.model.UsuarioVO;
-import es.unizar.pruebaCliente.model.partidas.Carta;
-import es.unizar.pruebaCliente.model.partidas.Jugada;
-import es.unizar.pruebaCliente.model.partidas.Partida;
-import es.unizar.pruebaCliente.model.salas.ConfigSala;
-import es.unizar.pruebaCliente.model.salas.NotificacionSala;
-import es.unizar.pruebaCliente.model.salas.ReglasEspeciales;
-import es.unizar.pruebaCliente.model.salas.RespuestaSala;
-import es.unizar.pruebaCliente.model.salas.Sala;
+import es.unizar.unoforall.model.*;
+import es.unizar.unoforall.model.salas.*;
+import es.unizar.unoforall.model.partidas.*;
 import es.unizar.pruebaCliente.utils.HashUtils;
 
 

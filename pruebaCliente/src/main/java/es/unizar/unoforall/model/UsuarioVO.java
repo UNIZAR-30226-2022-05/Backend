@@ -1,4 +1,4 @@
-package es.unizar.pruebaCliente.model;
+package es.unizar.unoforall.model;
 
 
 import java.util.UUID;
@@ -143,7 +143,43 @@ public class UsuarioVO {
 	}
 
 	public void setAvatar(int avatar) {
-		this.avatar = avatar;
+		switch(avatar) {
+			case 0:
+				this.avatar = avatar;
+				break;
+			case 1:
+				if (this.puntos >= 10) {
+					this.avatar = avatar;
+				}
+				break;
+			case 2:
+				if (this.puntos >= 30) {
+					this.avatar = avatar;
+				}
+				break;
+			case 3:
+				if (this.puntos >= 50) {
+					this.avatar = avatar;
+				}
+				break;
+			case 4:
+				if (this.puntos >= 100) {
+					this.avatar = avatar;
+				}
+				break;
+			case 5:
+				if (this.puntos >= 200) {
+					this.avatar = avatar;
+				}
+				break;
+			case 6:
+				if (this.puntos >= 500) {
+					this.avatar = avatar;
+				}
+				break;
+			default:	//avatar inválido
+				break;
+		}
 	}
 
 	public int getAspectoTablero() {

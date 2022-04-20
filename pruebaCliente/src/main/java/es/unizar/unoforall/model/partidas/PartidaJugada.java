@@ -1,9 +1,8 @@
-package es.unizar.pruebaCliente.model.partidas;
+package es.unizar.unoforall.model.partidas;
 
 import java.util.ArrayList;
 
-import es.unizar.pruebaCliente.model.PartidasAcabadasVO;
-
+import es.unizar.unoforall.model.PartidasAcabadasVO;
 
 public class PartidaJugada {
 
