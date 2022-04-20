@@ -257,7 +257,7 @@ public class Partida {
 	}
 
 	private void juegaCarta(Carta c, Jugada jugada) {
-		
+		c.setOculta();
 		esCambioDeColor = false;
 		efectoRayosX = false;
 		boolean esSalto = false;
