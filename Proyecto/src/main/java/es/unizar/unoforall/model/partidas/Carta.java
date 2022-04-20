@@ -1,5 +1,7 @@
 package es.unizar.unoforall.model.partidas;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class Carta implements Comparable<Carta> {
@@ -13,15 +15,47 @@ public class Carta implements Comparable<Carta> {
 	
 	private Tipo tipo;
 	private Color color;
-	
-	
+	private Map<Integer,Boolean> visiblePor = new HashMap<Integer,Boolean>();
 	public Carta(Tipo tipo, Color color) {
 		super();
 		this.tipo = tipo;
 		this.color = color;
+		for (int i = 0; i < 4 ; i++) {
+			visiblePor.put(i,false);
+		}
+	}
+	
+	public Carta(Tipo tipo, Color color, int numJugadores) {
+		super();
+		this.tipo = tipo;
+		this.color = color;
+		for (int i = 0; i < numJugadores ; i++) {
+			visiblePor.put(i,false);
+		}
 	}
 
-
+	public boolean isVisiblePor(int jugador) {
+		if(visiblePor.containsKey(jugador)) {
+			return visiblePor.get(jugador);
+		}
+		return false;
+	}
+	
+	public void setOculta() {
+		for (int i = 0; i < visiblePor.size(); i++ ) {
+			visiblePor.put(i,false);
+		}
+	}
+	
+	public boolean marcarVisible(int jugador) {
+		if(visiblePor.containsKey(jugador)) {
+			visiblePor.put(jugador, true);
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	public boolean esCompatible(Carta carta) {
 		if (this.color == Color.comodin || carta.color == Color.comodin) {
 			return true;

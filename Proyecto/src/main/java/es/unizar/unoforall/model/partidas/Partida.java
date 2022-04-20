@@ -257,6 +257,7 @@ public class Partida {
 	}
 
 	private void juegaCarta(Carta c, Jugada jugada) {
+		
 		esCambioDeColor = false;
 		efectoRayosX = false;
 		boolean esSalto = false;
@@ -315,6 +316,21 @@ public class Partida {
 				break;
 				
 			case rayosX:
+				for (int i = 0 ; i < configuracion.getMaxParticipantes() ; i++) {
+					if( i != turno ) {
+						Jugador j = jugadores.get(i);
+						List<Carta> mano = j.getMano();
+						Collections.shuffle(mano);
+						boolean hecho = false;
+						int carta = 0;
+						while(!hecho && carta<mano.size()) {
+							if(!mano.get(carta).isVisiblePor(turno)) {
+								mano.get(carta).marcarVisible(turno);
+								hecho = true;
+							}
+						}
+					}
+				}
 				List<Carta> mano = jugadores.get(jugada.getJugadorObjetivo()).getMano();
 				Collections.shuffle(mano);
 				vistaPorRayosX = mano.get(0);
@@ -669,7 +685,7 @@ public class Partida {
 	 * @return			null si no se ha jugado una carta de rayosX el turno anterior o no eres quien la jugó.
 	 * 					la carta vista si se ha jugado por el jugador.
 	 */
-	public Carta getRayosX(UUID jugadorID) {
+/*	public Carta getRayosX(UUID jugadorID) { //Descontinuado por modificación del funcionamiento de rayos X
 		if (efectoRayosX 
 				&& anteriorJugador().isEsIA() 
 				&& jugadorID.equals(anteriorJugador().getJugadorID())) {
@@ -677,7 +693,7 @@ public class Partida {
 			return vistaPorRayosX; 
 		}
 		return null;
-	}
+	}*/
 	
 	
 	
