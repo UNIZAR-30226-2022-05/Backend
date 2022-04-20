@@ -171,6 +171,8 @@ public class SocketController {
 		GestorSalas.obtenerSala(salaID).
 			nuevoParticipanteListo(GestorSesiones.obtenerUsuarioID(sesionID));
 		
+		System.out.println("- -- - - - -- - --- :\n" + GestorSalas.obtenerSala(salaID));
+		
 		return Serializar.serializar(GestorSalas.obtenerSala(salaID));
 	}
 	

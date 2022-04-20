@@ -11,7 +11,7 @@ import es.unizar.unoforall.model.salas.ConfigSala;
 
 public class Partida {
 	private boolean hayError = false;
-	private String error = null;
+	private String error = "";
 	
 	private List<Carta> mazo = null;
 	private List<Carta> cartasJugadas = null;
@@ -46,7 +46,7 @@ public class Partida {
 		public boolean esEscalera;
 		public boolean esIguales;
 		public boolean valida;
-		
+		 
 		public PosiblesTiposJugadas(boolean esEscalera, boolean esIguales, boolean valida) {
 			this.esEscalera = esEscalera;
 			this.esIguales = esIguales;

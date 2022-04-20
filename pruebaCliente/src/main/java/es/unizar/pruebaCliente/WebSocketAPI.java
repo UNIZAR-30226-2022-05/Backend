@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.converter.MessageConversionException;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -16,6 +17,7 @@ import org.springframework.messaging.simp.stomp.StompSessionHandler;
 import org.springframework.web.socket.client.WebSocketClient;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
+import org.springframework.web.socket.server.standard.ServletServerContainerFactoryBean;
 
 public class WebSocketAPI {
 	
@@ -43,6 +45,14 @@ public class WebSocketAPI {
         WebSocketAPI.SERVER_URL = "ws://" + serverIP + "/unoforall";
     }
 
+    @Bean
+	public ServletServerContainerFactoryBean createServletServerContainerFactoryBean() {
+	    ServletServerContainerFactoryBean container = new ServletServerContainerFactoryBean();
+	    container.setMaxTextMessageBufferSize(32768);
+	    container.setMaxBinaryMessageBufferSize(32768);
+	    return container;
+	}
+    
     
     public WebSocketAPI(){
     	suscripciones = new HashMap<>();

@@ -11,7 +11,7 @@ import es.unizar.unoforall.model.salas.ConfigSala;
 
 public class Partida {
 	private boolean hayError = false;
-	private String error = null;
+	private String error = "";
 	
 	private List<Carta> mazo = null;
 	private List<Carta> cartasJugadas = null;
@@ -37,10 +37,6 @@ public class Partida {
 	
 	private static final int MAX_ROBO_ATTACK = 10;
 	
-	public Partida(String error) {	//Para construir una partida con error = true
-		this.setHayError(true);
-		this.setError(error);
-	}
 	
 	private class PosiblesTiposJugadas {
 		public boolean esEscalera;
@@ -52,6 +48,12 @@ public class Partida {
 			this.esIguales = esIguales;
 			this.valida = valida;
 		}
+	}
+	
+	
+	public Partida(String error) {	//Para construir una partida con error = true
+		this.setHayError(true);
+		this.setError(error);
 	}
 		
 	public Partida(List<UUID> jugadoresID, ConfigSala configuracion) {

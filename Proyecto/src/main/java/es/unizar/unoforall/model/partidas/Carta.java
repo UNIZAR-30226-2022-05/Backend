@@ -15,24 +15,27 @@ public class Carta implements Comparable<Carta> {
 	
 	private Tipo tipo;
 	private Color color;
-	private Map<Integer,Boolean> visiblePor = new HashMap<Integer,Boolean>();
+	private HashMap<Integer,Boolean> visiblePor;
+	
 	public Carta(Tipo tipo, Color color) {
 		super();
 		this.tipo = tipo;
 		this.color = color;
+		this.visiblePor = new HashMap<Integer,Boolean>();
 		for (int i = 0; i < 4 ; i++) {
 			visiblePor.put(i,false);
 		}
 	}
 	
-	public Carta(Tipo tipo, Color color, int numJugadores) {
-		super();
-		this.tipo = tipo;
-		this.color = color;
-		for (int i = 0; i < numJugadores ; i++) {
-			visiblePor.put(i,false);
-		}
-	}
+//	public Carta(Tipo tipo, Color color, int numJugadores) {
+//		super();
+//		this.tipo = tipo;
+//		this.color = color;
+//		this.visiblePor = new HashMap<Integer,Boolean>();
+//		for (int i = 0; i < numJugadores ; i++) {
+//			visiblePor.put(i,false);
+//		}
+//	}
 
 	public boolean isVisiblePor(int jugador) {
 		if(visiblePor.containsKey(jugador)) {
