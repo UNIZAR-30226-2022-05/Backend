@@ -25,6 +25,11 @@ public class Sala {
 	//Conjunto de participantes con el indicador de si están listos o no
 	private HashMap<UUID, Boolean> participantes_listos;
 	
+	
+	private Sala() {
+		
+	}
+	
 	public Sala(String mensajeError) {
 		participantes = new HashMap<>();
 		participantes_listos = new HashMap<>();
@@ -171,4 +176,28 @@ public class Sala {
 		return partida;
 	}
 
+	
+	public Sala getSalaAEnviar() {
+		Sala salaResumida = new Sala();
+		
+		salaResumida.noExiste = noExiste;
+		salaResumida.error = error;
+		
+		salaResumida.configuracion = configuracion;
+		
+		salaResumida.enPartida = enPartida;
+		
+		if (partida != null) {
+			salaResumida.partida = partida.getPartidaAEnviar();
+		} else {
+			salaResumida.partida = null;
+		}
+		
+		//Identificador de cada usuario con su VO
+		salaResumida.participantes = participantes;
+		//Conjunto de participantes con el indicador de si están listos o no
+		salaResumida.participantes_listos = participantes_listos;
+		
+		return salaResumida;
+	}
 }

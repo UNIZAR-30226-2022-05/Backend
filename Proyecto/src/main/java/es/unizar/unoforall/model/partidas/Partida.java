@@ -39,11 +39,6 @@ public class Partida {
 	
 	private static final int MAX_ROBO_ATTACK = 10;
 	
-	public Partida(String error) {	//Para construir una partida con error = true
-		this.setHayError(true);
-		this.setError(error);
-	}
-	
 	private class PosiblesTiposJugadas {
 		public boolean esEscalera;
 		public boolean esIguales;
@@ -55,6 +50,17 @@ public class Partida {
 			this.valida = valida;
 		}
 	}
+	
+	public Partida(String error) {	//Para construir una partida con error = true
+		this.setHayError(true);
+		this.setError(error);
+	}
+	
+	private Partida() {
+		
+	}
+	
+	
 		
 	public Partida(List<UUID> jugadoresID, ConfigSala configuracion) {
 		this.setHayError(false);
@@ -681,31 +687,58 @@ public class Partida {
 		return configuracion;
 	}
 	
-	/**
-	 * @return			null si no se ha jugado una carta de rayosX el turno anterior o no eres quien la jugó.
-	 * 					la carta vista si se ha jugado por el jugador.
-	 */
-/*	public Carta getRayosX(UUID jugadorID) { //Descontinuado por modificación del funcionamiento de rayos X
-		if (efectoRayosX 
-				&& anteriorJugador().isEsIA() 
-				&& jugadorID.equals(anteriorJugador().getJugadorID())) {
-			//Si el jugador ha jugado una rayosX en el turno anterior
-			return vistaPorRayosX; 
-		}
-		return null;
-	}*/
-	
-	
-	
-	
 	@Override
 	public String toString() {
-		return "Partida [hayError=" + hayError + ", error=" + error + "\n\t mazo=" + mazo + "\n\n\t cartasJugadas="
-				+ cartasJugadas + "\n\n\t jugadores=" + jugadores + ", turno=" + turno + ", sentidoHorario=" + sentidoHorario
-				+ ", configuracion=" + configuracion + ", terminada=" + terminada + ", fechaInicio=" + fechaInicio
-				+ ", colorActual=" + colorActual + ", esCambioDeColor=" + esCambioDeColor + ", vistaPorRayosX="
-				+ vistaPorRayosX + ", efectoRayosX=" + efectoRayosX + ", modoAcumulandoRobo=" + modoAcumulandoRobo
-				+ ", roboAcumulado=" + roboAcumulado + "]";
+		final int maxLen = 5;
+		return "Partida [hayError=" + hayError + ", error=" + error + ", mazo="
+				+ (mazo != null ? mazo.subList(0, Math.min(mazo.size(), maxLen)) : null) + ", cartasJugadas="
+				+ (cartasJugadas != null ? cartasJugadas.subList(0, Math.min(cartasJugadas.size(), maxLen)) : null)
+				+ ", jugadores=" + (jugadores != null ? jugadores.subList(0, Math.min(jugadores.size(), maxLen)) : null)
+				+ ", turno=" + turno + ", sentidoHorario=" + sentidoHorario + ", configuracion=" + configuracion
+				+ ", terminada=" + terminada + ", fechaInicio=" + fechaInicio + ", colorActual=" + colorActual
+				+ ", esCambioDeColor=" + esCambioDeColor + ", vistaPorRayosX=" + vistaPorRayosX + ", efectoRayosX="
+				+ efectoRayosX + ", modoAcumulandoRobo=" + modoAcumulandoRobo + ", roboAcumulado=" + roboAcumulado
+				+ ", modoJugarCartaRobada=" + modoJugarCartaRobada + ", cartaRobada=" + cartaRobada + "]";
 	}
+
+
+	public Partida getPartidaAEnviar() {
+		Partida partidaResumida = new Partida();
+		
+		partidaResumida.hayError = hayError;
+		partidaResumida.error = error;
+		
+		partidaResumida.mazo = null;
+		
+		if (cartasJugadas != null && !cartasJugadas.isEmpty()) {
+			partidaResumida.cartasJugadas = this.cartasJugadas.subList(this.cartasJugadas.size()-1, this.cartasJugadas.size());
+		} else {
+			partidaResumida.cartasJugadas = this.cartasJugadas;
+		}
+		
+		
+		partidaResumida.jugadores = jugadores;
+		partidaResumida.turno = turno;
+		partidaResumida.sentidoHorario = sentidoHorario;
+		
+		partidaResumida.configuracion = configuracion;
+		partidaResumida.terminada = terminada;	
+		
+		//Fecha de inicio de la partida (Ya en formato sql porque no la necesita el frontend en este punto). 
+		partidaResumida.fechaInicio = fechaInicio; 
+		partidaResumida.colorActual = colorActual;
+		partidaResumida.esCambioDeColor = esCambioDeColor;
+		
+		//Variables para extraer resultados de efectos
+		partidaResumida.vistaPorRayosX = vistaPorRayosX;
+		partidaResumida.efectoRayosX = efectoRayosX;
+		partidaResumida.modoAcumulandoRobo = modoAcumulandoRobo;
+		partidaResumida.roboAcumulado = roboAcumulado;
+		partidaResumida.modoJugarCartaRobada = modoJugarCartaRobada;
+		partidaResumida.cartaRobada = cartaRobada;
+		
+		return partidaResumida;
+	}
+	
 	
 }

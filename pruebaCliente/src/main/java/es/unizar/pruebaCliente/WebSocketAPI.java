@@ -1,10 +1,15 @@
 package es.unizar.pruebaCliente;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
+
+import javax.websocket.ContainerProvider;
+import javax.websocket.WebSocketContainer;
 
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.converter.MessageConversionException;
@@ -16,6 +21,9 @@ import org.springframework.messaging.simp.stomp.StompSessionHandler;
 import org.springframework.web.socket.client.WebSocketClient;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
+import org.springframework.web.socket.sockjs.client.SockJsClient;
+import org.springframework.web.socket.sockjs.client.Transport;
+import org.springframework.web.socket.sockjs.client.WebSocketTransport;
 
 public class WebSocketAPI {
 	
@@ -39,10 +47,9 @@ public class WebSocketAPI {
         this.onError = onError;
     }
     
-    public static void setServerIP(String serverIP){
+    public static void setServerIP(String serverIP){ 
         WebSocketAPI.SERVER_URL = "ws://" + serverIP + "/unoforall";
     }
-
     
     public WebSocketAPI(){
     	suscripciones = new HashMap<>();
@@ -52,6 +59,8 @@ public class WebSocketAPI {
         WebSocketClient c = new StandardWebSocketClient();
         client = new WebSocketStompClient(c);
         client.setMessageConverter(new MappingJackson2MessageConverter());
+        client.setInboundMessageSizeLimit(Integer.MAX_VALUE);
+        
         sesion = null;
         closed = false;
         onError = t -> {t.printStackTrace(); close();};
@@ -100,7 +109,7 @@ public class WebSocketAPI {
 		};
     	
     	sesion = client.connect(SERVER_URL, sessionHandler).get();
-		
+
 		while(!sesion.isConnected()) {
 			synchronized (LOCK) {
 				LOCK.wait();

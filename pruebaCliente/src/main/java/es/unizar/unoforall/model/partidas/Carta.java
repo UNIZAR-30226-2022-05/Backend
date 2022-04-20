@@ -16,6 +16,7 @@ public class Carta implements Comparable<Carta> {
 	private Tipo tipo;
 	private Color color;
 	private Map<Integer,Boolean> visiblePor = new HashMap<Integer,Boolean>();
+	
 	public Carta(Tipo tipo, Color color) {
 		super();
 		this.tipo = tipo;

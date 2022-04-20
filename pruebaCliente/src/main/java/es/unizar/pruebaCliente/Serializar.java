@@ -10,7 +10,7 @@ import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 
 public class Serializar {
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
     public static <T> String serializar(T dato){
         if(dato instanceof String){

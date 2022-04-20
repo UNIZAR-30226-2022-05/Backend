@@ -142,7 +142,7 @@ public class SocketController {
 		GestorSalas.obtenerSala(salaID).
 			nuevoParticipante(UsuarioDAO.getUsuario(GestorSesiones.obtenerUsuarioID(sesionID)));
 		
-		return Serializar.serializar(GestorSalas.obtenerSala(salaID));
+		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
 	}
 	
 	/**
@@ -171,7 +171,7 @@ public class SocketController {
 		GestorSalas.obtenerSala(salaID).
 			nuevoParticipanteListo(GestorSesiones.obtenerUsuarioID(sesionID));
 		
-		return Serializar.serializar(GestorSalas.obtenerSala(salaID));
+		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
 	}
 	
 	/**
@@ -202,7 +202,7 @@ public class SocketController {
 		if (s == null) {
 			return Serializar.serializar(new Sala("La sala se ha eliminado"));
 		} else {
-			return Serializar.serializar(s);
+			return Serializar.serializar(s.getSalaAEnviar());
 		}
 	}
 	
@@ -225,7 +225,7 @@ public class SocketController {
 		if (s == null) {
 			return Serializar.serializar(new Sala("La sala se ha eliminado"));
 		} else {
-			return Serializar.serializar(s);
+			return Serializar.serializar(s.getSalaAEnviar());
 		}
 	}
 	
@@ -278,7 +278,7 @@ public class SocketController {
 			t.schedule(alarm, DELAY_TURNO_IA);
 		}
 		
-		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getPartida());
+		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getPartida().getPartidaAEnviar());
 	}
 	
 	/**
@@ -309,7 +309,7 @@ public class SocketController {
 			}			
 		}
 				
-		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getPartida());
+		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getPartida().getPartidaAEnviar());
 	}
 	
 	
