@@ -262,6 +262,7 @@ public class SocketController {
 		}
 		
 		System.out.println("- - - " + sesionID + " envia un turno a la sala " + salaID);
+		System.out.println("- - - Jugada: " + jugada);
 		
 		Partida partida = GestorSalas.obtenerSala(salaID).getPartida();
 		partida.ejecutarJugadaJugador(jugada, usuarioID);

@@ -1,5 +1,6 @@
 package es.unizar.unoforall.model.partidas;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Jugada {
@@ -10,19 +11,19 @@ public class Jugada {
 	
 	// La jugada es robar
 	public Jugada() {
-		this.cartas = null;
+		this.cartas = new ArrayList<>();;
 		this.robar = true;
 		this.nuevoColor = Carta.Color.comodin;	//por ejemplo (no se va a usar)
 	}
 	
-	public Jugada(List<Carta> cartas) {
+	public Jugada(ArrayList<Carta> cartas) {
 		this.cartas = cartas;
 		this.robar = false;
 		this.nuevoColor = cartas.get(cartas.size()-1).getColor();
 	}
 	
 	// Utilizar si la última carta es un cambio de color
-	public Jugada(List<Carta> cartas, Carta.Color nuevoColor) {
+	public Jugada(ArrayList<Carta> cartas, Carta.Color nuevoColor) {
 		this.cartas = cartas;
 		this.robar = false;
 		this.nuevoColor = nuevoColor;

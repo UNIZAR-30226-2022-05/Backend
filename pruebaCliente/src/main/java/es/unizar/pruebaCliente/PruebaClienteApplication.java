@@ -499,9 +499,10 @@ public class PruebaClienteApplication {
 						System.out.println("Introduce la carta:");
 						Integer carta = Integer.valueOf(scanner.nextLine());
 						
-						List<Carta> lista = new ArrayList<Carta>();
+						ArrayList<Carta> lista = new ArrayList<Carta>();
 						lista.add(miPartida.getJugadorActual().getMano().get(carta));
 						Jugada j = new Jugada(lista);
+						System.out.println("- -  - - Jugada:" + j);
 						
 						api.sendObject("/app/partidas/turnos/" + salaID, j);
 					} else {

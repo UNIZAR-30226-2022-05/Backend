@@ -1,6 +1,8 @@
 package es.unizar.unoforall.model.partidas;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 
@@ -15,11 +17,19 @@ public class Carta implements Comparable<Carta> {
 	
 	private Tipo tipo;
 	private Color color;
-	private Map<Integer,Boolean> visiblePor = new HashMap<Integer,Boolean>();
+	private Map<Integer,Boolean> visiblePor;
+	
+	public Carta() {
+		this.tipo = Tipo.n0;
+		this.color = Color.comodin;
+		visiblePor = new HashMap<Integer,Boolean>();
+	}
+	
 	public Carta(Tipo tipo, Color color) {
 		super();
 		this.tipo = tipo;
 		this.color = color;
+		visiblePor = new HashMap<Integer,Boolean>();
 		for (int i = 0; i < 4 ; i++) {
 			visiblePor.put(i,false);
 		}
@@ -29,6 +39,7 @@ public class Carta implements Comparable<Carta> {
 		super();
 		this.tipo = tipo;
 		this.color = color;
+		visiblePor = new HashMap<Integer,Boolean>();
 		for (int i = 0; i < numJugadores ; i++) {
 			visiblePor.put(i,false);
 		}
@@ -146,9 +157,26 @@ public class Carta implements Comparable<Carta> {
 			return result;
 		}
 	}
-	
+
 	@Override
 	public String toString() {
-		return "Carta [tipo=" + tipo + ", color=" + color + "]\n";
+		final int maxLen = 5;
+		return "Carta [tipo=" + tipo + ", color=" + color + ", visiblePor="
+				+ (visiblePor != null ? toString(visiblePor.entrySet(), maxLen) : null) + "]";
 	}
+
+	private String toString(Collection<?> collection, int maxLen) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("[");
+		int i = 0;
+		for (Iterator<?> iterator = collection.iterator(); iterator.hasNext() && i < maxLen; i++) {
+			if (i > 0)
+				builder.append(", ");
+			builder.append(iterator.next());
+		}
+		builder.append("]");
+		return builder.toString();
+	}
+	
+	
 }
