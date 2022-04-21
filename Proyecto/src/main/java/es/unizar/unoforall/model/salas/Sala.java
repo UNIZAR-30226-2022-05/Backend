@@ -139,7 +139,7 @@ public class Sala {
 		return result;
 	}
 	
-	public UsuarioVO getDAOParticipante(UUID participanteID) {
+	public UsuarioVO getParticipante(UUID participanteID) {
 		return participantes.get(participanteID);
 	}
 	
