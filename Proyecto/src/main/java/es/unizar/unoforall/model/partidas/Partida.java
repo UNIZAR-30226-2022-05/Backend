@@ -565,6 +565,15 @@ public class Partida {
 		}
 	}
 	
+	public int getNumIAs() {
+		int numIAs = 0;
+		for (Jugador j : this.jugadores) {
+			if (j.isEsIA()) {
+				numIAs++;
+			}
+		}
+		return numIAs;
+	}
 	
 	
 	/**************************************************************************/
