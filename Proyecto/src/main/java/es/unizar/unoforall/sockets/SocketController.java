@@ -246,7 +246,7 @@ public class SocketController {
 	 * @throws Exception
 	 */
 	@MessageMapping("/partidas/turnos/{salaID}")
-	@SendTo("/topic/partidas/turnos/{salaID}")
+	@SendTo("/topic/salas/{salaID}")
 	public String turnoPartida(@DestinationVariable UUID salaID, 
 							@Header("simpSessionId") String sesionID, 
 							Jugada jugada) throws Exception {		
@@ -279,7 +279,7 @@ public class SocketController {
 			t.schedule(alarm, DELAY_TURNO_IA);
 		}
 		
-		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getPartida().getPartidaAEnviar());
+		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
 	}
 	
 	/**
@@ -291,7 +291,7 @@ public class SocketController {
 	 * @throws Exception
 	 */
 	@MessageMapping("/partidas/turnosIA/{salaID}")
-	@SendTo("/topic/partidas/turnos/{salaID}")
+	@SendTo("/topic/salas/{salaID}")
 	public String turnoPartidaIA(@DestinationVariable UUID salaID, 
 							Object vacio) throws Exception {
 		
@@ -310,7 +310,7 @@ public class SocketController {
 			}			
 		}
 				
-		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getPartida().getPartidaAEnviar());
+		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
 	}
 	
 	
