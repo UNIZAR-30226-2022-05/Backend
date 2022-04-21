@@ -308,6 +308,11 @@ public class SocketController {
 			if (!error.equals("nulo")) {
 				//TODO Tratamiento de error al insertar en base de datos
 			}			
+		} else if (partida.turnoDeIA()) {
+			System.out.println("- - - Preparando turno de la IA");
+			AlarmaTurnoIA alarm = new AlarmaTurnoIA(salaID);
+			Timer t = new Timer();
+			t.schedule(alarm, DELAY_TURNO_IA);
 		}
 				
 		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
