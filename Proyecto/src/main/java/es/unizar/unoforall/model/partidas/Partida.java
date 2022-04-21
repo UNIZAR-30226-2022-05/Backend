@@ -96,8 +96,7 @@ public class Partida {
 		
 		// Cartas jugadas
 		this.cartasJugadas = new LinkedList<>();
-		this.cartasJugadas.add(new Carta(Carta.Tipo.n0,Carta.Color.rojo));
-		colorActual = getUltimaCartaJugada().getColor();
+		this.cartasJugadas.add(getCartaInicial());
 		
 		// Jugadores
 		this.jugadores = new LinkedList<>();
@@ -665,7 +664,7 @@ public class Partida {
 					valida = false; //Solo se puede jugar una si no son nÃºmeros. (o si no se permite jugar mÃ¡s de una).
 				}else { //Decía true aun con más de una carta sin este else
 					return Carta.compartenTipo(jugada.getCartas().get(0),anterior) 
-							|| jugada.getCartas().get(0).esDelColor(colorActual);
+							|| jugada.getCartas().get(0).esDelColor(getUltimaCartaJugada().getColor());
 				}
 				return Carta.compartenTipo(jugada.getCartas().get(0),anterior) 
 						|| jugada.getCartas().get(0).esDelColor(getUltimaCartaJugada().getColor());
@@ -733,11 +732,7 @@ public class Partida {
 	
 
 	public Carta.Color getColorActual() {
-		return colorActual;
-	}
-
-	public void setColorActual(Carta.Color colorActual) {
-		this.colorActual = colorActual;
+		return getUltimaCartaJugada().getColor();
 	}
 
 	public boolean isModoAcumulandoRobo() {
@@ -782,8 +777,6 @@ public class Partida {
 		
 		//Fecha de inicio de la partida (Ya en formato sql porque no la necesita el frontend en este punto). 
 		partidaResumida.fechaInicio = fechaInicio; 
-		partidaResumida.colorActual = colorActual;
-		partidaResumida.esCambioDeColor = esCambioDeColor;
 		
 		//Variables para extraer resultados de efectos
 		partidaResumida.vistaPorRayosX = vistaPorRayosX;
