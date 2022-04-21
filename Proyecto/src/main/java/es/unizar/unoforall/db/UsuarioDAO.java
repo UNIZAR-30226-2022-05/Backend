@@ -550,7 +550,7 @@ public class UsuarioDAO {
 		try {
 			conn = GestorPoolConexionesBD.getConnection();
 			PreparedStatement getRequest = 
-					conn.prepareStatement("Update usuarios WHERE id = ? set puntos = puntos + ?;");
+					conn.prepareStatement("Update usuarios set puntos = puntos + ? WHERE id = ?;");
 			getRequest.setObject(1,idUsuario);
 			getRequest.setInt(2, puntos);
 			int rows = getRequest.executeUpdate();
