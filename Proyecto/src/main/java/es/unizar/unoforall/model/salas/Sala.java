@@ -156,8 +156,9 @@ public class Sala {
 
 	@Override
 	public String toString() {
-		return "Sala [configuracion=" + configuracion + ", enPartida=" + enPartida + ", participantes=" + participantes
-				+ "]";
+		return "Sala [noExiste=" + noExiste + ", error=" + error + ", configuracion=" + configuracion + ", enPartida="
+				+ enPartida + ", partida=" + partida + ", participantes=" + participantes + ", participantes_listos="
+				+ participantes_listos + "]";
 	}
 
 	public boolean isNoExiste() {

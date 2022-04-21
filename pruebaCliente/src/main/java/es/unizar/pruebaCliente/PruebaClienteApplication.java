@@ -13,6 +13,17 @@ import es.unizar.unoforall.model.*;
 import es.unizar.unoforall.model.salas.*;
 import es.unizar.unoforall.model.partidas.*;
 import es.unizar.pruebaCliente.utils.HashUtils;
+import es.unizar.unoforall.model.ListaUsuarios;
+import es.unizar.unoforall.model.RespuestaLogin;
+import es.unizar.unoforall.model.UsuarioVO;
+import es.unizar.unoforall.model.partidas.Carta;
+import es.unizar.unoforall.model.partidas.Jugada;
+import es.unizar.unoforall.model.partidas.Partida;
+import es.unizar.unoforall.model.salas.ConfigSala;
+import es.unizar.unoforall.model.salas.NotificacionSala;
+import es.unizar.unoforall.model.salas.ReglasEspeciales;
+import es.unizar.unoforall.model.salas.RespuestaSala;
+import es.unizar.unoforall.model.salas.Sala;
 
 
 @SpringBootApplication
@@ -41,6 +52,8 @@ public class PruebaClienteApplication {
 			this.salas = salas;
 		}
 	}
+	
+	
 
 	
 	public static void main(String[] args) throws InterruptedException, ExecutionException {

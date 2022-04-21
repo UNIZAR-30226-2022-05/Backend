@@ -51,6 +51,7 @@ public class WebSocketAPI {
         WebSocketAPI.SERVER_URL = "ws://" + serverIP + "/unoforall";
     }
     
+    
     public WebSocketAPI(){
     	suscripciones = new HashMap<>();
     	receptores = new HashMap<>();
