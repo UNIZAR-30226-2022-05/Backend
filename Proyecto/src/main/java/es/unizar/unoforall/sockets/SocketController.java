@@ -202,6 +202,12 @@ public class SocketController {
 		if (s == null) {
 			return Serializar.serializar(new Sala("La sala se ha eliminado"));
 		} else {
+			if (s.getPartida() != null && s.getPartida().turnoDeIA()) {
+				System.out.println("- - - Preparando turno de la IA");
+				AlarmaTurnoIA alarm = new AlarmaTurnoIA(salaID);
+				Timer t = new Timer();
+				t.schedule(alarm, DELAY_TURNO_IA);
+			}
 			return Serializar.serializar(s.getSalaAEnviar());
 		}
 	}
