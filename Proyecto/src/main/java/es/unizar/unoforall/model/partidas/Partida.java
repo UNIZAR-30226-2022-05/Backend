@@ -92,7 +92,7 @@ public class Partida {
 				}
 			}
 		}
-		Collections.shuffle(this.mazo); //PARA DEBUG
+		Collections.shuffle(this.mazo); 
 		
 		
 		// Cartas jugadas
@@ -105,7 +105,8 @@ public class Partida {
 			this.jugadores.add(new Jugador(jID));
 		}
 			// Se crean las IA
-		for(int i = 0; i < getNumIAs(); i++) {
+		int numIAs = configuracion.getMaxParticipantes() - jugadoresID.size();
+		for(int i = 0; i < numIAs; i++) {
 			this.jugadores.add(new Jugador());
 		}
 			// Se crean las manos de todos los jugadores
@@ -179,22 +180,6 @@ public class Partida {
 	//FUNCIONA
 	private Jugador siguienteJugador() {
 		if (this.sentidoHorario) {
-			if (this.turno == this.jugadores.size() - 1) {
-				return this.jugadores.get(0);
-			} else {
-				return this.jugadores.get(this.turno + 1);
-			}
-		} else {
-			if (this.turno == 0) {
-				return this.jugadores.get(this.jugadores.size() - 1);
-			} else {
-				return this.jugadores.get(this.turno - 1);
-			}
-		}
-	}
-	
-	private Jugador anteriorJugador() {
-		if (!this.sentidoHorario) { //Sentido antihorario
 			if (this.turno == this.jugadores.size() - 1) {
 				return this.jugadores.get(0);
 			} else {
@@ -580,9 +565,7 @@ public class Partida {
 		}
 	}
 	
-	public int getNumIAs() {
-		return configuracion.getMaxParticipantes() - this.jugadores.size();
-	}
+	
 	
 	/**************************************************************************/
 	// Para los FRONTENDs
