@@ -271,13 +271,10 @@ public class Partida {
 		esCambioDeColor = false;
 		efectoRayosX = false;
 		boolean esSalto = false;
+		boolean hayIntercambio = false;
 		switch (c.getTipo()) {
 			case intercambio:
-				List<Carta> nuevaMano = new ArrayList<>(jugadores.get(jugada.getJugadorObjetivo()).getMano());
-				jugadores.get(jugada.getJugadorObjetivo()).getMano().clear();
-				jugadores.get(jugada.getJugadorObjetivo()).getMano().addAll(jugadores.get(turno).getMano());
-				jugadores.get(turno).getMano().clear();
-				jugadores.get(turno).getMano().addAll(nuevaMano);
+				hayIntercambio = false;
 				break;
 				
 			case mas2:
@@ -371,6 +368,13 @@ public class Partida {
 			for (int i = 0; i < 2; i++) {
 				this.jugadores.get(turno).getMano().add(robarCarta());
 			}
+		}
+		if(hayIntercambio) {
+			List<Carta> nuevaMano = new ArrayList<>(jugadores.get(jugada.getJugadorObjetivo()).getMano());
+			jugadores.get(jugada.getJugadorObjetivo()).getMano().clear();
+			jugadores.get(jugada.getJugadorObjetivo()).getMano().addAll(jugadores.get(turno).getMano());
+			jugadores.get(turno).getMano().clear();
+			jugadores.get(turno).getMano().addAll(nuevaMano);
 		}
 		if (this.jugadores.get(turno).getMano().size()!=1) {
 			this.jugadores.get(turno).setProtegido_UNO(false);
