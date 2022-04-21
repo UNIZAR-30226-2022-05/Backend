@@ -431,7 +431,7 @@ public class Partida {
 			
 		}
 		
-		if(!modoJugarCartaRobada && !(getJugadores().size() == 2 && !getUltimaCartaJugada().esDelTipo(Carta.Tipo.reversa))) {
+		if(!modoJugarCartaRobada && !(getJugadores().size() == 2 && getUltimaCartaJugada().esDelTipo(Carta.Tipo.reversa))) {
 			avanzarTurno();
 		}
 		
