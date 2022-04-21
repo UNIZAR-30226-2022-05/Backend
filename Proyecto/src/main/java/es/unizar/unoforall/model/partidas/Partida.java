@@ -257,9 +257,11 @@ public class Partida {
 		efectoRayosX = false;
 		boolean esSalto = false;
 		boolean hayIntercambio = false;
+		boolean hayReversa = false;
+		
 		switch (c.getTipo()) {
 			case intercambio:
-				hayIntercambio = false;
+				hayIntercambio = true;
 				break;
 				
 			case mas2:
@@ -329,6 +331,7 @@ public class Partida {
 				
 			case reversa:
 				this.sentidoHorario = ! this.sentidoHorario;
+				hayReversa = true;
 				break;
 				
 			case salta:
@@ -360,7 +363,7 @@ public class Partida {
 		if (this.jugadores.get(turno).getMano().size()!=1) {
 			this.jugadores.get(turno).setProtegido_UNO(false);
 		}
-		if (esSalto) {
+		if (esSalto && !hayReversa) {
 			avanzarTurno();
 		}
 	}
