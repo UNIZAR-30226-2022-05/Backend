@@ -157,6 +157,15 @@ public class Carta implements Comparable<Carta> {
 			return result;
 		}
 	}
+    
+    @Override
+	public Carta clone(){
+		Carta copia = new Carta();
+		copia.color = this.color;
+		copia.tipo = this.tipo;
+		copia.visiblePor = new HashMap<>(this.visiblePor);
+		return copia;
+	}
 
 	@Override
 	public String toString() {
