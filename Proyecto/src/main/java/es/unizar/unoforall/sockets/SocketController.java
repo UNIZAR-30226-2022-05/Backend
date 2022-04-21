@@ -326,6 +326,43 @@ public class SocketController {
 	
 	
 	
+	/**
+	 * Método para pulsar el botón de UNO en una partida
+	 * @param salaID		En la URL: id de la sala
+	 * @param sesionID		Automático
+	 * @param vacio			Cualquier objeto no nulo
+	 * @return				(Clase Partida) La partida actualizada después de que
+	 * 						un jugador presione el botón UNO
+	 * 						Partida con 'error' = true si la sala no existe o 
+	 * 						el usuario no está logueado
+	 * @throws Exception
+	 */
+	@MessageMapping("/partidas/botonUNO/{salaID}")
+	@SendTo("/topic/salas/{salaID}")
+	public String botonUNOPartida(@DestinationVariable UUID salaID, 
+							@Header("simpSessionId") String sesionID, 
+							Object vacio) throws Exception {		
+		
+		if (GestorSalas.obtenerSala(salaID) == null) {
+			return Serializar.serializar(new Partida("La sala de la partida ya no existe"));
+		} else if (!GestorSalas.obtenerSala(salaID).isEnPartida()) {
+			return Serializar.serializar(new Partida("La partida todavía no ha comenzado"));
+		}
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
+		if (usuarioID == null) {
+			return Serializar.serializar(new Partida("La sesión ha caducado. Vuelva a iniciar sesión"));
+		}
+		
+		System.out.println("El usuario " + usuarioID + " ha pulsado el botón UNO");
+		
+		Partida partida = GestorSalas.obtenerSala(salaID).getPartida();
+		partida.pulsarBotonUNO(usuarioID);
+		
+		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
+	}
+	
+	
+	
 	
 	
 	@EventListener

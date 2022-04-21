@@ -513,16 +513,16 @@ public class Partida {
 								int random_color = new Random().nextInt(4);
 								switch(random_color) {
 									case 0:
-										cartaRobada.setColor(Carta.Color.amarillo);
+										c.setColor(Carta.Color.amarillo);
 										break;
 									case 1:
-										cartaRobada.setColor(Carta.Color.rojo);
+										c.setColor(Carta.Color.rojo);
 										break;
 									case 2:
-										cartaRobada.setColor(Carta.Color.azul);
+										c.setColor(Carta.Color.azul);
 										break;
 									case 3:
-										cartaRobada.setColor(Carta.Color.verde);
+										c.setColor(Carta.Color.verde);
 										break;
 								}
 							}

@@ -361,6 +361,28 @@ public class ApiRestController {
 		return error;
     }
 	
+	
+	/**
+	 * Función a la que llamar para cambiar el avatar
+	 * @param correo 	contiene el nuevo correo que se había planteado para la actualización.
+	 * @return 			"nulo" en caso de que se haya podido cancelar la petición de registro.
+	 * 		   			"SESION_EXPIRADA" en caso de que la sesión del usuario haya caducado.
+	 * 					un String especificando el error que haya sucedido.
+	 */
+	@PostMapping("/cambiarAvatar")
+	public String cambiarAvatar(@RequestParam String sesionID){
+		
+		
+		String error = "nulo";
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
+		if(usuarioID != null) {
+			error = GestorActualizaCuentas.cancelarActualizacion(usuarioID);
+		} else {
+			error = "SESION_EXPIRADA";
+		}
+		return error;
+    }
+	
 
 	
 	

@@ -231,6 +231,43 @@ public class UsuarioDAO {
 		return result;
 	}
 	
+	
+	/**
+	 * Método para actualizar la personalización de aspecto de un usuario dado 
+	 * su identificador
+	 * @param idUsuario contiene el identificador de la cuenta en la base de datos.
+	 * @param avatar 		(0-6) es el nuevo avatar
+	 * @param aspectoCartas (0-1) es el nuevo aspecto de las cartas
+	 * @param avatar 		(0-2) es el nuevo aspecto del fondo
+	 * @return Un String que contiene el error en caso de error, y "nulo" si hay éxito.
+	 */
+	//public static String cambiarAvatar(UUID idUsuario, int avatar, int aspectoCartas, int aspectoFondo) {
+//		String result = "nulo";
+//		Connection conn = null;
+//		try {
+//			conn = GestorPoolConexionesBD.getConnection();
+//			
+//			PreparedStatement updateUser = 
+//					conn.prepareStatement("UPDATE usuarios SET contrasenna = ? WHERE id = ?;");
+//			updateUser.setString(1, avatar);
+//			updateUser.setObject(2, idUsuario);
+//			
+//			int rows = updateUser.executeUpdate();
+//			if(rows != 1) {
+//				result = "Ha habido un error con la actualización de la cuenta. Cuentas modificadas: " + Integer.toString(rows)+".";
+//			}
+//		}catch(Exception ex) {
+//			ex.printStackTrace();
+//		}finally {
+//			GestorPoolConexionesBD.releaseConnection(conn);
+//		}
+//		
+//		return result;
+	//}
+	
+	
+	
+	
 	/**
 	 * Método para obtener un usuario por su correo
 	 * @param correo
