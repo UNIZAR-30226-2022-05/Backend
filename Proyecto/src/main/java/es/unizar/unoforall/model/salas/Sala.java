@@ -139,6 +139,10 @@ public class Sala {
 		return result;
 	}
 	
+	public UsuarioVO getDAOParticipante(UUID participanteID) {
+		return participantes.get(participanteID);
+	}
+	
 	public int numParticipantes() {
 		return participantes.size();
 	}
