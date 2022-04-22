@@ -15,6 +15,7 @@ public class Sala {
 	private boolean noExiste;
 	private String error;
 	
+	private UUID salaID;
 	private ConfigSala configuracion;
 	
 	private boolean enPartida;
@@ -38,11 +39,12 @@ public class Sala {
 		partida = null;
 	}
 	
-	public Sala(ConfigSala configuracion) {
+	public Sala(ConfigSala configuracion, UUID salaID) {
 		this("");
 		this.configuracion = configuracion;
 		this.setEnPartida(false);
 		this.noExiste = false;
+		this.salaID = salaID;
 	}
 	
 	public void setEnPartida(boolean enPartida) {
@@ -52,7 +54,7 @@ public class Sala {
 			if (this.enPartida) {  // comienza una partida
 				List<UUID> jugadoresID = new ArrayList<>();
 				participantes.forEach((k,v) -> jugadoresID.add(k));
-				this.partida = new Partida(jugadoresID, configuracion);
+				this.partida = new Partida(jugadoresID, configuracion, salaID);
 			} else {			   // termina una partida
 				this.partida = null;
 			}

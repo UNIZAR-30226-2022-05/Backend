@@ -15,6 +15,7 @@ public class AlarmaFinTurno extends TimerTask {
 	@Override
 	public void run() {
 		try {
+			System.out.println("Turno terminado forzosamente por límite de tiempo");
 			GestorSesiones.getApiInterna().sendObject("/app/partidas/saltarTurno/" + salaID, "vacio");
 		} catch (Exception e1) {
 			e1.printStackTrace();

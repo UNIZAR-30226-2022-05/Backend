@@ -12,7 +12,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import es.unizar.unoforall.db.UsuarioDAO;
-import es.unizar.unoforall.gestores.AlarmaFinTurno;
 import es.unizar.unoforall.gestores.AlarmaTurnoIA;
 import es.unizar.unoforall.gestores.GestorSalas;
 import es.unizar.unoforall.gestores.GestorSesiones;
@@ -29,9 +28,6 @@ public class SocketController {
 	
 	private final static int DELAY_TURNO_IA = 2*1000;  // 2 segundos
 	private final static int DELAY_TURNO_IA_CORTO = 500;  // medio segundo
-	private final static int TIMEOUT_TURNO = 30*1000;  // 30 segundos
-	
-	private static Timer timerTurno = new Timer();
 	
 	/**
 	 * Método para iniciar sesión
@@ -177,7 +173,7 @@ public class SocketController {
 		
 		GestorSalas.obtenerSala(salaID).
 			nuevoParticipanteListo(GestorSesiones.obtenerUsuarioID(sesionID));
-		
+				
 		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
 	}
 	
@@ -278,7 +274,6 @@ public class SocketController {
 		System.out.println("- - - Jugada: " + jugada);
 		
 		Partida partida = GestorSalas.obtenerSala(salaID).getPartida();
-		int turnoAnterior = partida.getTurno();
 		partida.ejecutarJugadaJugador(jugada, usuarioID);
 		
 		if(partida.estaTerminada()) {
@@ -291,13 +286,6 @@ public class SocketController {
 			AlarmaTurnoIA alarm = new AlarmaTurnoIA(salaID);
 			Timer t = new Timer();
 			t.schedule(alarm, DELAY_TURNO_IA);
-		}
-		
-		if (partida.getTurno() != turnoAnterior) {	//se ha avanzado turno
-			AlarmaFinTurno alarm = new AlarmaFinTurno(salaID);
-			timerTurno.cancel();
-			timerTurno = new Timer();
-			timerTurno.schedule(alarm, TIMEOUT_TURNO);
 		}
 		
 		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
@@ -324,7 +312,6 @@ public class SocketController {
 				
 		System.out.println("Una IA envia un turno a la sala " + salaID);
 		Partida partida = GestorSalas.obtenerSala(salaID).getPartida();
-		int turnoAnterior = partida.getTurno();
 		partida.ejecutarJugadaIA();
 		
 		//Envía un emoji si ha tirado un +4
@@ -347,13 +334,6 @@ public class SocketController {
 				t.schedule(alarm, DELAY_TURNO_IA);
 			}
 			
-		}
-		
-		if (partida.getTurno() != turnoAnterior) {	//se ha avanzado turno
-			AlarmaFinTurno alarm = new AlarmaFinTurno(salaID);
-			timerTurno.cancel();
-			timerTurno = new Timer();
-			timerTurno.schedule(alarm, TIMEOUT_TURNO);
 		}
 				
 		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());

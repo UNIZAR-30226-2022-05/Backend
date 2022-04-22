@@ -31,7 +31,7 @@ public class GestorSalas {
 		synchronized (LOCK) {
 			UUID salaID = UUID.randomUUID();
 			
-			Sala sala = new Sala(configuracion);
+			Sala sala = new Sala(configuracion, salaID);
 			salas.put(salaID, sala);
 			return salaID;
 		}
