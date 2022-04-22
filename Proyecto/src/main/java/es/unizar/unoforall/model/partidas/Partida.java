@@ -672,7 +672,7 @@ public class Partida {
 		} else if(modoJugarCartaRobada) {
 			if(jugada.getCartas().isEmpty() 
 					|| jugada.getCartas().get(0).equals(this.cartaRobada) 
-					|| jugada.getCartas().get(0).esDelColor(Carta.Color.comodin)) { //Si se juega la carta robada o ninguna
+					|| this.cartaRobada.esDelColor(Carta.Color.comodin)) { //Si se juega la carta robada o ninguna
 				return true;
 			} else {
 				return false;
