@@ -98,7 +98,7 @@ public class Partida {
 		// Cartas jugadas
 		this.cartasJugadas = new LinkedList<>();
 		this.cartasJugadas.add(getCartaInicial());
-		
+		//this.cartasJugadas.add(new Carta(Carta.Tipo.n0,Carta.Color.amarillo));
 		// Jugadores
 		this.jugadores = new LinkedList<>();
 		for(UUID jID : jugadoresID) {
@@ -112,8 +112,19 @@ public class Partida {
 			// Se crean las manos de todos los jugadores
 		for(Jugador j : this.jugadores) {
 			for (int i = 0; i < 7; i++) {
-				j.getMano().add(robarCarta());
+				j.getMano().add(robarCarta());	
 			}
+			/*
+			j.getMano().add(new Carta(Carta.Tipo.mas2,Carta.Color.amarillo));
+			j.getMano().add(new Carta(Carta.Tipo.mas2,Carta.Color.verde));
+			j.getMano().add(new Carta(Carta.Tipo.reversa,Carta.Color.verde));
+			j.getMano().add(new Carta(Carta.Tipo.mas2,Carta.Color.verde));
+			j.getMano().add(new Carta(Carta.Tipo.mas4,Carta.Color.comodin));
+			j.getMano().add(new Carta(Carta.Tipo.reversa,Carta.Color.azul));
+			j.getMano().add(new Carta(Carta.Tipo.reversa,Carta.Color.amarillo));
+			j.getMano().add(new Carta(Carta.Tipo.reversa,Carta.Color.verde));
+			j.getMano().add(new Carta(Carta.Tipo.reversa,Carta.Color.rojo));
+			j.getMano().add(new Carta(Carta.Tipo.reversa,Carta.Color.azul));*/
 		}
 		
 		
@@ -219,7 +230,7 @@ public class Partida {
 	
 	private Carta robarCarta() {
 		if (this.mazo.isEmpty()) {
-			System.err.println("Intento de robo de mazo vacÃ­o.");
+			System.err.println("Intento de robo de mazo vacío.");
 			Carta auxiliar = cartasJugadas.get(cartasJugadas.size()-1);
 			cartasJugadas.remove(cartasJugadas.size()-1);
 			this.mazo.addAll(cartasJugadas);
@@ -232,9 +243,7 @@ public class Partida {
 			Collections.shuffle(this.mazo);
 		}
 		Carta c = this.mazo.get(0);
-		if (c.getTipo().equals(Carta.Tipo.cambioColor) || c.getTipo().equals(Carta.Tipo.mas4)) {
-			c.setColor(Carta.Color.comodin);
-		}
+		c.setDefault();
 		
 		this.mazo.remove(0);
 		if (this.mazo.isEmpty()) {
@@ -253,7 +262,6 @@ public class Partida {
 	}
 
 	private void juegaCarta(Carta c, Jugada jugada) {
-		c.setOculta();
 		efectoRayosX = false;
 		boolean esSalto = false;
 		boolean hayIntercambio = false;
@@ -370,7 +378,7 @@ public class Partida {
 	private boolean compruebaPuedeJugar() {
 		Carta anterior = getUltimaCartaJugada();
 		for(Carta c : jugadores.get(turno).getMano()) {
-			if (c.esDelColor(anterior.getColor()) ||
+			if (Carta.compartenColor(c, anterior) ||
 			    c.esDelColor(Carta.Color.comodin) ||
 			    Carta.compartenTipo(c, anterior)) {
 				return true;
@@ -418,7 +426,7 @@ public class Partida {
 			} else { //FUNCIONA
 				this.cartaRobada = robarCarta(); //No se usaba la variable global, se usaba una local
 				this.jugadores.get(turno).getMano().add(cartaRobada);
-				if (cartaRobada.esDelColor(getUltimaCartaJugada().getColor()) || cartaRobada.esDelColor(Carta.Color.comodin) 
+				if (Carta.compartenColor(cartaRobada, getUltimaCartaJugada()) || cartaRobada.esDelColor(Carta.Color.comodin) 
 						|| Carta.compartenTipo(cartaRobada,getUltimaCartaJugada())) {
 					modoJugarCartaRobada=true;
 				}
@@ -431,7 +439,8 @@ public class Partida {
 			
 		}
 		
-		if(!modoJugarCartaRobada && !(getJugadores().size() == 2 && getUltimaCartaJugada().esDelTipo(Carta.Tipo.reversa))) {
+		if(!modoJugarCartaRobada && 
+				(!(getJugadores().size() == 2 && jugada.getCartas().get(0).esDelTipo(Carta.Tipo.reversa)) || modoAcumulandoRobo)) {
 			avanzarTurno();
 		}
 		
@@ -464,7 +473,7 @@ public class Partida {
 					for (Carta c : this.jugadores.get(turno).getMano()) {
 						if(compatibleAcumulador(c) && 
 								(Carta.compartenTipo(c, cartaCentral)) 	//Si la carta es usable según las reglas
-										|| c.esDelColor(getUltimaCartaJugada().getColor())  
+										|| Carta.compartenColor(getUltimaCartaJugada(),c)  
 										|| c.esDelTipo(Carta.Tipo.mas4)) {
 							
 							List<Carta> listaCartas = new ArrayList<>();
@@ -635,7 +644,7 @@ public class Partida {
 			} else {
 				Carta c = jugada.getCartas().get(0);
 				if(compatibleAcumulador(c) && (Carta.compartenTipo(c, anterior) //Si la carta es usable según las reglas
-								|| c.esDelColor(getUltimaCartaJugada().getColor())  || c.esDelTipo(Carta.Tipo.mas4))) {
+								|| Carta.compartenColor(getUltimaCartaJugada(),c)  || c.esDelTipo(Carta.Tipo.mas4))) {
 					return true;
 				}
 			}
@@ -644,14 +653,14 @@ public class Partida {
 			boolean valida = false;
 			Carta.Tipo tipo = jugada.getCartas().get(0).getTipo();
 			
-			//Las Ãºnicas cartas que hacen "jugadas" son los nÃºmeros, para el resto de cartas solo se puede jugar una.
+			//Las únicas cartas que hacen "jugadas" son los números, para el resto de cartas solo se puede jugar una.
 			if(configuracion.getReglas().isJugarVariasCartas() && Carta.esNumero(tipo)) { //FUNCIONA
 				int numCartas = 0; //Se necesitan dos para definir si son escaleras o iguales
 				PosiblesTiposJugadas pj = new PosiblesTiposJugadas(false,false,false);
 				for (Carta c : jugada.getCartas()) {
 					if (numCartas<=1) {
 						if(numCartas==0) {
-							valida = Carta.compartenTipo(c, anterior) || c.esDelColor(getUltimaCartaJugada().getColor());
+							valida = Carta.compartenTipo(c, anterior) || Carta.compartenColor(anterior,c);
 						} else {
 							pj = evaluaJugada(anterior,c);
 							valida = pj.valida;
@@ -677,10 +686,10 @@ public class Partida {
 					valida = false; //Solo se puede jugar una si no son números. (o si no se permite jugar más de una).
 				}else { //Decía true aun con más de una carta sin este else
 					return Carta.compartenTipo(jugada.getCartas().get(0),anterior) 
-							|| jugada.getCartas().get(0).esDelColor(getUltimaCartaJugada().getColor());
+							|| Carta.compartenColor(anterior,jugada.getCartas().get(0));
 				}
 				return Carta.compartenTipo(jugada.getCartas().get(0),anterior) 
-						|| jugada.getCartas().get(0).esDelColor(getUltimaCartaJugada().getColor());
+						|| Carta.compartenColor(anterior,jugada.getCartas().get(0));
 			}
 			
 			return valida;
@@ -718,6 +727,9 @@ public class Partida {
 		return configuracion;
 	}
 
+	public Jugador getJugadorActual() {
+		return jugadores.get(turno);
+	}
 
 	@Override
 	public String toString() {
