@@ -6,13 +6,13 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
-import java.util.Timer;
 import java.util.UUID;
 
-import es.unizar.unoforall.gestores.AlarmaFinTurno;
 import es.unizar.unoforall.model.salas.ConfigSala;
 
 public class Partida {
+	public final static int TIMEOUT_TURNO = 15*1000;  // 30 segundos
+	
 	private boolean hayError = false;
 	private String error = "";
 	
@@ -37,20 +37,8 @@ public class Partida {
 	
 	private static final Object LOCK = new Object();
 	private static final int MAX_ROBO_ATTACK = 10;
-
-	private final static int TIMEOUT_TURNO = 30*1000;  // 30 segundos
 	
-	
-	private static Timer timerTurno = new Timer();
-	private UUID salaID = null;
-	
-	public void restartTimeout() {
-		AlarmaFinTurno alarm = new AlarmaFinTurno(salaID);
-		timerTurno.cancel();
-		timerTurno = new Timer();
-		timerTurno.schedule(alarm, TIMEOUT_TURNO);
-	}	
-	
+	private UUID salaID = null;	
 	
 	
 	private class PosiblesTiposJugadas {
@@ -131,8 +119,6 @@ public class Partida {
 				j.getMano().add(robarCarta());	
 			}
 		}
-		
-		restartTimeout();
 	}
 
 
@@ -455,7 +441,6 @@ public class Partida {
 		if(!modoJugarCartaRobada && !modoAcumulandoRobo &&
 				!(getJugadores().size() == 2 && !jugada.isRobar() && jugada.getCartas().get(0).esDelTipo(Carta.Tipo.reversa))) {
 			avanzarTurno();
-			restartTimeout();
 		}
 		
 		// Se comprueba si se ha acabado la partida
@@ -871,6 +856,8 @@ public class Partida {
 		partidaResumida.roboAcumulado = roboAcumulado;
 		partidaResumida.modoJugarCartaRobada = modoJugarCartaRobada;
 		partidaResumida.cartaRobada = cartaRobada;
+		
+		partidaResumida.salaID = null;
 		
 		return partidaResumida;
 	}

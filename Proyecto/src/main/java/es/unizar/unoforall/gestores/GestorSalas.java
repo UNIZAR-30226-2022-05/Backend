@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
 import java.util.UUID;
 
 import es.unizar.unoforall.db.PartidasDAO;
@@ -19,11 +20,13 @@ import es.unizar.unoforall.model.salas.Sala;
 
 public class GestorSalas {
 	private static HashMap<UUID,Sala> salas;
+	private static HashMap<UUID,Timer> timersSalas;
 	
 	private static final Object LOCK;
 	
 	static {
 		salas = new HashMap<>();
+		timersSalas = new HashMap<>();
 		LOCK = new Object();
 	}
 	
@@ -180,5 +183,29 @@ public class GestorSalas {
 			}
 			return error;
 		}
+	}
+	
+	public static void restartTimer(UUID salaID) {
+		Timer timerTurno = timersSalas.get(salaID);		
+		
+		AlarmaFinTurno alarm = new AlarmaFinTurno(salaID);
+		if(timerTurno != null)
+			timerTurno.cancel();
+		
+		if(obtenerSala(salaID).isEnPartida()) {
+			timerTurno = new Timer();
+			timerTurno.schedule(alarm, Partida.TIMEOUT_TURNO);
+			
+			timersSalas.put(salaID, timerTurno);
+		}
+	}
+	
+	public static void cancelTimer(UUID salaID) {
+		Timer timerTurno = timersSalas.get(salaID);
+		
+		if(timerTurno != null)
+			timerTurno.cancel();
+		
+		timersSalas.remove(salaID);
 	}
 }
