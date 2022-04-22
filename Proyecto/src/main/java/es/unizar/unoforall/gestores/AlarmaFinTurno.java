@@ -15,7 +15,7 @@ public class AlarmaFinTurno extends TimerTask {
 	@Override
 	public void run() {
 		try {
-			GestorSesiones.getApiInterna().sendObject("/app/partidas/turnosIA/" + salaID, "vacio");
+			GestorSesiones.getApiInterna().sendObject("/app/partidas/saltarTurno/" + salaID, "vacio");
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import es.unizar.unoforall.db.UsuarioDAO;
+import es.unizar.unoforall.gestores.AlarmaFinTurno;
 import es.unizar.unoforall.gestores.AlarmaTurnoIA;
 import es.unizar.unoforall.gestores.GestorSalas;
 import es.unizar.unoforall.gestores.GestorSesiones;
@@ -28,6 +29,7 @@ public class SocketController {
 	
 	private final static int DELAY_TURNO_IA = 2*1000;  // 2 segundos
 	private final static int DELAY_TURNO_IA_CORTO = 500;  // medio segundo
+	private final static int TIMEOUT_TURNO = 30*1000;  // 30 segundoS
 	
 	/**
 	 * Método para iniciar sesión
@@ -274,6 +276,7 @@ public class SocketController {
 		System.out.println("- - - Jugada: " + jugada);
 		
 		Partida partida = GestorSalas.obtenerSala(salaID).getPartida();
+		int turnoAnterior = partida.getTurno();
 		partida.ejecutarJugadaJugador(jugada, usuarioID);
 		
 		if(partida.estaTerminada()) {
@@ -286,6 +289,12 @@ public class SocketController {
 			AlarmaTurnoIA alarm = new AlarmaTurnoIA(salaID);
 			Timer t = new Timer();
 			t.schedule(alarm, DELAY_TURNO_IA);
+		}
+		
+		if (partida.getTurno() != turnoAnterior) {	//se ha avanzado turno
+			AlarmaFinTurno alarm = new AlarmaFinTurno(salaID);
+			Timer t = new Timer();
+			t.schedule(alarm, TIMEOUT_TURNO);
 		}
 		
 		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
@@ -312,6 +321,7 @@ public class SocketController {
 				
 		System.out.println("Una IA envia un turno a la sala " + salaID);
 		Partida partida = GestorSalas.obtenerSala(salaID).getPartida();
+		int turnoAnterior = partida.getTurno();
 		partida.ejecutarJugadaIA();
 		
 		//Envía un emoji si ha tirado un +4
@@ -335,12 +345,43 @@ public class SocketController {
 			}
 			
 		}
+		
+		if (partida.getTurno() != turnoAnterior) {	//se ha avanzado turno
+			AlarmaFinTurno alarm = new AlarmaFinTurno(salaID);
+			Timer t = new Timer();
+			t.schedule(alarm, TIMEOUT_TURNO);
+		}
 				
 		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
 	}
 	
 	
+	/**
+	 * (EXCLUSIVO BACKEND) Método saltar el turno tras los 30s
+	 * @param salaID		En la URL: id de la sala
+	 * @param vacio			Cualquier objeto no nulo
+	 * @return				(Clase Partida) La partida actualizada tras cada turno
+	 * 						Partida con 'error' = true si la sala no existe
+	 * @throws Exception
+	 */
+	@MessageMapping("/partidas/saltarTurno/{salaID}")
+	@SendTo("/topic/salas/{salaID}")
+	public String saltarTurno(@DestinationVariable UUID salaID, 
+							Object vacio) throws Exception {
+		
+		if (GestorSalas.obtenerSala(salaID) == null) {
+			return Serializar.serializar(new Partida("La sala de la partida ya no existe"));
+		} else if (!GestorSalas.obtenerSala(salaID).isEnPartida()) {
+			return Serializar.serializar(new Partida("La partida todavía no ha comenzado"));
+		}
+		
+		Partida partida = GestorSalas.obtenerSala(salaID).getPartida();
+		partida.saltarTurno();
+		
+		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
+	}
 	
+		
 	/**
 	 * Método para pulsar el botón de UNO en una partida
 	 * @param salaID		En la URL: id de la sala

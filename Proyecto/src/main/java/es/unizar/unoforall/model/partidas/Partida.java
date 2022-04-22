@@ -27,10 +27,7 @@ public class Partida {
 	//Fecha de inicio de la partida (Ya en formato sql porque no la necesita el frontend en este punto). 
 	private Date fechaInicio = null; 
 	
-	
 	//Variables para extraer resultados de efectos
-	private Carta vistaPorRayosX = null;
-	private boolean efectoRayosX = false;
 	private boolean modoAcumulandoRobo = false;
 	private int roboAcumulado = 0;
 	private boolean modoJugarCartaRobada = false;
@@ -252,7 +249,6 @@ public class Partida {
 	}
 
 	private void juegaCarta(Carta c, Jugada jugada) {
-		efectoRayosX = false;
 		boolean esSalto = false;
 		boolean hayIntercambio = false;
 		
@@ -320,10 +316,6 @@ public class Partida {
 						}
 					}
 				}
-				List<Carta> mano = jugadores.get(jugada.getJugadorObjetivo()).getMano();
-				Collections.shuffle(mano);
-				vistaPorRayosX = mano.get(0);
-				efectoRayosX = true;
 				break;
 				
 			case reversa:
@@ -397,21 +389,10 @@ public class Partida {
 		return false;
 	}
 	
-	//DESARROLLO
-	/*public boolean compruebaPuedeJugar(int jugador) {
-		Carta anterior = getUltimaCartaJugada();
-		for(Carta c : jugadores.get(jugador).getMano()) {
-			if (c.esDelColor(colorActual) ||
-			    c.esDelColor(Carta.Color.comodin) ||
-			    Carta.compartenTipo(c, anterior)) {
-				return true;
-			}
-		}
-		return false;
-	}*/
+	
 	
 	/**************************************************************************/
-	// Funciones pÃºblicas
+	// Funciones públicas
 	/**************************************************************************/
 	
 	public void ejecutarJugada(Jugada jugada) {
@@ -421,6 +402,7 @@ public class Partida {
 			}
 			cartaRobada=null;
 			modoJugarCartaRobada=false;
+			
 		} else if(jugada.isRobar()) {
 			if(modoAcumulandoRobo) {
 				modoAcumulandoRobo=false;
@@ -581,6 +563,12 @@ public class Partida {
 			}
 		}
 	}
+	
+	//Cuando un jugador se pasa del tiempo de turno
+	public void saltarTurno() {
+		ejecutarJugada(new Jugada());
+	}
+	
 	
 	public boolean turnoDeIA() {
 		return this.jugadores.get(turno).isEsIA();
@@ -789,16 +777,21 @@ public class Partida {
 		return jugadores.get(turno);
 	}
 
+	
+	
+
 	@Override
 	public String toString() {
-		return "Partida [hayError=" + hayError + ", error=" + error + ", mazo=" + mazo + ", cartasJugadas="
-				+ cartasJugadas + ", jugadores=" + jugadores + ", turno=" + turno + ", sentidoHorario=" + sentidoHorario
-				+ ", configuracion=" + configuracion + ", terminada=" + terminada + ", fechaInicio=" + fechaInicio
-				+ ", vistaPorRayosX=" + vistaPorRayosX + ", efectoRayosX=" + efectoRayosX + ", modoAcumulandoRobo="
+		final int maxLen = 5;
+		return "Partida [hayError=" + hayError + ", error=" + error + ", mazo="
+				+ (mazo != null ? mazo.subList(0, Math.min(mazo.size(), maxLen)) : null) + ", cartasJugadas="
+				+ (cartasJugadas != null ? cartasJugadas.subList(0, Math.min(cartasJugadas.size(), maxLen)) : null)
+				+ ", jugadores=" + (jugadores != null ? jugadores.subList(0, Math.min(jugadores.size(), maxLen)) : null)
+				+ ", turno=" + turno + ", sentidoHorario=" + sentidoHorario + ", configuracion=" + configuracion
+				+ ", terminada=" + terminada + ", fechaInicio=" + fechaInicio + ", modoAcumulandoRobo="
 				+ modoAcumulandoRobo + ", roboAcumulado=" + roboAcumulado + ", modoJugarCartaRobada="
 				+ modoJugarCartaRobada + ", cartaRobada=" + cartaRobada + "]";
 	}
-	
 
 	public Carta.Color getColorActual() {
 		return getUltimaCartaJugada().getColor();
@@ -855,8 +848,6 @@ public class Partida {
 		partidaResumida.fechaInicio = fechaInicio; 
 		
 		//Variables para extraer resultados de efectos
-		partidaResumida.vistaPorRayosX = vistaPorRayosX;
-		partidaResumida.efectoRayosX = efectoRayosX;
 		partidaResumida.modoAcumulandoRobo = modoAcumulandoRobo;
 		partidaResumida.roboAcumulado = roboAcumulado;
 		partidaResumida.modoJugarCartaRobada = modoJugarCartaRobada;
