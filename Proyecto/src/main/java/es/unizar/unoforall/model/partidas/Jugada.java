@@ -10,17 +10,11 @@ public class Jugada {
 	
 	// La jugada es robar
 	public Jugada() {
-		this.cartas = new ArrayList<>();;
+		this.cartas = new ArrayList<>();
 		this.robar = true;
 	}
 	
-	public Jugada(ArrayList<Carta> cartas) {
-		this.cartas = cartas;
-		this.robar = false;
-	}
-	
-	// Utilizar si la última carta es un cambio de color
-	public Jugada(ArrayList<Carta> cartas, Carta.Color nuevoColor) {
+	public Jugada(List<Carta> cartas) {
 		this.cartas = cartas;
 		this.robar = false;
 	}
