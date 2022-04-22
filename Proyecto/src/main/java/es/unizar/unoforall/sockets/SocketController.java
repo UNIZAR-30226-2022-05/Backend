@@ -29,7 +29,9 @@ public class SocketController {
 	
 	private final static int DELAY_TURNO_IA = 2*1000;  // 2 segundos
 	private final static int DELAY_TURNO_IA_CORTO = 500;  // medio segundo
-	private final static int TIMEOUT_TURNO = 30*1000;  // 30 segundoS
+	private final static int TIMEOUT_TURNO = 30*1000;  // 30 segundos
+	
+	private static Timer timerTurno = new Timer();
 	
 	/**
 	 * Método para iniciar sesión
@@ -293,8 +295,8 @@ public class SocketController {
 		
 		if (partida.getTurno() != turnoAnterior) {	//se ha avanzado turno
 			AlarmaFinTurno alarm = new AlarmaFinTurno(salaID);
-			Timer t = new Timer();
-			t.schedule(alarm, TIMEOUT_TURNO);
+			timerTurno.cancel();
+			timerTurno.schedule(alarm, TIMEOUT_TURNO);
 		}
 		
 		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
@@ -348,8 +350,8 @@ public class SocketController {
 		
 		if (partida.getTurno() != turnoAnterior) {	//se ha avanzado turno
 			AlarmaFinTurno alarm = new AlarmaFinTurno(salaID);
-			Timer t = new Timer();
-			t.schedule(alarm, TIMEOUT_TURNO);
+			timerTurno.cancel();
+			timerTurno.schedule(alarm, TIMEOUT_TURNO);
 		}
 				
 		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
