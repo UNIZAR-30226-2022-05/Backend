@@ -474,11 +474,29 @@ public class Partida {
 		}
 	}
 	
+	public void cambiarColorAleatorioIA(Carta c) {
+		int random_color = new Random().nextInt(4);
+		switch(random_color) {
+			case 0:
+				c.setColor(Carta.Color.amarillo);
+				break;
+			case 1:
+				c.setColor(Carta.Color.rojo);
+				break;
+			case 2:
+				c.setColor(Carta.Color.azul);
+				break;
+			case 3:
+				c.setColor(Carta.Color.verde);
+				break;
+		}
+	}
+	
 	public void ejecutarJugadaIA() {
 		if (this.jugadores.get(turno).isEsIA()) {
 			Jugada jugadaIA = new Jugada();	// por defecto, robar
 			
-			if (compruebaPuedeJugar()) {
+			if (compruebaPuedeJugar()) {	
 				Carta cartaCentral = getUltimaCartaJugada();
 				
 				if (modoAcumulandoRobo) {
@@ -503,21 +521,7 @@ public class Partida {
 					jugadaIA.setRobar(false);
 					
 					if (cartaRobada.esDelColor(Carta.Color.comodin)) {
-						int random_color = new Random().nextInt(4);
-						switch(random_color) {
-							case 0:
-								cartaRobada.setColor(Carta.Color.amarillo);
-								break;
-							case 1:
-								cartaRobada.setColor(Carta.Color.rojo);
-								break;
-							case 2:
-								cartaRobada.setColor(Carta.Color.azul);
-								break;
-							case 3:
-								cartaRobada.setColor(Carta.Color.verde);
-								break;
-						}
+						cambiarColorAleatorioIA(cartaRobada);
 					}
 					
 				} else {
@@ -529,21 +533,7 @@ public class Partida {
 							jugadaIA.setRobar(false);
 							
 							if (c.esDelColor(Carta.Color.comodin)) {
-								int random_color = new Random().nextInt(4);
-								switch(random_color) {
-									case 0:
-										c.setColor(Carta.Color.amarillo);
-										break;
-									case 1:
-										c.setColor(Carta.Color.rojo);
-										break;
-									case 2:
-										c.setColor(Carta.Color.azul);
-										break;
-									case 3:
-										c.setColor(Carta.Color.verde);
-										break;
-								}
+								cambiarColorAleatorioIA(c);
 							}
 							break;
 						}
@@ -552,11 +542,25 @@ public class Partida {
 				
 				if (!validarJugada(jugadaIA)) {
 					System.err.println("ERROR: la IA ha elegido una jugada no válida");
+					return;
+				}
+				
+				if (!jugadaIA.isRobar() && 
+						this.jugadores.get(turno).getMano().size() - jugadaIA.getCartas().size() == 1) {
+					pulsarBotonUNOInterno(turno);		// Se protege
 				}
 			}
 			
 			System.err.println("Jugada elegida por la IA: " + jugadaIA);
 			ejecutarJugada(jugadaIA);
+			
+			
+			// Comprueba si puede denunciar a alguien (por simplicidad solo lo hace en su turno)
+			for (Jugador j : this.jugadores) {
+				if(!j.isProtegido_UNO() && j.getMano().size()==1) { //Pillado
+					pulsarBotonUNOInterno(turno);		// Se protege
+				}	
+			}
 		}
 	}
 	

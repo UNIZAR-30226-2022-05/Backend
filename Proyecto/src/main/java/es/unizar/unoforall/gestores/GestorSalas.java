@@ -120,61 +120,65 @@ public class GestorSalas {
 	}
 	
 	public static String insertarPartidaEnBd(Partida partida) {
-		String error = null;
-		PartidasAcabadasVO pa = new PartidasAcabadasVO(null, 
-				partida.getFechaInicio(), 
-				new Date(System.currentTimeMillis()), 
-				partida.getNumIAs(),
-				partida.getConfiguracion().getModoJuego().ordinal());
-		
-		ArrayList<HaJugadoVO> participantes = new ArrayList<HaJugadoVO>(); 
-		
-		ArrayList<Integer> puntos = new ArrayList<Integer>();
-		for (Jugador j : partida.getJugadores()) {
-			puntos.add(j.sacarPuntos()); //puntos.size()==configuracion.getMaxParticipantes()
-		}
-		int i = 0; //indice del jugador que estamos comprobando
-		for (Jugador j : partida.getJugadores()) {
-			if (!j.isEsIA()) {
-				int usuariosDebajo = 0;
-				boolean haGanado = false;
-				if (puntos.get(i)==0) {
-					haGanado = true;
-					usuariosDebajo = partida.getConfiguracion().getMaxParticipantes()-1;
-				} else {
-					for(Integer p : puntos) {
-						if(p>puntos.get(i)) { //En caso de usuarios empatados ninguno está por debajo de otro.
-							usuariosDebajo++; //No es necesario preocuparse por compararse consigo mismo porque
-						}					  //cuenta como empate.
-					}
-				}
-				error = actualizarPuntosJugador(usuariosDebajo,j.getJugadorID());
-				if (!error.equals("nulo")) {
-					return error;
-				}
-				participantes.add(new HaJugadoVO(j.getJugadorID(),pa.getId(),usuariosDebajo,haGanado));				
+		synchronized (LOCK) {
+			String error = null;
+			PartidasAcabadasVO pa = new PartidasAcabadasVO(null, 
+					partida.getFechaInicio(), 
+					new Date(System.currentTimeMillis()), 
+					partida.getNumIAs(),
+					partida.getConfiguracion().getModoJuego().ordinal());
+			
+			ArrayList<HaJugadoVO> participantes = new ArrayList<HaJugadoVO>(); 
+			
+			ArrayList<Integer> puntos = new ArrayList<Integer>();
+			for (Jugador j : partida.getJugadores()) {
+				puntos.add(j.sacarPuntos()); //puntos.size()==configuracion.getMaxParticipantes()
 			}
-			i++;
+			int i = 0; //indice del jugador que estamos comprobando
+			for (Jugador j : partida.getJugadores()) {
+				if (!j.isEsIA()) {
+					int usuariosDebajo = 0;
+					boolean haGanado = false;
+					if (puntos.get(i)==0) {
+						haGanado = true;
+						usuariosDebajo = partida.getConfiguracion().getMaxParticipantes()-1;
+					} else {
+						for(Integer p : puntos) {
+							if(p>puntos.get(i)) { //En caso de usuarios empatados ninguno está por debajo de otro.
+								usuariosDebajo++; //No es necesario preocuparse por compararse consigo mismo porque
+							}					  //cuenta como empate.
+						}
+					}
+					error = actualizarPuntosJugador(usuariosDebajo,j.getJugadorID());
+					if (!error.equals("nulo")) {
+						return error;
+					}
+					participantes.add(new HaJugadoVO(j.getJugadorID(),pa.getId(),usuariosDebajo,haGanado));				
+				}
+				i++;
+			}
+			//participantes.size()==configuracion.getMaxParticipantes()-numIAs
+			PartidaJugada pj = new PartidaJugada(pa,participantes);
+			error = PartidasDAO.insertarPartidaAcabada(pj);
+			return error;
 		}
-		//participantes.size()==configuracion.getMaxParticipantes()-numIAs
-		PartidaJugada pj = new PartidaJugada(pa,participantes);
-		error = PartidasDAO.insertarPartidaAcabada(pj);
-		return error;
 	}
 	
 	private static String actualizarPuntosJugador(int usuariosDebajo, UUID jugadorID) {
-		String error = "nulo";
-		switch(usuariosDebajo) {
-			case 1://5
-				error = UsuarioDAO.actualizarPuntos(5, jugadorID);
-				break;
-			case 2://10
-				error = UsuarioDAO.actualizarPuntos(10, jugadorID);
-				break;
-			case 3://20
-				error = UsuarioDAO.actualizarPuntos(20, jugadorID);
-				break;
+		synchronized (LOCK) {
+			String error = "nulo";
+			switch(usuariosDebajo) {
+				case 1://5
+					error = UsuarioDAO.actualizarPuntos(5, jugadorID);
+					break;
+				case 2://10
+					error = UsuarioDAO.actualizarPuntos(10, jugadorID);
+					break;
+				case 3://20
+					error = UsuarioDAO.actualizarPuntos(20, jugadorID);
+					break;
+			}
+			return error;
 		}
-		return error;
 	}
 }
