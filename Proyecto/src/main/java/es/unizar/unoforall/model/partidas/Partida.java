@@ -340,8 +340,16 @@ public class Partida {
 			default:
 				break;
 		}
+		
 		this.cartasJugadas.add(c); //La añade al final (por implementaciones de rellenar y robar del mazo);
-		this.jugadores.get(turno).getMano().remove(c);
+		if (c.esDelTipo(Carta.Tipo.cambioColor) || c.esDelTipo(Carta.Tipo.mas4)) {
+			this.jugadores.get(turno).getMano().removeIf((carta) -> carta.esDelTipo(c.getTipo()));
+		} else {
+			this.jugadores.get(turno).getMano().remove(c);
+		}
+		
+		
+		
 		if(	configuracion.getReglas().isEvitarEspecialFinal() && 
 				this.jugadores.get(turno).getMano().size()==1 &&
 				this.jugadores.get(turno).getMano().get(0).esDelColor(Carta.Color.comodin)) {
