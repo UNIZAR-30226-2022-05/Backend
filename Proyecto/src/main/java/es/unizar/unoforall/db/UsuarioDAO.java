@@ -551,8 +551,9 @@ public class UsuarioDAO {
 			conn = GestorPoolConexionesBD.getConnection();
 			PreparedStatement getRequest = 
 					conn.prepareStatement("Update usuarios set puntos = puntos + ? WHERE id = ?;");
-			getRequest.setObject(1,idUsuario);
-			getRequest.setInt(2, puntos);
+			
+			getRequest.setInt(1, puntos);
+			getRequest.setObject(2,idUsuario);
 			int rows = getRequest.executeUpdate();
 			if (rows!=1) {
 				error = "Ha surgido un error al actualizar los puntos del usuario <"+idUsuario+">. Se querían incrementar en <" +
