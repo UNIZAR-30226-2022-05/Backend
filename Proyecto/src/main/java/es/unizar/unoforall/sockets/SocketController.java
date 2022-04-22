@@ -15,6 +15,7 @@ import es.unizar.unoforall.db.UsuarioDAO;
 import es.unizar.unoforall.gestores.AlarmaTurnoIA;
 import es.unizar.unoforall.gestores.GestorSalas;
 import es.unizar.unoforall.gestores.GestorSesiones;
+import es.unizar.unoforall.model.partidas.EnvioEmoji;
 import es.unizar.unoforall.model.partidas.Jugada;
 import es.unizar.unoforall.model.partidas.Partida;
 import es.unizar.unoforall.model.salas.NotificacionSala;
@@ -362,6 +363,30 @@ public class SocketController {
 	}
 	
 	
+	/**
+	 * Método para enviar un emoji en una partida
+	 * @param salaID		En la URL: id de la sala
+	 * @param sesionID		Automático
+	 * @param emoji			Entero identificador del emoji
+	 * @return				(Clase EnvioEmoji) El identificador del emoji y el emisor.
+	 * 						El identificador será -1 si ha habido algún error, y hay
+	 * 						que ignorar ese envío del emoji
+	 * @throws Exception
+	 */
+	@MessageMapping("/partidas/emojiPartida/{salaID}")
+	@SendTo("/topic/salas/{salaID}/emoji")
+	public String emojiPartida(@DestinationVariable UUID salaID, 
+							@Header("simpSessionId") String sesionID, 
+							Integer emoji) throws Exception {		
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
+		if (usuarioID == null) {
+			return Serializar.serializar(new EnvioEmoji(-1, null));
+		} else if (emoji >= 0 && emoji <= 4) {
+			return Serializar.serializar(new EnvioEmoji(emoji, usuarioID));
+		} else {
+			return Serializar.serializar(new EnvioEmoji(-1, null));
+		}
+	}
 	
 	
 	
