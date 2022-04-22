@@ -26,6 +26,7 @@ import es.unizar.unoforall.utils.Serializar;
 public class SocketController {	
 	
 	private final static int DELAY_TURNO_IA = 2*1000;  // 2 segundos
+	private final static int DELAY_TURNO_IA_CORTO = 500;  // medio segundo
 	
 	/**
 	 * Método para iniciar sesión
@@ -304,6 +305,8 @@ public class SocketController {
 		
 		if (GestorSalas.obtenerSala(salaID) == null) {
 			return Serializar.serializar(new Partida("La sala de la partida ya no existe"));
+		} else if (!GestorSalas.obtenerSala(salaID).isEnPartida()) {
+			return Serializar.serializar(new Partida("La partida todavía no ha comenzado"));
 		}
 				
 		System.out.println("Una IA envia un turno a la sala " + salaID);
@@ -319,7 +322,12 @@ public class SocketController {
 			System.out.println("- - - Preparando turno de la IA");
 			AlarmaTurnoIA alarm = new AlarmaTurnoIA(salaID);
 			Timer t = new Timer();
-			t.schedule(alarm, DELAY_TURNO_IA);
+			if (partida.isModoJugarCartaRobada()) {
+				t.schedule(alarm, DELAY_TURNO_IA_CORTO);
+			} else {
+				t.schedule(alarm, DELAY_TURNO_IA);
+			}
+			
 		}
 				
 		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
