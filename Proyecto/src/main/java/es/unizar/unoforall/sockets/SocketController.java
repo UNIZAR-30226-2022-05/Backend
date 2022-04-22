@@ -394,11 +394,12 @@ public class SocketController {
 							@Header("simpSessionId") String sesionID, 
 							Integer emoji) throws Exception {		
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
-		if (usuarioID == null) {
-			return Serializar.serializar(new EnvioEmoji(-1, null, false));
+		if (usuarioID == null) {	
+			//ha mandado el emoji la IA o un usuario no registrado (obviamos eso)
+			return Serializar.serializar(new EnvioEmoji(emoji, usuarioID, true));
 		} else if (emoji >= 0 && emoji <= 4) {
 			return Serializar.serializar(new EnvioEmoji(emoji, usuarioID, false));
-		} else {
+		} else {	//emoji inválido
 			return Serializar.serializar(new EnvioEmoji(-1, null, false));
 		}
 	}

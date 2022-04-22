@@ -820,7 +820,14 @@ public class Partida {
 		this.modoJugarCartaRobada = modoJugarCartaRobada;
 	}
 
+	
+	public Carta getCartaRobada() {
+		return cartaRobada;
+	}
 
+	public void setCartaRobada(Carta cartaRobada) {
+		this.cartaRobada = cartaRobada;
+	}
 
 	public Partida getPartidaAEnviar() {
 		Partida partidaResumida = new Partida();
