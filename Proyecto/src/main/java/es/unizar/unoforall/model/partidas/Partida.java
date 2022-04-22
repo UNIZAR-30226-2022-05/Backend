@@ -575,20 +575,30 @@ public class Partida {
 		}
 	}
 	
+	
 	public void pulsarBotonUNO(UUID jugadorID) { 
-			
-		for (Jugador j : this.jugadores) {
-			if (j.getJugadorID().equals(jugadorID)) {
-				if ((jugadores.get(turno).getJugadorID().equals(j.getJugadorID()) 
-					 && j.getMano().size()==2 
-					 && compruebaPuedeJugar(turno))
-						|| j.getMano().size()==1) { 
-					//Si es su turno y puede jugar la penultima carta, o solo tiene una, se protege
-					j.setProtegido_UNO(true);
-				}
-			} else if(!j.isProtegido_UNO() && j.getMano().size()==1) { //Pillado, roba dos cartas.
-				j.getMano().add(robarCarta());
-				j.getMano().add(robarCarta());
+		for (int indice = 0; indice < jugadores.size(); indice++) {
+			if (jugadores.get(indice).getJugadorID().equals(jugadorID)) {
+				pulsarBotonUNOInterno(indice);
+				break;
+			}
+		}
+	}
+	
+	public void pulsarBotonUNOInterno(int jugador) { 
+		Jugador j = jugadores.get(jugador);
+		if ((jugador == turno 
+			 && j.getMano().size()==2 
+			 && compruebaPuedeJugar(jugador))
+				|| j.getMano().size()==1) { 
+			//Si es su turno y puede jugar la penultima carta, o solo tiene una, se protege
+			j.setProtegido_UNO(true);
+		}
+		
+		for (Jugador j2 : this.jugadores) {
+			if(!j2.isProtegido_UNO() && j2.getMano().size()==1) { //Pillado, roba dos cartas.
+				j2.getMano().add(robarCarta());
+				j2.getMano().add(robarCarta());
 			}	
 		}
 	}
