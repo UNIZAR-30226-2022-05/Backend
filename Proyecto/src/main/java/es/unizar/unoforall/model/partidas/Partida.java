@@ -387,6 +387,18 @@ public class Partida {
 		return false;
 	}
 	
+	private boolean compruebaPuedeJugar(int jugador) {
+		Carta anterior = getUltimaCartaJugada();
+		for(Carta c : jugadores.get(jugador).getMano()) {
+			if (Carta.compartenColor(c, anterior) ||
+			    c.esDelColor(Carta.Color.comodin) ||
+			    Carta.compartenTipo(c, anterior)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	//DESARROLLO
 	/*public boolean compruebaPuedeJugar(int jugador) {
 		Carta anterior = getUltimaCartaJugada();
@@ -563,15 +575,16 @@ public class Partida {
 		}
 	}
 	
-	public void pulsarBotonUNO(UUID jugador) {
+	public void pulsarBotonUNO(int jugador) {
+		if(jugadores.get(jugador).getMano().size()==2 && compruebaPuedeJugar(jugador) ||
+				jugadores.get(jugador).getMano().size()==1) { //Si puede jugar la penultima carta o solo tiene una, se protege
+			jugadores.get(jugador).setProtegido_UNO(true);
+		}
 		for (Jugador j : this.jugadores) {
-			if (j.getJugadorID().equals(jugador)) {
-				j.setProtegido_UNO(true);
-			} else if(!j.isProtegido_UNO() && j.getMano().size()==1) { //Pillado, roba dos cartas.
-				this.jugadores.get(turno).getMano().add(robarCarta());
-				this.jugadores.get(turno).getMano().add(robarCarta());
-			}
-				
+			if(!j.isProtegido_UNO() && j.getMano().size()==1) { //Pillado, roba dos cartas.
+				j.getMano().add(robarCarta());
+				j.getMano().add(robarCarta());
+			}	
 		}
 	}
 	
