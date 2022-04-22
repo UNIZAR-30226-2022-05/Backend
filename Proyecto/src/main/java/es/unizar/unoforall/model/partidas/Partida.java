@@ -438,7 +438,7 @@ public class Partida {
 			
 		}
 		
-		if(!modoJugarCartaRobada && !modoAcumulandoRobo &&
+		if(!modoJugarCartaRobada && 
 				!(getJugadores().size() == 2 && !jugada.isRobar() && jugada.getCartas().get(0).esDelTipo(Carta.Tipo.reversa))) {
 			avanzarTurno();
 		}
@@ -570,7 +570,11 @@ public class Partida {
 	//Cuando un jugador se pasa del tiempo de turno
 	public void saltarTurno() {
 		ejecutarJugada(new Jugada());
-		modoJugarCartaRobada = false;
+		if (modoJugarCartaRobada) {
+			modoJugarCartaRobada = false;
+			avanzarTurno();
+		}
+		
 	}
 	
 	
