@@ -719,11 +719,13 @@ public class Partida {
 				}else { //Decía true aun con más de una carta sin este else
 					return Carta.compartenTipo(jugada.getCartas().get(0),anterior) 
 							|| Carta.compartenColor(anterior,jugada.getCartas().get(0))
-							|| jugada.getCartas().get(0).esDelColor(Carta.Color.comodin);
+							|| jugada.getCartas().get(0).esDelTipo(Carta.Tipo.mas4)
+							|| jugada.getCartas().get(0).esDelTipo(Carta.Tipo.cambioColor);
 				}
 				return Carta.compartenTipo(jugada.getCartas().get(0),anterior) 
 						|| Carta.compartenColor(anterior,jugada.getCartas().get(0))
-						|| jugada.getCartas().get(0).esDelColor(Carta.Color.comodin);
+						|| jugada.getCartas().get(0).esDelTipo(Carta.Tipo.mas4)
+						|| jugada.getCartas().get(0).esDelTipo(Carta.Tipo.cambioColor);
 			}
 			
 			return valida;
