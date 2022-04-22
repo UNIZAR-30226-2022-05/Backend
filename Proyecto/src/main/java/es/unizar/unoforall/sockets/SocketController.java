@@ -296,6 +296,7 @@ public class SocketController {
 		if (partida.getTurno() != turnoAnterior) {	//se ha avanzado turno
 			AlarmaFinTurno alarm = new AlarmaFinTurno(salaID);
 			timerTurno.cancel();
+			timerTurno = new Timer();
 			timerTurno.schedule(alarm, TIMEOUT_TURNO);
 		}
 		
@@ -351,6 +352,7 @@ public class SocketController {
 		if (partida.getTurno() != turnoAnterior) {	//se ha avanzado turno
 			AlarmaFinTurno alarm = new AlarmaFinTurno(salaID);
 			timerTurno.cancel();
+			timerTurno = new Timer();
 			timerTurno.schedule(alarm, TIMEOUT_TURNO);
 		}
 				
