@@ -424,7 +424,11 @@ public class Partida {
 		} else if(jugada.isRobar()) {
 			if(modoAcumulandoRobo) {
 				modoAcumulandoRobo=false;
-				for(int i = 0; i<roboAcumulado; i++) {
+				int maxRobo = roboAcumulado;
+				if (this.jugadores.get(turno).getMano().size() + roboAcumulado > 20) {
+					maxRobo = 20;
+				}
+				for(int i = 0; i<maxRobo; i++) {
 					this.jugadores.get(turno).getMano().add(robarCarta());
 				}
 				roboAcumulado=0;
@@ -472,7 +476,8 @@ public class Partida {
 		}
 	}
 	
-	public void cambiarColorAleatorioIA(Carta c) {
+	
+	private void cambiarColorAleatorioIA(Carta c) {
 		int random_color = new Random().nextInt(4);
 		switch(random_color) {
 			case 0:
@@ -546,6 +551,21 @@ public class Partida {
 				if (!jugadaIA.isRobar() && 
 						this.jugadores.get(turno).getMano().size() - jugadaIA.getCartas().size() == 1) {
 					pulsarBotonUNOInterno(turno);		// Se protege
+				}
+				
+				if (jugadaIA.getCartas().get(0).esDelTipo(Carta.Tipo.intercambio)) {
+					int mejorJugador = 0;
+					int menorNumCartas = 300;
+						
+					//busca el jugador con menos cartas
+					for (int indice = 0; indice < jugadores.size(); indice++) { 	
+						if (jugadores.get(indice).getMano().size() < menorNumCartas) {
+							mejorJugador = indice;
+							menorNumCartas = jugadores.get(indice).getMano().size();
+						}
+					}
+					
+					jugadaIA.setJugadorObjetivo(mejorJugador);
 				}
 			}
 			
