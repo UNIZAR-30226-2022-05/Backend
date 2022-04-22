@@ -441,8 +441,8 @@ public class Partida {
 			
 		}
 		
-		if(!modoJugarCartaRobada && 
-				(!(getJugadores().size() == 2 && jugada.getCartas().get(0).esDelTipo(Carta.Tipo.reversa)) || modoAcumulandoRobo)) {
+		if(!modoJugarCartaRobada && !modoAcumulandoRobo &&
+				!(getJugadores().size() == 2 && !jugada.isRobar() && jugada.getCartas().get(0).esDelTipo(Carta.Tipo.reversa))) {
 			avanzarTurno();
 		}
 		
@@ -710,10 +710,12 @@ public class Partida {
 					valida = false; //Solo se puede jugar una si no son números. (o si no se permite jugar más de una).
 				}else { //Decía true aun con más de una carta sin este else
 					return Carta.compartenTipo(jugada.getCartas().get(0),anterior) 
-							|| Carta.compartenColor(anterior,jugada.getCartas().get(0));
+							|| Carta.compartenColor(anterior,jugada.getCartas().get(0))
+							|| jugada.getCartas().get(0).esDelColor(Carta.Color.comodin);
 				}
 				return Carta.compartenTipo(jugada.getCartas().get(0),anterior) 
-						|| Carta.compartenColor(anterior,jugada.getCartas().get(0));
+						|| Carta.compartenColor(anterior,jugada.getCartas().get(0))
+						|| jugada.getCartas().get(0).esDelColor(Carta.Color.comodin);
 			}
 			
 			return valida;
