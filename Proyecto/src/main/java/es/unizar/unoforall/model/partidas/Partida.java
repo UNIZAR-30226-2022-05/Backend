@@ -36,6 +36,7 @@ public class Partida {
 	private boolean modoJugarCartaRobada = false;
 	private Carta cartaRobada = null;
 	
+	private static final Object LOCK = new Object();
 	private static final int MAX_ROBO_ATTACK = 10;
 	
 	private class PosiblesTiposJugadas {
@@ -98,7 +99,7 @@ public class Partida {
 		// Cartas jugadas
 		this.cartasJugadas = new LinkedList<>();
 		this.cartasJugadas.add(getCartaInicial());
-		//this.cartasJugadas.add(new Carta(Carta.Tipo.n0,Carta.Color.amarillo));
+		
 		// Jugadores
 		this.jugadores = new LinkedList<>();
 		for(UUID jID : jugadoresID) {
@@ -114,17 +115,6 @@ public class Partida {
 			for (int i = 0; i < 7; i++) {
 				j.getMano().add(robarCarta());	
 			}
-			/*
-			j.getMano().add(new Carta(Carta.Tipo.mas2,Carta.Color.amarillo));
-			j.getMano().add(new Carta(Carta.Tipo.mas2,Carta.Color.verde));
-			j.getMano().add(new Carta(Carta.Tipo.reversa,Carta.Color.verde));
-			j.getMano().add(new Carta(Carta.Tipo.mas2,Carta.Color.verde));
-			j.getMano().add(new Carta(Carta.Tipo.mas4,Carta.Color.comodin));
-			j.getMano().add(new Carta(Carta.Tipo.reversa,Carta.Color.azul));
-			j.getMano().add(new Carta(Carta.Tipo.reversa,Carta.Color.amarillo));
-			j.getMano().add(new Carta(Carta.Tipo.reversa,Carta.Color.verde));
-			j.getMano().add(new Carta(Carta.Tipo.reversa,Carta.Color.rojo));
-			j.getMano().add(new Carta(Carta.Tipo.reversa,Carta.Color.azul));*/
 		}
 		
 		
@@ -590,20 +580,22 @@ public class Partida {
 	}
 	
 	public void pulsarBotonUNOInterno(int jugador) { 
-		Jugador j = jugadores.get(jugador);
-		if ((jugador == turno 
-			 && j.getMano().size()==2 
-			 && compruebaPuedeJugar(jugador))
-				|| j.getMano().size()==1) { 
-			//Si es su turno y puede jugar la penultima carta, o solo tiene una, se protege
-			j.setProtegido_UNO(true);
-		}
-		
-		for (Jugador j2 : this.jugadores) {
-			if(!j2.isProtegido_UNO() && j2.getMano().size()==1) { //Pillado, roba dos cartas.
-				j2.getMano().add(robarCarta());
-				j2.getMano().add(robarCarta());
-			}	
+		synchronized (LOCK) {
+			Jugador j = jugadores.get(jugador);
+			if ((jugador == turno 
+				 && j.getMano().size()==2 
+				 && compruebaPuedeJugar(jugador))
+					|| j.getMano().size()==1) { 
+				//Si es su turno y puede jugar la penultima carta, o solo tiene una, se protege
+				j.setProtegido_UNO(true);
+			}
+			
+			for (Jugador j2 : this.jugadores) {
+				if(!j2.isProtegido_UNO() && j2.getMano().size()==1) { //Pillado, roba dos cartas.
+					j2.getMano().add(robarCarta());
+					j2.getMano().add(robarCarta());
+				}	
+			}
 		}
 	}
 	
