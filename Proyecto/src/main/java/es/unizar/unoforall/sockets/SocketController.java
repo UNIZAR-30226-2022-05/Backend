@@ -15,6 +15,7 @@ import es.unizar.unoforall.db.UsuarioDAO;
 import es.unizar.unoforall.gestores.AlarmaTurnoIA;
 import es.unizar.unoforall.gestores.GestorSalas;
 import es.unizar.unoforall.gestores.GestorSesiones;
+import es.unizar.unoforall.model.partidas.Carta;
 import es.unizar.unoforall.model.partidas.EnvioEmoji;
 import es.unizar.unoforall.model.partidas.Jugada;
 import es.unizar.unoforall.model.partidas.Partida;
@@ -313,6 +314,11 @@ public class SocketController {
 		Partida partida = GestorSalas.obtenerSala(salaID).getPartida();
 		partida.ejecutarJugadaIA();
 		
+		//Envía un emoji si ha tirado un +4
+		if (partida.getUltimaCartaJugada().esDelTipo(Carta.Tipo.mas4)) {
+			GestorSesiones.getApiInterna().sendObject("/partidas/emojiPartida/" + salaID, 0);
+		}
+		
 		if(partida.estaTerminada()) {
 			String error = GestorSalas.insertarPartidaEnBd(partida);
 			if (!error.equals("nulo")) {
@@ -376,23 +382,24 @@ public class SocketController {
 	 * @param salaID		En la URL: id de la sala
 	 * @param sesionID		Automático
 	 * @param emoji			Entero identificador del emoji
+	 * @param esIA			falso (solo true cuando lo llame el backend)
 	 * @return				(Clase EnvioEmoji) El identificador del emoji y el emisor.
 	 * 						El identificador será -1 si ha habido algún error, y hay
 	 * 						que ignorar ese envío del emoji
 	 * @throws Exception
 	 */
 	@MessageMapping("/partidas/emojiPartida/{salaID}")
-	@SendTo("/topic/salas/{salaID}/emoji")
+	@SendTo("/topic/salas/{salaID}/emojis")
 	public String emojiPartida(@DestinationVariable UUID salaID, 
 							@Header("simpSessionId") String sesionID, 
 							Integer emoji) throws Exception {		
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
 		if (usuarioID == null) {
-			return Serializar.serializar(new EnvioEmoji(-1, null));
+			return Serializar.serializar(new EnvioEmoji(-1, null, false));
 		} else if (emoji >= 0 && emoji <= 4) {
-			return Serializar.serializar(new EnvioEmoji(emoji, usuarioID));
+			return Serializar.serializar(new EnvioEmoji(emoji, usuarioID, false));
 		} else {
-			return Serializar.serializar(new EnvioEmoji(-1, null));
+			return Serializar.serializar(new EnvioEmoji(-1, null, false));
 		}
 	}
 	
