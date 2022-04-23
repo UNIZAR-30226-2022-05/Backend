@@ -34,6 +34,7 @@ public class Partida {
 	private int roboAcumulado = 0;
 	private boolean modoJugarCartaRobada = false;
 	private Carta cartaRobada = null;
+	private boolean repeticionTurno = false;
 	
 	private static final Object LOCK = new Object();
 	private static final int MAX_ROBO_ATTACK = 10;
@@ -399,6 +400,7 @@ public class Partida {
 	/**************************************************************************/
 	
 	public void ejecutarJugada(Jugada jugada) {
+		repeticionTurno = false;
 		if(modoJugarCartaRobada) { //FUNCIONA
 			if(jugada.getCartas()!=null && jugada.getCartas().size()==1) {
 				juegaCarta(jugada.getCartas().get(0), jugada);
@@ -438,8 +440,10 @@ public class Partida {
 			
 		}
 		
-		if(!modoJugarCartaRobada && 
-				!(getJugadores().size() == 2 && !jugada.isRobar() && jugada.getCartas().get(0).esDelTipo(Carta.Tipo.reversa))) {
+		//repite turno por ser dos jugadores
+		repeticionTurno = getJugadores().size() == 2 && !jugada.isRobar() && jugada.getCartas().get(0).esDelTipo(Carta.Tipo.reversa);
+		
+		if(!modoJugarCartaRobada && !repeticionTurno) {
 			avanzarTurno();
 		}
 		
@@ -876,5 +880,14 @@ public class Partida {
 		this.salaID = salaID;
 	}
 	
+	
+	public boolean isRepeticionTurno() {
+		return repeticionTurno;
+	}
+
+	public void setRepeticionTurno(boolean repeticionTurno) {
+		this.repeticionTurno = repeticionTurno;
+	}
+
 	
 }

@@ -305,7 +305,7 @@ public class SocketController {
 			t.schedule(alarm, DELAY_TURNO_IA);
 		}
 		
-		if(turnoAnterior != partida.getTurno()) {
+		if(turnoAnterior != partida.getTurno() || partida.isRepeticionTurno()) {
 			GestorSalas.restartTimer(salaID);
 		}
 		
@@ -362,7 +362,7 @@ public class SocketController {
 			
 		}
 		
-		if(turnoAnterior != partida.getTurno()) {
+		if(turnoAnterior != partida.getTurno() || partida.isRepeticionTurno()) {
 			GestorSalas.restartTimer(salaID);
 		}
 		
@@ -470,6 +470,9 @@ public class SocketController {
 			return Serializar.serializar(new EnvioEmoji(-1, null, false));
 		}
 	}
+	
+	
+	
 	
 	
 	
