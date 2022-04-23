@@ -339,7 +339,13 @@ public class Partida {
 		
 		this.cartasJugadas.add(c); //La añade al final (por implementaciones de rellenar y robar del mazo);
 		if (c.esDelTipo(Carta.Tipo.cambioColor) || c.esDelTipo(Carta.Tipo.mas4)) {
-			this.jugadores.get(turno).getMano().removeIf((carta) -> carta.esDelTipo(c.getTipo()));
+			for(int i = 0; i < this.jugadores.get(turno).getMano().size(); i++) {
+				if (this.jugadores.get(turno).getMano().get(i).esDelTipo(c.getTipo())) {
+					this.jugadores.get(turno).getMano().remove(i);
+					break;
+				}
+			}
+			
 		} else {
 			this.jugadores.get(turno).getMano().remove(c);
 		}
