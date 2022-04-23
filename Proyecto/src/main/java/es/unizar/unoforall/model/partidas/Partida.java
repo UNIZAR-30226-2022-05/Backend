@@ -891,5 +891,7 @@ public class Partida {
 		this.repeticionTurno = repeticionTurno;
 	}
 
-	
+	public int getRoboAcumulado() {
+		return roboAcumulado;
+	}
 }
