@@ -456,6 +456,7 @@ public class Partida {
 	
 	public void ejecutarJugadaJugador(Jugada jugada, UUID jugadorID) {
 		if (validarJugada(jugada) && 
+				this.jugadores.get(turno).getJugadorID() != null &&
 				this.jugadores.get(turno).getJugadorID().equals(jugadorID)) {
 			ejecutarJugada(jugada);
 		}
@@ -585,7 +586,7 @@ public class Partida {
 	public void expulsarJugador(UUID jugadorID) {
 		//se sustituye por IA
 		for (Jugador j : jugadores) {
-			if(j.getJugadorID().equals(jugadorID)) {
+			if(!j.isEsIA() && j.getJugadorID().equals(jugadorID)) {
 				j.setEsIA(true);
 				j.setJugadorID(null);
 				break;
@@ -596,7 +597,8 @@ public class Partida {
 	
 	public void pulsarBotonUNO(UUID jugadorID) { 
 		for (int indice = 0; indice < jugadores.size(); indice++) {
-			if (jugadores.get(indice).getJugadorID().equals(jugadorID)) {
+			if (jugadores.get(indice).getJugadorID() != null && 
+					jugadores.get(indice).getJugadorID().equals(jugadorID)) {
 				pulsarBotonUNOInterno(indice);
 				break;
 			}
