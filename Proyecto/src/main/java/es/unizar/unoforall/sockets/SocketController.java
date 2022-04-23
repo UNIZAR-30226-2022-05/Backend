@@ -225,6 +225,43 @@ public class SocketController {
 	
 	
 	/**
+	 * Método para salirse de una sala en pausa definitivamente (si no, se seguirá
+	 * perteneciendo a la partida pausada)
+	 * @param salaID		En la URL: id de la sala
+	 * @param sesionID		Automático
+	 * @param vacio			Cualquier objeto no nulo
+	 * @return				(Clase Sala) La sala actualizada
+	 * 						Sala con 'noExiste' = true si la sala no existe o 
+	 * 						ha sido eliminada
+	 * @throws Exception
+	 */
+	@MessageMapping("/salas/salirDefinitivo/{salaID}")
+	@SendTo("/topic/salas/{salaID}")
+	public String salirseSalaDefinitivo(@DestinationVariable UUID salaID, 
+							@Header("simpSessionId") String sesionID, 
+							Object vacio) throws Exception {
+		
+		if (GestorSalas.obtenerSala(salaID) == null) {
+			return Serializar.serializar(new Sala("La sala ya no existe"));
+		}
+		if (GestorSesiones.obtenerUsuarioID(sesionID) == null) {
+			return Serializar.serializar(new Sala("La sesión ha caducado. Vuelva a iniciar sesión"));
+		}		
+		
+		Sala s = GestorSalas.obtenerSala(salaID);
+		s.eliminarParticipanteDefinitivamente(GestorSesiones.obtenerUsuarioID(sesionID));
+		
+		if(s.numParticipantes() == 0) {
+			System.out.println("Eliminando sala " + salaID);
+			GestorSalas.eliminarSala(salaID);
+			return Serializar.serializar(new Sala("La sala se ha eliminado"));
+		}
+				
+		return Serializar.serializar(s.getSalaAEnviar());
+	}
+	
+	
+	/**
 	 * (EXCLUSIVO BACKEND) Método para avisar a los participantes de la salida
 	 * por desconexión de alguno de ellos
 	 * @param salaID		En la URL: id de la sala
@@ -261,7 +298,7 @@ public class SocketController {
 	 * @param salaID		En la URL: id de la sala
 	 * @param sesionID		Automático
 	 * @param jugada		Jugada realizada
-	 * @return				(Clase Partida) La partida actualizada tras cada turno
+	 * @return				(Clase Sala) La partida actualizada tras cada turno
 	 * 						Partida con 'error' = true si la sala no existe o 
 	 * 						el usuario no está logueado
 	 * @throws Exception
@@ -273,13 +310,13 @@ public class SocketController {
 							Jugada jugada) throws Exception {		
 		
 		if (GestorSalas.obtenerSala(salaID) == null) {
-			return Serializar.serializar(new Partida("La sala de la partida ya no existe"));
+			return Serializar.serializar(new Sala("La sala de la partida ya no existe"));
 		} else if (!GestorSalas.obtenerSala(salaID).isEnPartida()) {
-			return Serializar.serializar(new Partida("La partida todavía no ha comenzado"));
+			return Serializar.serializar(new Sala("La partida todavía no ha comenzado"));
 		}
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
 		if (usuarioID == null) {
-			return Serializar.serializar(new Partida("La sesión ha caducado. Vuelva a iniciar sesión"));
+			return Serializar.serializar(new Sala("La sesión ha caducado. Vuelva a iniciar sesión"));
 		}
 		
 		System.out.println("- - - " + sesionID + " envia un turno a la sala " + salaID);
@@ -316,7 +353,7 @@ public class SocketController {
 	 * (EXCLUSIVO BACKEND) Método para avisar de un turno generado por la IA
 	 * @param salaID		En la URL: id de la sala
 	 * @param vacio			Cualquier objeto no nulo
-	 * @return				(Clase Partida) La partida actualizada tras cada turno
+	 * @return				(Clase Sala) La partida actualizada tras cada turno
 	 * 						Partida con 'error' = true si la sala no existe
 	 * @throws Exception
 	 */
@@ -326,9 +363,9 @@ public class SocketController {
 							Object vacio) throws Exception {
 		
 		if (GestorSalas.obtenerSala(salaID) == null) {
-			return Serializar.serializar(new Partida("La sala de la partida ya no existe"));
+			return Serializar.serializar(new Sala("La sala de la partida ya no existe"));
 		} else if (!GestorSalas.obtenerSala(salaID).isEnPartida()) {
-			return Serializar.serializar(new Partida("La partida todavía no ha comenzado"));
+			return Serializar.serializar(new Sala("La partida todavía no ha comenzado"));
 		}
 				
 		System.out.println("Una IA envia un turno a la sala " + salaID);
@@ -374,7 +411,7 @@ public class SocketController {
 	 * (EXCLUSIVO BACKEND) Método saltar el turno tras los 30s
 	 * @param salaID		En la URL: id de la sala
 	 * @param vacio			Cualquier objeto no nulo
-	 * @return				(Clase Partida) La partida actualizada tras cada turno
+	 * @return				(Clase Sala) La partida actualizada tras cada turno
 	 * 						Partida con 'error' = true si la sala no existe
 	 * @throws Exception
 	 */
@@ -384,9 +421,9 @@ public class SocketController {
 							Object vacio) throws Exception {
 		
 		if (GestorSalas.obtenerSala(salaID) == null) {
-			return Serializar.serializar(new Partida("La sala de la partida ya no existe"));
+			return Serializar.serializar(new Sala("La sala de la partida ya no existe"));
 		} else if (!GestorSalas.obtenerSala(salaID).isEnPartida()) {
-			return Serializar.serializar(new Partida("La partida todavía no ha comenzado"));
+			return Serializar.serializar(new Sala("La partida todavía no ha comenzado"));
 		}
 		
 		Partida partida = GestorSalas.obtenerSala(salaID).getPartida();
@@ -413,7 +450,7 @@ public class SocketController {
 	 * @param salaID		En la URL: id de la sala
 	 * @param sesionID		Automático
 	 * @param vacio			Cualquier objeto no nulo
-	 * @return				(Clase Partida) La partida actualizada después de que
+	 * @return				(Clase Sala) La partida actualizada después de que
 	 * 						un jugador presione el botón UNO
 	 * 						Partida con 'error' = true si la sala no existe o 
 	 * 						el usuario no está logueado
@@ -426,13 +463,13 @@ public class SocketController {
 							Object vacio) throws Exception {		
 		
 		if (GestorSalas.obtenerSala(salaID) == null) {
-			return Serializar.serializar(new Partida("La sala de la partida ya no existe"));
+			return Serializar.serializar(new Sala("La sala de la partida ya no existe"));
 		} else if (!GestorSalas.obtenerSala(salaID).isEnPartida()) {
-			return Serializar.serializar(new Partida("La partida todavía no ha comenzado"));
+			return Serializar.serializar(new Sala("La partida todavía no ha comenzado"));
 		}
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
 		if (usuarioID == null) {
-			return Serializar.serializar(new Partida("La sesión ha caducado. Vuelva a iniciar sesión"));
+			return Serializar.serializar(new Sala("La sesión ha caducado. Vuelva a iniciar sesión"));
 		}
 		
 		System.out.println("El usuario " + usuarioID + " ha pulsado el botón UNO");
@@ -472,6 +509,39 @@ public class SocketController {
 	}
 	
 	
+	/**
+	 * Método para enviar un emoji en una partida
+	 * @param salaID		En la URL: id de la sala
+	 * @param sesionID		Automático
+	 * @param vacio			Cualquier objeto no nulo
+	 * @param esIA			falso (solo true cuando lo llame el backend)
+	 * @return				(Clase UUID) El id del jugador que ha votado 
+	 * 						abandonar, o "nulo" si ha habido un error (ignorar 
+	 * 						por el resto)
+	 * @throws Exception
+	 * 
+	 * El frontend debe almacenar un hashmap con la decisión de cada jugador, al
+	 * principio todas a false. Cuando uno vota por primera vez, se muestra el 
+	 * estado de la votación, que terminará cuando todos 
+	 */
+	@MessageMapping("/partidas/votaciones/{salaID}")
+	@SendTo("/topic/salas/{salaID}/votacion")
+	public String votacionPartida(@DestinationVariable UUID salaID, 
+							@Header("simpSessionId") String sesionID, 
+							Object vacio) throws Exception {	
+		
+		if (GestorSalas.obtenerSala(salaID) == null) {
+			return "nulo";
+		} else if (!GestorSalas.obtenerSala(salaID).isEnPartida()) {
+			return "nulo";
+		}
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
+		if (usuarioID == null) {
+			return "nulo";
+		}
+		
+		return Serializar.serializar(usuarioID);
+	}
 	
 	
 	

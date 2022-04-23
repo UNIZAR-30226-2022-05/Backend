@@ -458,8 +458,6 @@ public class Partida {
 			}
 		}
 		
-		
-		//eventos asíncronos: emojis, botón de UNO, tiempo, votación pausa
 	}
 	
 	public void ejecutarJugadaJugador(Jugada jugada, UUID jugadorID) {
