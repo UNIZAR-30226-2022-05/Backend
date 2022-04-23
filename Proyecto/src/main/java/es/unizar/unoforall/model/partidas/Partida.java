@@ -274,6 +274,7 @@ public class Partida {
 						siguienteJugador().getMano().add(robarCarta());
 					}
 					esSalto=true;
+					repeticionTurno = true;
 				}
 				break;
 				
@@ -290,6 +291,7 @@ public class Partida {
 						siguienteJugador().getMano().add(robarCarta());
 					}
 					esSalto=true;
+					repeticionTurno = true;
 				}
 				break;
 				
@@ -302,6 +304,7 @@ public class Partida {
 					siguienteJugador().getMano().add(robarCarta());
 				}
 				esSalto=true;
+				repeticionTurno = true;
 				break;
 				
 			case rayosX:
@@ -328,6 +331,7 @@ public class Partida {
 				
 			case salta:
 				esSalto = true;//avanzarTurno();
+				repeticionTurno = true;
 				break;
 				
 			case cambioColor:
