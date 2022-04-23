@@ -290,7 +290,7 @@ public class SocketController {
 		partida.ejecutarJugadaJugador(jugada, usuarioID);
 		
 		if(partida.estaTerminada()) {
-			String error = GestorSalas.insertarPartidaEnBd(partida);
+			String error = GestorSalas.insertarPartidaEnBd(salaID);
 			if (!error.equals("nulo")) {
 				//TODO Tratamiento de error al insertar en base de datos
 			}	
@@ -342,7 +342,7 @@ public class SocketController {
 		}
 		
 		if(partida.estaTerminada()) {
-			String error = GestorSalas.insertarPartidaEnBd(partida);
+			String error = GestorSalas.insertarPartidaEnBd(salaID);
 			if (!error.equals("nulo")) {
 				//TODO Tratamiento de error al insertar en base de datos
 			}	

@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import es.unizar.unoforall.model.UsuarioVO;
 import es.unizar.unoforall.model.partidas.Partida;
+import es.unizar.unoforall.model.partidas.PartidaJugada;
 
 public class Sala {	
 	//Para devolver una sala que no existe
@@ -20,6 +21,7 @@ public class Sala {
 	
 	private boolean enPartida;
 	private Partida partida;
+	private PartidaJugada ultimaPartidaJugada;
 	
 	//Identificador de cada usuario con su VO
 	private HashMap<UUID, UsuarioVO> participantes;
@@ -209,5 +211,13 @@ public class Sala {
 		salaResumida.participantes_listos = participantes_listos;
 		
 		return salaResumida;
+	}
+
+	public PartidaJugada getUltimaPartidaJugada() {
+		return ultimaPartidaJugada;
+	}
+
+	public void setUltimaPartidaJugada(PartidaJugada ultimaPartidaJugada) {
+		this.ultimaPartidaJugada = ultimaPartidaJugada;
 	}
 }

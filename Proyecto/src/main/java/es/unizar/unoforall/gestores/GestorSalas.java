@@ -122,8 +122,10 @@ public class GestorSalas {
 		}
 	}
 	
-	public static String insertarPartidaEnBd(Partida partida) {
+	public static String insertarPartidaEnBd(UUID salaID) {
 		synchronized (LOCK) {
+			Partida partida = obtenerSala(salaID).getPartida();
+			
 			String error = null;
 			PartidasAcabadasVO pa = new PartidasAcabadasVO(null, 
 					partida.getFechaInicio(), 
@@ -163,6 +165,8 @@ public class GestorSalas {
 			//participantes.size()==configuracion.getMaxParticipantes()-numIAs
 			PartidaJugada pj = new PartidaJugada(pa,participantes);
 			error = PartidasDAO.insertarPartidaAcabada(pj);
+			obtenerSala(salaID).setUltimaPartidaJugada(pj);
+			
 			return error;
 		}
 	}
