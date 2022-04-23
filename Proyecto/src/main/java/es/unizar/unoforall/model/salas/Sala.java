@@ -56,6 +56,9 @@ public class Sala {
 				participantes.forEach((k,v) -> jugadoresID.add(k));
 				this.partida = new Partida(jugadoresID, configuracion, salaID);
 			} else {			   // termina una partida
+				for (Map.Entry<UUID, Boolean> entry : participantes_listos.entrySet()) {
+					entry.setValue(false);
+				}
 				this.partida = null;
 			}
 		}

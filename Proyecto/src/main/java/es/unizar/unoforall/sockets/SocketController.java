@@ -292,11 +292,12 @@ public class SocketController {
 		if(partida.estaTerminada()) {
 			String error = GestorSalas.insertarPartidaEnBd(partida);
 			if (!error.equals("nulo")) {
-				GestorSalas.cancelTimer(salaID);
-				Sala sala = GestorSalas.obtenerSala(salaID);
-				sala.setEnPartida(false);
 				//TODO Tratamiento de error al insertar en base de datos
-			}			
+			}	
+			GestorSalas.cancelTimer(salaID);
+			Sala sala = GestorSalas.obtenerSala(salaID);
+			sala.setEnPartida(false);
+			
 		} else if (partida.turnoDeIA()) {
 			System.out.println("- - - Preparando turno de la IA");
 			AlarmaTurnoIA alarm = new AlarmaTurnoIA(salaID);
@@ -343,11 +344,12 @@ public class SocketController {
 		if(partida.estaTerminada()) {
 			String error = GestorSalas.insertarPartidaEnBd(partida);
 			if (!error.equals("nulo")) {
-				GestorSalas.cancelTimer(salaID);
-				Sala sala = GestorSalas.obtenerSala(salaID);
-				sala.setEnPartida(false);
 				//TODO Tratamiento de error al insertar en base de datos
-			}			
+			}	
+			GestorSalas.cancelTimer(salaID);
+			Sala sala = GestorSalas.obtenerSala(salaID);
+			sala.setEnPartida(false);
+			
 		} else if (partida.turnoDeIA()) {
 			System.out.println("- - - Preparando turno de la IA");
 			AlarmaTurnoIA alarm = new AlarmaTurnoIA(salaID);
