@@ -544,7 +544,8 @@ public class Partida {
 					pulsarBotonUNOInterno(turno);		// Se protege
 				}
 				
-				if (jugadaIA.getCartas().get(0).esDelTipo(Carta.Tipo.intercambio)) {
+				if (!jugadaIA.isRobar() && 
+						jugadaIA.getCartas().get(0).esDelTipo(Carta.Tipo.intercambio)) {
 					int mejorJugador = 0;
 					int menorNumCartas = 300;
 						
