@@ -241,29 +241,31 @@ public class UsuarioDAO {
 	 * @param avatar 		(0-2) es el nuevo aspecto del fondo
 	 * @return Un String que contiene el error en caso de error, y "nulo" si hay éxito.
 	 */
-	//public static String cambiarAvatar(UUID idUsuario, int avatar, int aspectoCartas, int aspectoFondo) {
-//		String result = "nulo";
-//		Connection conn = null;
-//		try {
-//			conn = GestorPoolConexionesBD.getConnection();
-//			
-//			PreparedStatement updateUser = 
-//					conn.prepareStatement("UPDATE usuarios SET contrasenna = ? WHERE id = ?;");
-//			updateUser.setString(1, avatar);
-//			updateUser.setObject(2, idUsuario);
-//			
-//			int rows = updateUser.executeUpdate();
-//			if(rows != 1) {
-//				result = "Ha habido un error con la actualización de la cuenta. Cuentas modificadas: " + Integer.toString(rows)+".";
-//			}
-//		}catch(Exception ex) {
-//			ex.printStackTrace();
-//		}finally {
-//			GestorPoolConexionesBD.releaseConnection(conn);
-//		}
-//		
-//		return result;
-	//}
+	public static String cambiarAvatar(UUID idUsuario, int avatar, int aspectoCartas, int aspectoFondo) {
+		String result = "nulo";
+		Connection conn = null;
+		try {
+			conn = GestorPoolConexionesBD.getConnection();
+			
+			PreparedStatement updateUser = 
+					conn.prepareStatement("UPDATE usuarios SET avatar = ?, aspectoCartas = ?, aspectoTablero = ? WHERE id = ?;");
+			updateUser.setInt(1, avatar);
+			updateUser.setInt(2, aspectoCartas);
+			updateUser.setInt(3, aspectoFondo);
+			updateUser.setObject(4, idUsuario);
+			
+			int rows = updateUser.executeUpdate();
+			if(rows != 1) {
+				result = "Ha habido un error con la actualización de la cuenta. Cuentas modificadas: " + Integer.toString(rows)+".";
+			}
+		}catch(Exception ex) {
+			ex.printStackTrace();
+		}finally {
+			GestorPoolConexionesBD.releaseConnection(conn);
+		}
+		
+		return result;
+	}
 	
 	
 	

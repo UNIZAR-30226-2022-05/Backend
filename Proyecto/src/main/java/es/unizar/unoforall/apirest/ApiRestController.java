@@ -321,7 +321,7 @@ public class ApiRestController {
 	
 	/**
 	 * Función a la que llamar para confirmar el código y aplicar el cambio. 
-	 * @param idSesion	id de la sesión del usuario.
+	 * @param sesionID	id de la sesión del usuario.
 	 * @param codigo	código enviado al correo pasado por parámetro.
 	 * @return			"nulo" si no ha habido ningún error.
 	 * 					En caso de que no haya una sesión asignada a al id dado, devuelve "SESION_EXPIRADA". 		   				
@@ -363,20 +363,26 @@ public class ApiRestController {
 	
 	
 	/**
-	 * Función a la que llamar para cambiar el avatar
-	 * @param correo 	contiene el nuevo correo que se había planteado para la actualización.
+	 * Función a la que llamar para cambiar la personalización del usuario
+	 * @param sesionID	id de la sesión del usuario.
+	 * @param avatar 		(0-6) es el nuevo avatar
+	 * @param aspectoCartas (0-1) es el nuevo aspecto de las cartas
+	 * @param avatar 		(0-2) es el nuevo aspecto del fondo
 	 * @return 			"nulo" en caso de que se haya podido cancelar la petición de registro.
 	 * 		   			"SESION_EXPIRADA" en caso de que la sesión del usuario haya caducado.
 	 * 					un String especificando el error que haya sucedido.
 	 */
 	@PostMapping("/cambiarAvatar")
-	public String cambiarAvatar(@RequestParam String sesionID){
+	public String cambiarPersonalizacion(@RequestParam String sesionID,
+											@RequestParam Integer avatar,
+											@RequestParam Integer aspectoCartas,
+											@RequestParam Integer aspectoFondo){
 		
 		
 		String error = "nulo";
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
 		if(usuarioID != null) {
-			error = GestorActualizaCuentas.cancelarActualizacion(usuarioID);
+			error = UsuarioDAO.cambiarAvatar(usuarioID, avatar, aspectoCartas, aspectoFondo);
 		} else {
 			error = "SESION_EXPIRADA";
 		}
