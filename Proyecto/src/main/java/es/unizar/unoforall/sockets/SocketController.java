@@ -442,8 +442,9 @@ public class SocketController {
 			} else {
 				t.schedule(alarm, DELAY_TURNO_IA);
 			}
-			
 		}
+		
+		GestorSalas.restartTimer(salaID);
 		
 		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
 	}

@@ -869,6 +869,8 @@ public class Partida {
 		partidaResumida.modoJugarCartaRobada = modoJugarCartaRobada;
 		partidaResumida.cartaRobada = cartaRobada;
 		
+		partidaResumida.repeticionTurno = repeticionTurno;
+		
 		partidaResumida.salaID = null;
 		
 		return partidaResumida;
