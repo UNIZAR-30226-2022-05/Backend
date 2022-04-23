@@ -274,7 +274,6 @@ public class Partida {
 						siguienteJugador().getMano().add(robarCarta());
 					}
 					esSalto=true;
-					repeticionTurno = true;
 				}
 				break;
 				
@@ -291,7 +290,6 @@ public class Partida {
 						siguienteJugador().getMano().add(robarCarta());
 					}
 					esSalto=true;
-					repeticionTurno = true;
 				}
 				break;
 				
@@ -304,7 +302,6 @@ public class Partida {
 					siguienteJugador().getMano().add(robarCarta());
 				}
 				esSalto=true;
-				repeticionTurno = true;
 				break;
 				
 			case rayosX:
@@ -331,7 +328,6 @@ public class Partida {
 				
 			case salta:
 				esSalto = true;//avanzarTurno();
-				repeticionTurno = true;
 				break;
 				
 			case cambioColor:
@@ -369,6 +365,7 @@ public class Partida {
 		}
 		if (esSalto) {
 			avanzarTurno();
+			repeticionTurno = true;
 		}
 	}
 	
@@ -445,9 +442,12 @@ public class Partida {
 		}
 		
 		//repite turno por ser dos jugadores
-		repeticionTurno = getJugadores().size() == 2 && !jugada.isRobar() && jugada.getCartas().get(0).esDelTipo(Carta.Tipo.reversa);
+		boolean reversaRepiteTurno = repeticionTurno = getJugadores().size() == 2 && !jugada.isRobar() && jugada.getCartas().get(0).esDelTipo(Carta.Tipo.reversa);
+		if (reversaRepiteTurno) {
+			repeticionTurno = true;
+		}
 		
-		if(!modoJugarCartaRobada && !repeticionTurno) {
+		if(!modoJugarCartaRobada && !reversaRepiteTurno) {
 			avanzarTurno();
 		}
 		
