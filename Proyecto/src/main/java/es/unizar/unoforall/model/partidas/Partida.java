@@ -11,7 +11,7 @@ import java.util.UUID;
 import es.unizar.unoforall.model.salas.ConfigSala;
 
 public class Partida {
-	public final static int TIMEOUT_TURNO = 15*1000;  // 30 segundos
+	public final static int TIMEOUT_TURNO = 30*1000;  // 30 segundos
 	
 	private boolean hayError = false;
 	private String error = "";
@@ -80,23 +80,41 @@ public class Partida {
 		
 		//Mazo
 		this.mazo = new LinkedList<>();
-		for(Carta.Color color : Carta.Color.values()) {
-			if (color != Carta.Color.comodin) {
-				for(Carta.Tipo tipo : Carta.Tipo.values()) {
-					if (tipo.equals(Carta.Tipo.n0)) {
-						this.mazo.add(new Carta(tipo,color));
-					} else if (compruebaIncluirMazo(tipo)) {	//dos veces
-						this.mazo.add(new Carta(tipo,color));
-						this.mazo.add(new Carta(tipo,color));
-					}
-				}
-			} else {
-				for(int i = 0; i < 4; i++) {
-					this.mazo.add(new Carta(Carta.Tipo.cambioColor,Carta.Color.comodin));
-					this.mazo.add(new Carta(Carta.Tipo.mas4,Carta.Color.comodin));
-				}
+		
+//		for(Carta.Color color : Carta.Color.values()) {
+//			if (color != Carta.Color.comodin) {
+//				for(Carta.Tipo tipo : Carta.Tipo.values()) {
+//					if (tipo.equals(Carta.Tipo.n0)) {
+//						this.mazo.add(new Carta(tipo,color));
+//					} else if (compruebaIncluirMazo(tipo)) {	//dos veces
+//						this.mazo.add(new Carta(tipo,color));
+//						this.mazo.add(new Carta(tipo,color));
+//					}
+//				}
+//			} else {
+//				for(int i = 0; i < 4; i++) {
+//					this.mazo.add(new Carta(Carta.Tipo.cambioColor,Carta.Color.comodin));
+//					this.mazo.add(new Carta(Carta.Tipo.mas4,Carta.Color.comodin));
+//				}
+//			}
+//		}
+		
+		List<Carta> listaCartasBaraja = new ArrayList<>();
+		listaCartasBaraja.add(new Carta(Carta.Tipo.cambioColor, Carta.Color.comodin));
+		listaCartasBaraja.add(new Carta(Carta.Tipo.mas4, Carta.Color.comodin));
+		listaCartasBaraja.add(new Carta(Carta.Tipo.n1, Carta.Color.rojo));
+		listaCartasBaraja.add(new Carta(Carta.Tipo.n2, Carta.Color.rojo));
+		listaCartasBaraja.add(new Carta(Carta.Tipo.n3, Carta.Color.rojo));
+		listaCartasBaraja.add(new Carta(Carta.Tipo.mas2, Carta.Color.rojo));
+		listaCartasBaraja.add(new Carta(Carta.Tipo.reversa, Carta.Color.rojo));
+		
+		for (Carta c : listaCartasBaraja) {
+			for(int i = 0; i < 20; i++) {
+				this.mazo.add(c.clone());
 			}
 		}
+		
+		
 		Collections.shuffle(this.mazo); 
 		
 		
@@ -418,11 +436,11 @@ public class Partida {
 		} else if(jugada.isRobar()) {
 			if(modoAcumulandoRobo) {
 				modoAcumulandoRobo=false;
-				int maxRobo = roboAcumulado;
-				if (this.jugadores.get(turno).getMano().size() + roboAcumulado > 20) {
-					maxRobo = 20;
+				int robo = roboAcumulado;
+				if (this.jugadores.get(turno).getMano().size() + robo > 20) {
+					robo = 20 - this.jugadores.get(turno).getMano().size();
 				}
-				for(int i = 0; i<maxRobo; i++) {
+				for(int i = 0; i<robo; i++) {
 					this.jugadores.get(turno).getMano().add(robarCarta());
 				}
 				roboAcumulado=0;
@@ -571,7 +589,7 @@ public class Partida {
 				}
 			}
 			
-			System.err.println("Jugada elegida por la IA: " + jugadaIA);
+			System.out.println("* * * Jugada elegida por la IA: " + jugadaIA);
 			ejecutarJugada(jugadaIA);
 			
 			
@@ -579,6 +597,7 @@ public class Partida {
 			for (Jugador j : this.jugadores) {
 				if(!j.isProtegido_UNO() && j.getMano().size()==1) { //Pillado
 					pulsarBotonUNOInterno(turno);		// Se protege
+					System.out.println("* * * La IA pulsa el botón de 1");
 				}	
 			}
 		}
@@ -625,7 +644,6 @@ public class Partida {
 		synchronized (LOCK) {
 			Jugador j = jugadores.get(jugador);
 			if ((jugador == turno 
-				 && j.getMano().size()==2 
 				 && compruebaPuedeJugar(jugador))
 					|| j.getMano().size()==1) { 
 				//Si es su turno y puede jugar la penultima carta, o solo tiene una, se protege

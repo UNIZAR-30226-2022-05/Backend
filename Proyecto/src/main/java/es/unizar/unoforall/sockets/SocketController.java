@@ -370,7 +370,6 @@ public class SocketController {
 			return Serializar.serializar(new Sala("La partida todavía no ha comenzado"));
 		}
 				
-		System.out.println("Una IA envia un turno a la sala " + salaID);
 		Partida partida = GestorSalas.obtenerSala(salaID).getPartida();
 		int turnoAnterior = partida.getTurno();
 		partida.ejecutarJugadaIA();
@@ -392,7 +391,6 @@ public class SocketController {
 		} else {
 			
 			if (partida.turnoDeIA()) {
-				System.out.println("- - - Preparando turno de la IA");
 				AlarmaTurnoIA alarm = new AlarmaTurnoIA(salaID);
 				Timer t = new Timer();
 				if (partida.isModoJugarCartaRobada()) {
