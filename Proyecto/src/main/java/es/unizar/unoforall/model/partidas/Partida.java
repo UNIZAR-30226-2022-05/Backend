@@ -448,7 +448,10 @@ public class Partida {
 		}
 		
 		//repite turno por ser dos jugadores
-		boolean reversaRepiteTurno = getJugadores().size() == 2 && !jugada.isRobar() && jugada.getCartas().get(0).esDelTipo(Carta.Tipo.reversa);
+		boolean reversaRepiteTurno = getJugadores().size() == 2 
+									&& !jugada.isRobar() 
+									&& !modoAcumulandoRobo
+									&& jugada.getCartas().get(0).esDelTipo(Carta.Tipo.reversa);
 		if (reversaRepiteTurno) {
 			repeticionTurno = true;
 		}
@@ -459,6 +462,7 @@ public class Partida {
 		
 		// Se comprueba si se ha acabado la partida
 		for (Jugador j : this.jugadores) {
+			j.setPenalizado_UNO(false);
 			if (j.getMano().size() == 0) {
 				this.terminada = true;
 			}
@@ -632,6 +636,7 @@ public class Partida {
 				if(!j2.isProtegido_UNO() && j2.getMano().size()==1) { //Pillado, roba dos cartas.
 					j2.getMano().add(robarCarta());
 					j2.getMano().add(robarCarta());
+					j2.setPenalizado_UNO(true);
 				}	
 			}
 		}
