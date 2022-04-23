@@ -197,10 +197,10 @@ public class Partida {
 	}
 	
 	private boolean compatibleAcumulador(Carta c) {
-		if ((configuracion.getReglas().isEncadenarRoboCartas() 
+		if ( (configuracion.getReglas().isEncadenarRoboCartas() 
 				&& (c.esDelTipo(Carta.Tipo.mas4) || c.esDelTipo(Carta.Tipo.mas2))) 
 			|| 
-			(configuracion.getReglas().isRedirigirRoboCartas() && c.esDelTipo(Carta.Tipo.reversa)) ) {
+			 (configuracion.getReglas().isRedirigirRoboCartas() && c.esDelTipo(Carta.Tipo.reversa)) ) {
 			return true;
 		} else {
 			return false;
@@ -497,9 +497,9 @@ public class Partida {
 				if (modoAcumulandoRobo) {
 					for (Carta c : this.jugadores.get(turno).getMano()) {
 						if(compatibleAcumulador(c) && 
-								(Carta.compartenTipo(c, cartaCentral)) 	//Si la carta es usable según las reglas
+								((Carta.compartenTipo(c, cartaCentral)) 	//Si la carta es usable según las reglas
 										|| Carta.compartenColor(getUltimaCartaJugada(),c)  
-										|| c.esDelTipo(Carta.Tipo.mas4)) {
+										|| c.esDelTipo(Carta.Tipo.mas4))) {
 							
 							List<Carta> listaCartas = new ArrayList<>();
 							listaCartas.add(c);
@@ -537,7 +537,6 @@ public class Partida {
 				
 				if (!validarJugada(jugadaIA)) {
 					System.err.println("ERROR: la IA ha elegido una jugada no válida");
-					return;
 				}
 				
 				if (!jugadaIA.isRobar() && 

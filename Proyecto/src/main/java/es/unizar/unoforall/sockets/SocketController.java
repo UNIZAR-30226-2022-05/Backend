@@ -335,15 +335,17 @@ public class SocketController {
 			Sala sala = GestorSalas.obtenerSala(salaID);
 			sala.setEnPartida(false);
 			
-		} else if (partida.turnoDeIA()) {
-			System.out.println("- - - Preparando turno de la IA");
-			AlarmaTurnoIA alarm = new AlarmaTurnoIA(salaID);
-			Timer t = new Timer();
-			t.schedule(alarm, DELAY_TURNO_IA);
-		}
-		
-		if(turnoAnterior != partida.getTurno() || partida.isRepeticionTurno()) {
-			GestorSalas.restartTimer(salaID);
+		} else {
+			if (partida.turnoDeIA()) {
+				System.out.println("- - - Preparando turno de la IA");
+				AlarmaTurnoIA alarm = new AlarmaTurnoIA(salaID);
+				Timer t = new Timer();
+				t.schedule(alarm, DELAY_TURNO_IA);
+			}
+			
+			if(turnoAnterior != partida.getTurno() || partida.isRepeticionTurno()) {
+				GestorSalas.restartTimer(salaID);
+			}
 		}
 		
 		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
@@ -387,20 +389,22 @@ public class SocketController {
 			Sala sala = GestorSalas.obtenerSala(salaID);
 			sala.setEnPartida(false);
 			
-		} else if (partida.turnoDeIA()) {
-			System.out.println("- - - Preparando turno de la IA");
-			AlarmaTurnoIA alarm = new AlarmaTurnoIA(salaID);
-			Timer t = new Timer();
-			if (partida.isModoJugarCartaRobada()) {
-				t.schedule(alarm, DELAY_TURNO_IA_CORTO);
-			} else {
-				t.schedule(alarm, DELAY_TURNO_IA);
+		} else {
+			
+			if (partida.turnoDeIA()) {
+				System.out.println("- - - Preparando turno de la IA");
+				AlarmaTurnoIA alarm = new AlarmaTurnoIA(salaID);
+				Timer t = new Timer();
+				if (partida.isModoJugarCartaRobada()) {
+					t.schedule(alarm, DELAY_TURNO_IA_CORTO);
+				} else {
+					t.schedule(alarm, DELAY_TURNO_IA);
+				}
 			}
 			
-		}
-		
-		if(turnoAnterior != partida.getTurno() || partida.isRepeticionTurno()) {
-			GestorSalas.restartTimer(salaID);
+			if(turnoAnterior != partida.getTurno() || partida.isRepeticionTurno()) {
+				GestorSalas.restartTimer(salaID);
+			}
 		}
 		
 		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());

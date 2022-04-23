@@ -76,7 +76,6 @@ public class Sala {
 				for (Map.Entry<UUID, Boolean> entry : participantes_listos.entrySet()) {
 					entry.setValue(false);
 				}
-				this.partida = null;
 			}
 		}
 		
