@@ -542,8 +542,8 @@ public class SocketController {
 		if (usuarioID == null) {
 			return "nulo";
 		}
-		
-		return Serializar.serializar(usuarioID);
+	
+		return Serializar.serializar(GestorSalas.obtenerSala(salaID).setParticipantesVotoAbandono(usuarioID));
 	}
 	
 	

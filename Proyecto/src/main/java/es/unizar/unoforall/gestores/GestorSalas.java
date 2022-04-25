@@ -122,6 +122,17 @@ public class GestorSalas {
 		}
 	}
 	
+	public static Sala getSalaPausada(UUID usuarioID) {
+		for(Map.Entry<UUID, Sala> entry : salas.entrySet()) {
+			Sala sala = entry.getValue();
+		    
+			if (sala.getParticipantesVotoAbandono().containsKey(usuarioID)) {
+				return sala;
+			}
+		}
+		return null;
+	}
+	
 	public static String insertarPartidaEnBd(UUID salaID) {
 		synchronized (LOCK) {
 			Partida partida = obtenerSala(salaID).getPartida();

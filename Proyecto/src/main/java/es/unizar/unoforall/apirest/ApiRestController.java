@@ -617,8 +617,28 @@ public class ApiRestController {
     }
 	
 	
+	/**
+	 * Método para buscar salas públicas con una determinada configuración
+	 * @param sesionID			Id de seisón del usuario
+	 *
+	 * @return					(Sala) Sala pausada si la hay para el usuario de sesionID, o null 
+	 * 							si no la hay
+	 */
+	@PostMapping("/comprobarPartidaPausada")
+	public String comprobarPartidaPausada(@RequestParam String sesionID){		
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
+		if(usuarioID != null) {
+			Sala salaPausada = GestorSalas.getSalaPausada(usuarioID);
+			if (salaPausada != null) {
+				return Serializar.serializar(salaPausada); 
+			} else {
+				return Serializar.serializar(new Sala("No hay ninguna sala pausada"));
+			}
 
-	
+		} else {
+			return Serializar.serializar(new Sala("No hay ninguna sala pausada"));
+		}
+    }
 	
 	
 	/**

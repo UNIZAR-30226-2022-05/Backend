@@ -81,39 +81,39 @@ public class Partida {
 		//Mazo
 		this.mazo = new LinkedList<>();
 		
-//		for(Carta.Color color : Carta.Color.values()) {
-//			if (color != Carta.Color.comodin) {
-//				for(Carta.Tipo tipo : Carta.Tipo.values()) {
-//					if (tipo.equals(Carta.Tipo.n0)) {
-//						this.mazo.add(new Carta(tipo,color));
-//					} else if (compruebaIncluirMazo(tipo)) {	//dos veces
-//						this.mazo.add(new Carta(tipo,color));
-//						this.mazo.add(new Carta(tipo,color));
-//					}
-//				}
-//			} else {
-//				for(int i = 0; i < 4; i++) {
-//					this.mazo.add(new Carta(Carta.Tipo.cambioColor,Carta.Color.comodin));
-//					this.mazo.add(new Carta(Carta.Tipo.mas4,Carta.Color.comodin));
-//				}
-//			}
-//		}
-		
-		List<Carta> listaCartasBaraja = new ArrayList<>();
-		listaCartasBaraja.add(new Carta(Carta.Tipo.cambioColor, Carta.Color.comodin));
-		listaCartasBaraja.add(new Carta(Carta.Tipo.mas4, Carta.Color.comodin));
-		listaCartasBaraja.add(new Carta(Carta.Tipo.n1, Carta.Color.rojo));
-		listaCartasBaraja.add(new Carta(Carta.Tipo.n2, Carta.Color.rojo));
-		listaCartasBaraja.add(new Carta(Carta.Tipo.n3, Carta.Color.rojo));
-		listaCartasBaraja.add(new Carta(Carta.Tipo.mas2, Carta.Color.rojo));
-		listaCartasBaraja.add(new Carta(Carta.Tipo.reversa, Carta.Color.rojo));
-		
-		for (Carta c : listaCartasBaraja) {
-			for(int i = 0; i < 20; i++) {
-				this.mazo.add(c.clone());
+		for(Carta.Color color : Carta.Color.values()) {
+			if (color != Carta.Color.comodin) {
+				for(Carta.Tipo tipo : Carta.Tipo.values()) {
+					if (tipo.equals(Carta.Tipo.n0)) {
+						this.mazo.add(new Carta(tipo,color));
+					} else if (compruebaIncluirMazo(tipo)) {	//dos veces
+						this.mazo.add(new Carta(tipo,color));
+						this.mazo.add(new Carta(tipo,color));
+					}
+				}
+			} else {
+				for(int i = 0; i < 4; i++) {
+					this.mazo.add(new Carta(Carta.Tipo.cambioColor,Carta.Color.comodin));
+					this.mazo.add(new Carta(Carta.Tipo.mas4,Carta.Color.comodin));
+				}
 			}
 		}
 		
+//		List<Carta> listaCartasBaraja = new ArrayList<>();
+//		listaCartasBaraja.add(new Carta(Carta.Tipo.cambioColor, Carta.Color.comodin));
+//		listaCartasBaraja.add(new Carta(Carta.Tipo.mas4, Carta.Color.comodin));
+//		listaCartasBaraja.add(new Carta(Carta.Tipo.n1, Carta.Color.rojo));
+//		listaCartasBaraja.add(new Carta(Carta.Tipo.n2, Carta.Color.rojo));
+//		listaCartasBaraja.add(new Carta(Carta.Tipo.n3, Carta.Color.rojo));
+//		listaCartasBaraja.add(new Carta(Carta.Tipo.mas2, Carta.Color.rojo));
+//		listaCartasBaraja.add(new Carta(Carta.Tipo.reversa, Carta.Color.rojo));
+//		
+//		for (Carta c : listaCartasBaraja) {
+//			for(int i = 0; i < 20; i++) {
+//				this.mazo.add(c.clone());
+//			}
+//		}
+//		
 		
 		Collections.shuffle(this.mazo); 
 		
