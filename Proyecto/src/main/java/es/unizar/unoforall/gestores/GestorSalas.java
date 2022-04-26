@@ -10,8 +10,10 @@ import java.util.UUID;
 import es.unizar.unoforall.db.PartidasDAO;
 import es.unizar.unoforall.db.UsuarioDAO;
 import es.unizar.unoforall.model.PartidasAcabadasVO;
+import es.unizar.unoforall.model.UsuarioVO;
 import es.unizar.unoforall.model.partidas.HaJugadoVO;
 import es.unizar.unoforall.model.partidas.Jugador;
+import es.unizar.unoforall.model.partidas.Participante;
 import es.unizar.unoforall.model.partidas.Partida;
 import es.unizar.unoforall.model.partidas.PartidaJugada;
 import es.unizar.unoforall.model.salas.ConfigSala;
@@ -145,10 +147,32 @@ public class GestorSalas {
 					partida.getConfiguracion().getModoJuego().ordinal());
 			
 			ArrayList<HaJugadoVO> participantes = new ArrayList<HaJugadoVO>(); 
+			boolean parejas = partida.getConfiguracion().getModoJuego().equals(ConfigSala.ModoJuego.Parejas);
 			
+			//if(!parejas) { //Versión para calcular puntos por parejas descartada por ser demasiado farragosa.
+				
 			ArrayList<Integer> puntos = new ArrayList<Integer>();
 			for (Jugador j : partida.getJugadores()) {
 				puntos.add(j.sacarPuntos()); //puntos.size()==configuracion.getMaxParticipantes()
+			}
+			if(parejas) { //Hace que las parejas tengan la misma puntuación
+				for (int i = 0; i < 4; i++) {
+					if(puntos.get(i)==0) {
+						puntos = new ArrayList<Integer>();
+						if (i==0 || i==2) {
+							puntos.add(0);
+							puntos.add(1);
+							puntos.add(0);
+							puntos.add(1);
+						} else {
+							puntos.add(1);
+							puntos.add(0);
+							puntos.add(1);
+							puntos.add(0);
+						}
+						break;
+					}
+				}
 			}
 			int i = 0; //indice del jugador que estamos comprobando
 			for (Jugador j : partida.getJugadores()) {
@@ -157,7 +181,11 @@ public class GestorSalas {
 					boolean haGanado = false;
 					if (puntos.get(i)==0) {
 						haGanado = true;
-						usuariosDebajo = partida.getConfiguracion().getMaxParticipantes()-1;
+						if (parejas) {
+							usuariosDebajo = 2;
+						} else {
+							usuariosDebajo = partida.getConfiguracion().getMaxParticipantes()-1;
+						}
 					} else {
 						for(Integer p : puntos) {
 							if(p>puntos.get(i)) { //En caso de usuarios empatados ninguno está por debajo de otro.
@@ -173,8 +201,101 @@ public class GestorSalas {
 				}
 				i++;
 			}
+			/*} else { //Versión para calcular puntos por parejas descartada por ser demasiado farragosa.
+				int i = 0; //indice del jugador que estamos comprobando
+				for (Jugador j : partida.getJugadores()) {
+					if (j.getMano().size()==0) { //Si es el ganador realizar la operación
+						boolean haGanado = true;
+						int usuariosDebajo = 2; // La pareja perdedora
+						participantes.add(new HaJugadoVO(j.getJugadorID(),pa.getId(),usuariosDebajo,haGanado));
+						switch(i) {
+							case 0: //Pareja 2
+								if (!partida.getJugadores().get(1).isEsIA()) {
+									participantes.add(new HaJugadoVO(partida.getJugadores().get(2).getJugadorID(),pa.getId(),
+																														0,false));
+								}
+								if (!partida.getJugadores().get(2).isEsIA()) {
+									participantes.add(new HaJugadoVO(partida.getJugadores().get(2).getJugadorID(),pa.getId(),
+																										usuariosDebajo,haGanado));
+									error = actualizarPuntosJugador(usuariosDebajo,j.getJugadorID());
+									if (!error.equals("nulo")) {
+										return error;
+									}
+								}
+								if (!partida.getJugadores().get(3).isEsIA()) {
+									participantes.add(new HaJugadoVO(partida.getJugadores().get(2).getJugadorID(),pa.getId(),
+																														0,false));
+								}
+							case 1: //Pareja 3
+								if (!partida.getJugadores().get(0).isEsIA()) {
+									participantes.add(new HaJugadoVO(partida.getJugadores().get(2).getJugadorID(),pa.getId(),
+																														0,false));
+								}
+								if (!partida.getJugadores().get(2).isEsIA()) {
+									participantes.add(new HaJugadoVO(partida.getJugadores().get(2).getJugadorID(),pa.getId(),
+																														0,false));
+								}
+								if (!partida.getJugadores().get(3).isEsIA()) {
+									participantes.add(new HaJugadoVO(partida.getJugadores().get(2).getJugadorID(),pa.getId(),
+																										usuariosDebajo,haGanado));
+									error = actualizarPuntosJugador(usuariosDebajo,j.getJugadorID());
+									if (!error.equals("nulo")) {
+										return error;
+									}
+								}
+							case 2: //Pareja 0
+								if (!partida.getJugadores().get(0).isEsIA()) {
+									participantes.add(new HaJugadoVO(partida.getJugadores().get(2).getJugadorID(),pa.getId(),
+																										usuariosDebajo,haGanado));
+									error = actualizarPuntosJugador(usuariosDebajo,j.getJugadorID());
+									if (!error.equals("nulo")) {
+										return error;
+									}
+								}
+								if (!partida.getJugadores().get(1).isEsIA()) {
+									participantes.add(new HaJugadoVO(partida.getJugadores().get(2).getJugadorID(),pa.getId(),
+																														0,false));
+								}
+								if (!partida.getJugadores().get(3).isEsIA()) {
+									participantes.add(new HaJugadoVO(partida.getJugadores().get(2).getJugadorID(),pa.getId(),
+																														0,false));
+								}
+							case 3: //Pareja 1
+								if (!partida.getJugadores().get(0).isEsIA()) {
+									participantes.add(new HaJugadoVO(partida.getJugadores().get(2).getJugadorID(),pa.getId(),
+																														0,false));
+								}
+								if (!partida.getJugadores().get(2).isEsIA()) {
+									participantes.add(new HaJugadoVO(partida.getJugadores().get(2).getJugadorID(),pa.getId(),
+																														0,false));
+								}
+								if (!partida.getJugadores().get(3).isEsIA()) {
+									participantes.add(new HaJugadoVO(partida.getJugadores().get(2).getJugadorID(),pa.getId(),
+																										usuariosDebajo,haGanado));
+									error = actualizarPuntosJugador(usuariosDebajo,j.getJugadorID());
+									if (!error.equals("nulo")) {
+										return error;
+									}
+								}
+						}
+						if (!j.isEsIA()) {
+							error = actualizarPuntosJugador(usuariosDebajo,j.getJugadorID());
+							if (!error.equals("nulo")) {
+								return error;
+							}
+						}
+						break; //Ya se han añadido los participantes y se han actualizado los puntos.
+					}	
+					i++;
+				}
+			}*/
 			//participantes.size()==configuracion.getMaxParticipantes()-numIAs
-			PartidaJugada pj = new PartidaJugada(pa,participantes);
+			ArrayList<Participante> listaParticipantes = new ArrayList<Participante>();
+			for(HaJugadoVO part : participantes) {
+				UsuarioVO usuario = UsuarioDAO.getUsuario(part.getUsuario());
+				listaParticipantes.add(new Participante(usuario,part));
+			}
+			PartidaJugada pj = new PartidaJugada(pa,listaParticipantes);
 			error = PartidasDAO.insertarPartidaAcabada(pj);
 			obtenerSala(salaID).setUltimaPartidaJugada(pj);
 			

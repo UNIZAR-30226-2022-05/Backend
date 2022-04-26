@@ -7,8 +7,10 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import es.unizar.unoforall.model.PartidasAcabadasVO;
+import es.unizar.unoforall.model.UsuarioVO;
 import es.unizar.unoforall.model.partidas.HaJugadoVO;
 import es.unizar.unoforall.model.partidas.ListaPartidas;
+import es.unizar.unoforall.model.partidas.Participante;
 import es.unizar.unoforall.model.partidas.PartidaJugada;
 
 public class PartidasDAO {
@@ -38,11 +40,12 @@ public class PartidasDAO {
 						conn.prepareStatement("SELECT * FROM ha_jugado WHERE partida = ?;");
 				sacarParticipantes.setObject(1,(UUID) rs.getObject("partida"));
 				ResultSet rs2 = sacarParticipantes.executeQuery();
-				ArrayList<HaJugadoVO> listaParticipantes = new ArrayList<HaJugadoVO>();
+				ArrayList<Participante> listaParticipantes = new ArrayList<Participante>();
 				while(rs2.next()) {
-					listaParticipantes.add(new HaJugadoVO((UUID)rs2.getObject("usuario"),
-								(UUID)rs2.getObject("partida"),rs2.getInt("usrs_debajo"),
-															rs2.getBoolean("ha_ganado")));
+					UsuarioVO usuario = UsuarioDAO.getUsuario((UUID)rs2.getObject("usuario"));
+					listaParticipantes.add(new Participante(usuario, new HaJugadoVO(
+									(UUID)rs2.getObject("usuario"), (UUID)rs2.getObject("partida"),
+									rs2.getInt("usrs_debajo"), rs2.getBoolean("ha_ganado"))));
 				}
 				//Saca los datos de la partida
 				PreparedStatement sacarPartida = 
@@ -90,13 +93,13 @@ public class PartidasDAO {
 			int rows = insertarPartida.executeUpdate();
 			if(rows==1) {
 				int numInsertados=0;
-				for(HaJugadoVO j : partida.getParticipantes()) {
+				for(Participante j : partida.getParticipantes()) {
 					PreparedStatement insertarParticipante = 
 							conn.prepareStatement("Insert Into ha_jugado Values(?,?,?,?);");
-					insertarParticipante.setObject(1, j.getUsuario());
-					insertarParticipante.setObject(2, j.getPartida());
-					insertarParticipante.setInt(3, j.getUsrsDebajo());
-					insertarParticipante.setBoolean(4, j.isHaGanado());
+					insertarParticipante.setObject(1, j.getDatosPartida().getUsuario());
+					insertarParticipante.setObject(2, j.getDatosPartida().getPartida());
+					insertarParticipante.setInt(3, j.getDatosPartida().getUsrsDebajo());
+					insertarParticipante.setBoolean(4, j.getDatosPartida().isHaGanado());
 					rows = insertarParticipante.executeUpdate();
 					if(rows!=1) {
 						error = "Ha habido un problema al insertar el jugado de UUID <"+j.getUsuario()+

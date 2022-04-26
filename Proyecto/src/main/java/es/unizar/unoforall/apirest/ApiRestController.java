@@ -662,15 +662,16 @@ public class ApiRestController {
 		String error = null;
 		PartidasAcabadasVO pa = new PartidasAcabadasVO(null,new Date(System.currentTimeMillis()),new Date(System.currentTimeMillis()+1000000),1,0);
 		ArrayList<HaJugadoVO> participantes = new ArrayList<HaJugadoVO>(); 
-		participantes.add(new HaJugadoVO(UUID.fromString("4c2a49ed-48be-4970-9010-edb1faf918f2"),pa.getId(),0,false));
-		participantes.add(new HaJugadoVO(UUID.fromString("4c2a49ed-48be-4970-9010-edb1faf918f1"),pa.getId(),3,true));
-		participantes.add(new HaJugadoVO(UUID.fromString("4c2a49ed-48be-4970-9010-edb1faf918f4"),pa.getId(),1,false));
+		/*Obsoleto debido a nueva versión de la clase "HaJugadoVO*/
+		//participantes.add(new HaJugadoVO(UUID.fromString("4c2a49ed-48be-4970-9010-edb1faf918f2"),pa.getId(),0,false));
+		//participantes.add(new HaJugadoVO(UUID.fromString("4c2a49ed-48be-4970-9010-edb1faf918f1"),pa.getId(),3,true));
+		//participantes.add(new HaJugadoVO(UUID.fromString("4c2a49ed-48be-4970-9010-edb1faf918f4"),pa.getId(),1,false));
 		
 		
 		//participantes.size()==configuracion.getMaxParticipantes()-numIAs
-		PartidaJugada pj = new PartidaJugada(pa,participantes);
+		//PartidaJugada pj = new PartidaJugada(pa,participantes);
 		System.out.println("Id Partida: "+pa.getId());
-		error = PartidasDAO.insertarPartidaAcabada(pj);
+		//error = PartidasDAO.insertarPartidaAcabada(pj);
 		
 		return Serializar.serializar(error);
 	}
