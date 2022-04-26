@@ -50,6 +50,7 @@ public class GestorRegistros {
 					+ "registrarse (podrá usar el mismo correo)");
 				
 				if (!exitoMail)	{
+					System.err.println("Error al enviar el mail");
 					error = "Fallo en el servidor: no se pudo enviar el correo";
 				} else {
 					AlarmaRegistro alarm = new AlarmaRegistro(user.getCorreo());

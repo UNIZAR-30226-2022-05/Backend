@@ -533,6 +533,10 @@ public class Partida {
 							listaCartas.add(c);
 							jugadaIA.setCartas(listaCartas);
 							jugadaIA.setRobar(false);
+							
+							if (c.esDelColor(Carta.Color.comodin)) {
+								cambiarColorAleatorioIA(c);
+							}
 							break;
 						}
 					}

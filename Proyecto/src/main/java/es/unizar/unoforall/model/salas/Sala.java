@@ -2,6 +2,7 @@ package es.unizar.unoforall.model.salas;
 
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,6 +65,7 @@ public class Sala {
 				if (!isEnPausa()) {
 					List<UUID> jugadoresID = new ArrayList<>();
 					participantes.forEach((k,v) -> jugadoresID.add(k));
+					Collections.shuffle(jugadoresID); 
 					this.partida = new Partida(jugadoresID, configuracion, salaID);
 				} else {
 					this.partida = this.partidaPausada;

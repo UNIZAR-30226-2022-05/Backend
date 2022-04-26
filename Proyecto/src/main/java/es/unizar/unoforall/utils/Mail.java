@@ -86,6 +86,7 @@ public class Mail {
 		}catch(SendFailedException e) {
 			return false;
 		}catch(Exception ex) {
+			ex.printStackTrace();
 			if(t != null) {
 				try {
 					t.close();
