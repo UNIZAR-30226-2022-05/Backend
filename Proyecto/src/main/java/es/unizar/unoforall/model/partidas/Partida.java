@@ -445,7 +445,10 @@ public class Partida {
 				}
 				roboAcumulado=0;
 			} else if (configuracion.getModoJuego().equals(ConfigSala.ModoJuego.Attack)) {
-					int random_robo = (int)Math.floor(Math.random()*(MAX_ROBO_ATTACK)+1);
+					int random_robo = new Random().nextInt(MAX_ROBO_ATTACK)+1;
+					if (this.jugadores.get(turno).getMano().size() + random_robo > 20) {
+						random_robo = 20 - this.jugadores.get(turno).getMano().size();
+					}
 					for (int i = 0; i < random_robo; i++) {
 						this.jugadores.get(turno).getMano().add(robarCarta());
 					}
