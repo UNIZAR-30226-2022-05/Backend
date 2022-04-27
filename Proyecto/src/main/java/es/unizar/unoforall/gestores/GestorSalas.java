@@ -157,19 +157,10 @@ public class GestorSalas {
 			}
 			if(parejas) { //Hace que las parejas tengan la misma puntuación
 				for (int i = 0; i < 4; i++) {
-					if(puntos.get(i)==0) {
-						puntos = new ArrayList<Integer>();
-						if (i==0 || i==2) {
-							puntos.add(0);
-							puntos.add(1);
-							puntos.add(0);
-							puntos.add(1);
-						} else {
-							puntos.add(1);
-							puntos.add(0);
-							puntos.add(1);
-							puntos.add(0);
-						}
+					if (puntos.get(i)==0) { // Si es el ganador. i : 0 1 2 3
+						puntos.set((i+1)%4, 1); //Rival				 1 2 3 0
+						puntos.set((i+2)%4, 0); //Pareja			 2 3 0 1
+						puntos.set((i+3)%4, 1); //Rival	 			 3 0 1 2
 						break;
 					}
 				}
