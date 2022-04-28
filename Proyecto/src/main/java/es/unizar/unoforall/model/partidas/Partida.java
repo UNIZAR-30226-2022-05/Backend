@@ -638,6 +638,7 @@ public class Partida {
 	
 	
 	public void pulsarBotonUNO(UUID jugadorID) { 
+		repeticionTurno = false;
 		for (int indice = 0; indice < jugadores.size(); indice++) {
 			if (jugadores.get(indice).getJugadorID() != null && 
 					jugadores.get(indice).getJugadorID().equals(jugadorID)) {

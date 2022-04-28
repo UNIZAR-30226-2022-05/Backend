@@ -50,7 +50,7 @@ public class PartidasDAO {
 				//Saca los datos de la partida
 				PreparedStatement sacarPartida = 
 						conn.prepareStatement("SELECT * FROM partidas_acabadas WHERE id = ?;");
-				sacarParticipantes.setObject(1,(UUID) rs.getObject("partida"));
+				sacarPartida.setObject(1,(UUID) rs.getObject("partida"));
 				ResultSet rs3 = sacarPartida.executeQuery();
 				if(rs3.next()) {
 					partidas.add(new PartidaJugada(new PartidasAcabadasVO((UUID)rs3.getObject("id"),
