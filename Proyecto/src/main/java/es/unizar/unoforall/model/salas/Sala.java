@@ -219,13 +219,12 @@ public class Sala {
 	}
 	
 	public boolean puedeUnirse() {
-		if (isEnPausa()) {
+		if (isEnPausa() || isEnPartida()) {
 			return false;
 		}
 		
 		if (getConfiguracion().isEsPublica()
-				&& numParticipantes() < getConfiguracion().getMaxParticipantes() 
-				&& !isEnPartida()) {
+				&& numParticipantes() < getConfiguracion().getMaxParticipantes()) {
 			return true;
 		} else {
 			return false;

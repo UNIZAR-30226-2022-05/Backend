@@ -511,6 +511,8 @@ public class SocketController {
 	 * @param vacio			Cualquier objeto no nulo
 	 * @param esIA			falso (solo true cuando lo llame el backend)
 	 * @return				Clase RespuestaVotacionPausa
+	 * 						nulo si la sala no existe, no está en partida, o el
+	 * 						emisor no tiene una sesión iniciada
 	 * @throws Exception
 	 * 
 	 * El frontend debe almacenar un hashmap con la decisión de cada jugador, al
@@ -538,7 +540,7 @@ public class SocketController {
 		
 		if (resp.getNumVotos() == resp.getNumVotantes()) {
 			GestorSesiones.getApiInterna()
-				.sendObject("/app/salas/actualizar/" + salaID, "");
+				.sendObject("/app/salas/actualizar/" + salaID, "VACIO");
 		}
 		
 		return Serializar.serializar(resp);
