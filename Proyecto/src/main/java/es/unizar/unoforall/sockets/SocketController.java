@@ -1,6 +1,5 @@
 package es.unizar.unoforall.sockets;
 
-import java.util.HashMap;
 import java.util.Timer;
 import java.util.UUID;
 
@@ -509,15 +508,10 @@ public class SocketController {
 	 * @param salaID		En la URL: id de la sala
 	 * @param sesionID		Automático
 	 * @param vacio			Cualquier objeto no nulo
-	 * @param esIA			falso (solo true cuando lo llame el backend)
 	 * @return				Clase RespuestaVotacionPausa
 	 * 						nulo si la sala no existe, no está en partida, o el
 	 * 						emisor no tiene una sesión iniciada
 	 * @throws Exception
-	 * 
-	 * El frontend debe almacenar un hashmap con la decisión de cada jugador, al
-	 * principio todas a false. Cuando uno vota por primera vez, se muestra el 
-	 * estado de la votación, que terminará cuando todos 
 	 */
 	@MessageMapping("/partidas/votaciones/{salaID}")
 	@SendTo("/topic/salas/{salaID}/votaciones")
@@ -544,6 +538,32 @@ public class SocketController {
 		}
 		
 		return Serializar.serializar(resp);
+		
+	}
+	
+	
+	/**
+	 * (EXCLUSIVO BACKEND) Método para actualizar los votos cuando un jugador abandona
+	 * @param salaID		En la URL: id de la sala
+	 * @param vacio			Cualquier objeto no nulo
+	 * @return				Clase RespuestaVotacionPausa
+	 * 						nulo si la sala no existe, no está en partida, o el
+	 * 						emisor no tiene una sesión iniciada
+	 * @throws Exception
+	 */
+	@MessageMapping("/partidas/votacionesInternas/{salaID}")
+	@SendTo("/topic/salas/{salaID}/votaciones")
+	public String votacionPartidaInterna(@DestinationVariable UUID salaID, 
+							Object vacio) throws Exception {	
+		
+		if (GestorSalas.obtenerSala(salaID) == null) {
+			return "nulo";
+		} else if (!GestorSalas.obtenerSala(salaID).isEnPartida()) {
+			return "nulo";
+		}
+		
+		return Serializar.serializar(GestorSalas.obtenerSala(salaID)
+											.getParticipantesVotoAbandono());
 		
 	}
 	

@@ -4,7 +4,6 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 import java.util.Timer;
 import java.util.UUID;
 
@@ -104,6 +103,8 @@ public class GestorSalas {
 				GestorSalas.eliminarSala(salaID);
 				return null;
 			} else {
+				GestorSesiones.getApiInterna().sendObject("/app/partidas/votacionesInternas/" + salaID, "vacio");
+				
 				return GestorSalas.obtenerSala(salaID);
 			}
 		}
@@ -129,7 +130,7 @@ public class GestorSalas {
 		for(Map.Entry<UUID, Sala> entry : salas.entrySet()) {
 			Sala sala = entry.getValue();
 		    
-			if (sala.getParticipantesVotoAbandono().containsKey(usuarioID)) {
+			if (sala.isEnPausa() && sala.hayParticipante(usuarioID)) {
 				return sala;
 			}
 		}

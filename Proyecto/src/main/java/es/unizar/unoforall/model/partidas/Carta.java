@@ -6,8 +6,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 
-import es.unizar.unoforall.model.partidas.Carta.Color;
-import es.unizar.unoforall.model.partidas.Carta.Tipo;
 
 public class Carta implements Comparable<Carta> {
 	

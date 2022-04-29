@@ -231,27 +231,24 @@ public class Sala {
 		}
 	}
 	
-	public HashMap<UUID, Boolean> getParticipantesVotoAbandono() {
-		return participantesVotoAbandono;
-	}
 	
 	public RespuestaVotacionPausa setParticipantesVotoAbandono(UUID participanteID) {
 		if(participantesVotoAbandono.containsKey(participanteID)) {
 			participantesVotoAbandono.put(participanteID, true);
-			
-			int numListos = (int)participantesVotoAbandono.values()
-									.stream().filter(listo -> listo).count();
-			if (numListos == participantesVotoAbandono.size()) {
-				setEnPausa(true);
-			}
-			return new RespuestaVotacionPausa(numListos, participantesVotoAbandono.size());
-		} else {
-			int numListos = (int)participantesVotoAbandono.values()
-					.stream().filter(listo -> listo).count();
-			return new RespuestaVotacionPausa(numListos, participantesVotoAbandono.size());
 		}
 		
+		return getParticipantesVotoAbandono();
 	}
+	
+	public RespuestaVotacionPausa getParticipantesVotoAbandono() {
+		int numListos = (int)participantesVotoAbandono.values()
+								.stream().filter(listo -> listo).count();
+		if (numListos == participantesVotoAbandono.size()) {
+			setEnPausa(true);
+		}
+		return new RespuestaVotacionPausa(numListos, participantesVotoAbandono.size());
+	}
+	
 	
 	public boolean isEnPausa() {
 		return enPausa;

@@ -1,8 +1,6 @@
 package es.unizar.unoforall.apirest;
 
 
-import java.sql.Date;
-import java.util.ArrayList;
 import java.util.UUID;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,9 +19,7 @@ import es.unizar.unoforall.gestores.apirest.GestorContrasennas;
 import es.unizar.unoforall.gestores.apirest.GestorRegistros;
 import es.unizar.unoforall.model.RespuestaLogin;
 import es.unizar.unoforall.model.UsuarioVO;
-import es.unizar.unoforall.model.partidas.HaJugadoVO;
 import es.unizar.unoforall.model.partidas.ListaPartidas;
-import es.unizar.unoforall.model.partidas.PartidaJugada;
 import es.unizar.unoforall.model.salas.ConfigSala;
 import es.unizar.unoforall.model.salas.RespuestaSala;
 import es.unizar.unoforall.model.salas.RespuestaSalas;
@@ -31,7 +27,6 @@ import es.unizar.unoforall.model.salas.Sala;
 import es.unizar.unoforall.utils.CaracteresInvalidos;
 import es.unizar.unoforall.utils.Serializar;
 import es.unizar.unoforall.model.ListaUsuarios;
-import es.unizar.unoforall.model.PartidasAcabadasVO;
 
 
 /**
@@ -657,24 +652,24 @@ public class ApiRestController {
 		}
     }
 	
-	@PostMapping("/insertarPartidaAcabadaTEST")
-	public String insertarPartidaAcabadaTEST(){
-		String error = null;
-		PartidasAcabadasVO pa = new PartidasAcabadasVO(null,new Date(System.currentTimeMillis()),new Date(System.currentTimeMillis()+1000000),1,0);
-		ArrayList<HaJugadoVO> participantes = new ArrayList<HaJugadoVO>(); 
-		/*Obsoleto debido a nueva versión de la clase "HaJugadoVO*/
-		//participantes.add(new HaJugadoVO(UUID.fromString("4c2a49ed-48be-4970-9010-edb1faf918f2"),pa.getId(),0,false));
-		//participantes.add(new HaJugadoVO(UUID.fromString("4c2a49ed-48be-4970-9010-edb1faf918f1"),pa.getId(),3,true));
-		//participantes.add(new HaJugadoVO(UUID.fromString("4c2a49ed-48be-4970-9010-edb1faf918f4"),pa.getId(),1,false));
-		
-		
-		//participantes.size()==configuracion.getMaxParticipantes()-numIAs
-		//PartidaJugada pj = new PartidaJugada(pa,participantes);
-		System.out.println("Id Partida: "+pa.getId());
-		//error = PartidasDAO.insertarPartidaAcabada(pj);
-		
-		return Serializar.serializar(error);
-	}
+//	@PostMapping("/insertarPartidaAcabadaTEST")
+//	public String insertarPartidaAcabadaTEST(){
+//		String error = null;
+//		PartidasAcabadasVO pa = new PartidasAcabadasVO(null,new Date(System.currentTimeMillis()),new Date(System.currentTimeMillis()+1000000),1,0);
+//		ArrayList<HaJugadoVO> participantes = new ArrayList<HaJugadoVO>(); 
+//		/*Obsoleto debido a nueva versión de la clase "HaJugadoVO*/
+//		//participantes.add(new HaJugadoVO(UUID.fromString("4c2a49ed-48be-4970-9010-edb1faf918f2"),pa.getId(),0,false));
+//		//participantes.add(new HaJugadoVO(UUID.fromString("4c2a49ed-48be-4970-9010-edb1faf918f1"),pa.getId(),3,true));
+//		//participantes.add(new HaJugadoVO(UUID.fromString("4c2a49ed-48be-4970-9010-edb1faf918f4"),pa.getId(),1,false));
+//		
+//		
+//		//participantes.size()==configuracion.getMaxParticipantes()-numIAs
+//		//PartidaJugada pj = new PartidaJugada(pa,participantes);
+//		System.out.println("Id Partida: "+pa.getId());
+//		//error = PartidasDAO.insertarPartidaAcabada(pj);
+//		
+//		return Serializar.serializar(error);
+//	}
 
 	
 }
