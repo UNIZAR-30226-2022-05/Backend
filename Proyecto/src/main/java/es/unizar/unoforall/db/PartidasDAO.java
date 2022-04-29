@@ -41,11 +41,17 @@ public class PartidasDAO {
 				sacarParticipantes.setObject(1,(UUID) rs.getObject("partida"));
 				ResultSet rs2 = sacarParticipantes.executeQuery();
 				ArrayList<Participante> listaParticipantes = new ArrayList<Participante>();
+				int numParticipantes = 0;
 				while(rs2.next()) {
+					numParticipantes++;
 					UsuarioVO usuario = UsuarioDAO.getUsuario((UUID)rs2.getObject("usuario"));
+					
 					listaParticipantes.add(new Participante(usuario, new HaJugadoVO(
 									(UUID)rs2.getObject("usuario"), (UUID)rs2.getObject("partida"),
 									rs2.getInt("usrs_debajo"), rs2.getBoolean("ha_ganado"))));
+				}
+				for (Participante p : listaParticipantes) {
+					p.setPuesto(numParticipantes);
 				}
 				//Saca los datos de la partida
 				PreparedStatement sacarPartida = 
