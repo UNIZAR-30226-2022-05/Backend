@@ -376,7 +376,7 @@ public class SocketController {
 		
 		//Envía un emoji si ha tirado un +4
 		if (partida.getUltimaCartaJugada().esDelTipo(Carta.Tipo.mas4)) {
-			GestorSesiones.getApiInterna().sendObject("/partidas/emojiPartida/" + salaID, new EnvioEmoji(0,turnoAnterior,true));
+			GestorSesiones.getApiInterna().sendObject("app/partidas/emojiPartida/" + salaID, new EnvioEmoji(0,turnoAnterior,true));
 		}
 		
 		if(partida.estaTerminada()) {
