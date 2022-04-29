@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.Timer;
 import java.util.UUID;
 
@@ -148,13 +149,54 @@ public class GestorSalas {
 			
 			ArrayList<HaJugadoVO> participantes = new ArrayList<HaJugadoVO>(); 
 			boolean parejas = partida.getConfiguracion().getModoJuego().equals(ConfigSala.ModoJuego.Parejas);
-			
-			//if(!parejas) { //Versión para calcular puntos por parejas descartada por ser demasiado farragosa.
 				
 			ArrayList<Integer> puntos = new ArrayList<Integer>();
-			for (Jugador j : partida.getJugadores()) {
+			
+			//Para tratar empates
+			int numImplicados = 0;
+			int empates = 0;
+		
+			for (Jugador j : partida.getJugadores()) { //Pueden haber empates hasta a tres bandas
+				if (puntos.contains(j.sacarPuntos())) {
+					numImplicados++; //Solo puede haber empate a un valor por partida (el ganador no puede empatar)
+					empates = j.sacarPuntos();
+				}
 				puntos.add(j.sacarPuntos()); //puntos.size()==configuracion.getMaxParticipantes()
 			}
+			
+			//Caso empates
+			if(empates != 0 && !parejas) {
+				boolean limSup = false;
+				int limite = 0;
+				ArrayList<Integer> auxiliar = new ArrayList<Integer>();
+				if(numImplicados==3) { 						//No hay riesgo de generar empates
+					auxiliar.add((int) Math.random());
+					auxiliar.add((int) Math.random());
+					auxiliar.add((int) Math.random());
+				} else { 									//Riesgo de generar empates
+					for(Integer p : puntos) {
+						if (p!=empates && p!= 0) {
+							limite=p;
+							if(p>empates) { //Si los valores a generar deben ser menores
+								limSup=true;
+							}
+							break;
+						}
+					}
+					auxiliar.add((int) Math.random());
+					auxiliar.add((int) Math.random());
+				}
+				ArrayList<Integer> orden = sacarOrden(auxiliar,limSup); //Si hay límite superior, genera valores negativos
+				int indice = 0;
+				for(Integer p : puntos) {
+					if (p==empates) {
+						p=limite + orden.get(indice);
+						indice++;
+					}
+				}
+			}
+			
+			//Caso modo por parejas
 			if(parejas) { //Hace que las parejas tengan la misma puntuación
 				for (int i = 0; i < 4; i++) {
 					if (puntos.get(i)==0) { // Si es el ganador. i : 0 1 2 3
@@ -192,95 +234,8 @@ public class GestorSalas {
 				}
 				i++;
 			}
-			/*} else { //Versión para calcular puntos por parejas descartada por ser demasiado farragosa.
-				int i = 0; //indice del jugador que estamos comprobando
-				for (Jugador j : partida.getJugadores()) {
-					if (j.getMano().size()==0) { //Si es el ganador realizar la operación
-						boolean haGanado = true;
-						int usuariosDebajo = 2; // La pareja perdedora
-						participantes.add(new HaJugadoVO(j.getJugadorID(),pa.getId(),usuariosDebajo,haGanado));
-						switch(i) {
-							case 0: //Pareja 2
-								if (!partida.getJugadores().get(1).isEsIA()) {
-									participantes.add(new HaJugadoVO(partida.getJugadores().get(2).getJugadorID(),pa.getId(),
-																														0,false));
-								}
-								if (!partida.getJugadores().get(2).isEsIA()) {
-									participantes.add(new HaJugadoVO(partida.getJugadores().get(2).getJugadorID(),pa.getId(),
-																										usuariosDebajo,haGanado));
-									error = actualizarPuntosJugador(usuariosDebajo,j.getJugadorID());
-									if (!error.equals("nulo")) {
-										return error;
-									}
-								}
-								if (!partida.getJugadores().get(3).isEsIA()) {
-									participantes.add(new HaJugadoVO(partida.getJugadores().get(2).getJugadorID(),pa.getId(),
-																														0,false));
-								}
-							case 1: //Pareja 3
-								if (!partida.getJugadores().get(0).isEsIA()) {
-									participantes.add(new HaJugadoVO(partida.getJugadores().get(2).getJugadorID(),pa.getId(),
-																														0,false));
-								}
-								if (!partida.getJugadores().get(2).isEsIA()) {
-									participantes.add(new HaJugadoVO(partida.getJugadores().get(2).getJugadorID(),pa.getId(),
-																														0,false));
-								}
-								if (!partida.getJugadores().get(3).isEsIA()) {
-									participantes.add(new HaJugadoVO(partida.getJugadores().get(2).getJugadorID(),pa.getId(),
-																										usuariosDebajo,haGanado));
-									error = actualizarPuntosJugador(usuariosDebajo,j.getJugadorID());
-									if (!error.equals("nulo")) {
-										return error;
-									}
-								}
-							case 2: //Pareja 0
-								if (!partida.getJugadores().get(0).isEsIA()) {
-									participantes.add(new HaJugadoVO(partida.getJugadores().get(2).getJugadorID(),pa.getId(),
-																										usuariosDebajo,haGanado));
-									error = actualizarPuntosJugador(usuariosDebajo,j.getJugadorID());
-									if (!error.equals("nulo")) {
-										return error;
-									}
-								}
-								if (!partida.getJugadores().get(1).isEsIA()) {
-									participantes.add(new HaJugadoVO(partida.getJugadores().get(2).getJugadorID(),pa.getId(),
-																														0,false));
-								}
-								if (!partida.getJugadores().get(3).isEsIA()) {
-									participantes.add(new HaJugadoVO(partida.getJugadores().get(2).getJugadorID(),pa.getId(),
-																														0,false));
-								}
-							case 3: //Pareja 1
-								if (!partida.getJugadores().get(0).isEsIA()) {
-									participantes.add(new HaJugadoVO(partida.getJugadores().get(2).getJugadorID(),pa.getId(),
-																														0,false));
-								}
-								if (!partida.getJugadores().get(2).isEsIA()) {
-									participantes.add(new HaJugadoVO(partida.getJugadores().get(2).getJugadorID(),pa.getId(),
-																														0,false));
-								}
-								if (!partida.getJugadores().get(3).isEsIA()) {
-									participantes.add(new HaJugadoVO(partida.getJugadores().get(2).getJugadorID(),pa.getId(),
-																										usuariosDebajo,haGanado));
-									error = actualizarPuntosJugador(usuariosDebajo,j.getJugadorID());
-									if (!error.equals("nulo")) {
-										return error;
-									}
-								}
-						}
-						if (!j.isEsIA()) {
-							error = actualizarPuntosJugador(usuariosDebajo,j.getJugadorID());
-							if (!error.equals("nulo")) {
-								return error;
-							}
-						}
-						break; //Ya se han añadido los participantes y se han actualizado los puntos.
-					}	
-					i++;
-				}
-			}*/
 			//participantes.size()==configuracion.getMaxParticipantes()-numIAs
+			
 			ArrayList<Participante> listaParticipantes = new ArrayList<Participante>();
 			for(HaJugadoVO part : participantes) {
 				UsuarioVO usuario = UsuarioDAO.getUsuario(part.getUsuario());
@@ -310,6 +265,42 @@ public class GestorSalas {
 			}
 			return error;
 		}
+	}
+	
+	private static ArrayList<Integer> sacarOrden(ArrayList<Integer> valores, boolean limSup) {
+		ArrayList<Integer> orden = new ArrayList<Integer>();
+		int i = valores.get(0);
+		int j = valores.get(1);
+		if (j > i) {
+			if(!limSup) {
+				orden.add(2);
+				orden.add(1);
+			} else {
+				orden.add(-1);
+				orden.add(-2);
+			}
+		} else { 
+			if(!limSup) {
+				orden.add(1);
+				orden.add(2);
+			} else {
+				orden.add(-2);
+				orden.add(-1);
+			}
+		}
+		if(valores.size()==3) {//Empate a tres bandas
+			int posicion = 3;
+			if(valores.get(2) > i) {
+				orden.set(0, orden.get(0)+1);
+				posicion--;
+			} 
+			if(valores.get(2) > j) {
+				orden.set(1, orden.get(1)+1);
+				posicion--;
+			} 
+			orden.add(posicion);
+		}
+		return orden;
 	}
 	
 	public static void restartTimer(UUID salaID) {
