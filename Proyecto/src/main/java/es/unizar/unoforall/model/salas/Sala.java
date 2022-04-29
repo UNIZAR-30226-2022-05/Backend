@@ -11,6 +11,7 @@ import java.util.UUID;
 import es.unizar.unoforall.model.UsuarioVO;
 import es.unizar.unoforall.model.partidas.Partida;
 import es.unizar.unoforall.model.partidas.PartidaJugada;
+import es.unizar.unoforall.model.partidas.RespuestaVotacionPausa;
 
 public class Sala {	
 	//Para devolver una sala que no existe
@@ -143,9 +144,22 @@ public class Sala {
 		if(participantes.containsKey(participanteID)) {
 			participantes.remove(participanteID);
 			participantes_listos.remove(participanteID);
+			participantesVotoAbandono.remove(participanteID);
 			
 			if (this.enPartida)	 {
 				partida.expulsarJugador(participanteID);
+				
+				boolean todosListos = true;
+				for (Map.Entry<UUID, Boolean> entry : participantesVotoAbandono.entrySet()) {
+					if (entry.getValue() == false) { 
+						todosListos = false; 
+					}
+				}
+				if (todosListos) {
+					setEnPausa(todosListos);
+				}
+				//TODO enviar actualización voto
+				
 			} else {	//Si se va un jugador no listo, y el resto ya lo están 
 						//	-> se empieza la partida
 				boolean todosListos = true;
@@ -227,21 +241,22 @@ public class Sala {
 		return participantesVotoAbandono;
 	}
 	
-	public HashMap<UUID, Boolean> setParticipantesVotoAbandono(UUID participanteID) {
+	public RespuestaVotacionPausa setParticipantesVotoAbandono(UUID participanteID) {
 		if(participantesVotoAbandono.containsKey(participanteID)) {
 			participantesVotoAbandono.put(participanteID, true);
 			
-			boolean todosListos = true;
-			for (Map.Entry<UUID, Boolean> entry : participantesVotoAbandono.entrySet()) {
-				if (entry.getValue() == false) { 
-					todosListos = false; 
-				}
+			int numListos = (int)participantesVotoAbandono.values()
+									.stream().filter(listo -> listo).count();
+			if (numListos == participantesVotoAbandono.size()) {
+				setEnPausa(true);
 			}
-			if (todosListos) {
-				setEnPausa(todosListos);
-			}
+			return new RespuestaVotacionPausa(numListos, participantesVotoAbandono.size());
+		} else {
+			int numListos = (int)participantesVotoAbandono.values()
+					.stream().filter(listo -> listo).count();
+			return new RespuestaVotacionPausa(numListos, participantesVotoAbandono.size());
 		}
-		return getParticipantesVotoAbandono();
+		
 	}
 	
 	public boolean isEnPausa() {
