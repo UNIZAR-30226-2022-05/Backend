@@ -326,5 +326,13 @@ public class Sala {
 		this.ultimaPartidaJugada = ultimaPartidaJugada;
 	}
 
+	public UUID getSalaID() {
+		return salaID;
+	}
+
+	public void setSalaID(UUID salaID) {
+		this.salaID = salaID;
+	}
+
 	
 }
