@@ -518,7 +518,7 @@ public class SocketController {
 	 * estado de la votación, que terminará cuando todos 
 	 */
 	@MessageMapping("/partidas/votaciones/{salaID}")
-	@SendTo("/topic/salas/{salaID}/votacion")
+	@SendTo("/topic/salas/{salaID}/votaciones")
 	public String votacionPartida(@DestinationVariable UUID salaID, 
 							@Header("simpSessionId") String sesionID, 
 							Object vacio) throws Exception {	
