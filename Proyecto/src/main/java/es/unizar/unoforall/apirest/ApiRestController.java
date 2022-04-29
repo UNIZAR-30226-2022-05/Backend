@@ -614,7 +614,7 @@ public class ApiRestController {
 	
 	/**
 	 * Método para buscar salas públicas con una determinada configuración
-	 * @param sesionID			Id de seisión del usuario
+	 * @param sesionID			Id de sesión del usuario
 	 *
 	 * @return					(Sala) Sala pausada si la hay para el usuario de sesionID, o null 
 	 * 							si no la hay
