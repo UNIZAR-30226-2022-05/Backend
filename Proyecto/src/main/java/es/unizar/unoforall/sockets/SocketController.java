@@ -509,7 +509,7 @@ public class SocketController {
 	 * @param sesionID		Automático
 	 * @param vacio			Cualquier objeto no nulo
 	 * @param esIA			falso (solo true cuando lo llame el backend)
-	 * @return				Clase RespuestaVotoPausa
+	 * @return				Clase RespuestaVotacionPausa
 	 * @throws Exception
 	 * 
 	 * El frontend debe almacenar un hashmap con la decisión de cada jugador, al
