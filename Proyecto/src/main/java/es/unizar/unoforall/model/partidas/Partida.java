@@ -19,6 +19,8 @@ public class Partida {
 	private List<Carta> mazo = null;
 	private List<Carta> cartasJugadas = null;
 	
+	private Jugada ultimaJugada = null;
+	
 	private List<Jugador> jugadores = null;
 	private int turno = 0;
 	private boolean sentidoHorario = true;
@@ -73,6 +75,7 @@ public class Partida {
 		this.configuracion = configuracion;
 		this.terminada = false;
 		this.salaID = salaID;
+		ultimaJugada = null;
 				
 				
 		//Marcamos fecha de inicio
@@ -425,6 +428,7 @@ public class Partida {
 	/**************************************************************************/
 	
 	public void ejecutarJugada(Jugada jugada) {
+		ultimaJugada = jugada;
 		repeticionTurno = false;
 		if(modoJugarCartaRobada) { //FUNCIONA
 			if(jugada.getCartas()!=null && jugada.getCartas().size()==1) {
@@ -639,6 +643,7 @@ public class Partida {
 	
 	public void pulsarBotonUNO(UUID jugadorID) { 
 		repeticionTurno = false;
+		ultimaJugada = null;
 		for (int indice = 0; indice < jugadores.size(); indice++) {
 			if (jugadores.get(indice).getJugadorID() != null && 
 					jugadores.get(indice).getJugadorID().equals(jugadorID)) {
@@ -888,6 +893,8 @@ public class Partida {
 		} else {
 			partidaResumida.cartasJugadas = this.cartasJugadas;
 		}
+		
+		partidaResumida.ultimaJugada = this.ultimaJugada;
 		
 		
 		partidaResumida.jugadores = jugadores;
