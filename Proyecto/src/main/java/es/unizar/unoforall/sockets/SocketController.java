@@ -20,6 +20,7 @@ import es.unizar.unoforall.model.partidas.Carta;
 import es.unizar.unoforall.model.partidas.EnvioEmoji;
 import es.unizar.unoforall.model.partidas.Jugada;
 import es.unizar.unoforall.model.partidas.Partida;
+import es.unizar.unoforall.model.partidas.RespuestaVotacionPausa;
 import es.unizar.unoforall.model.salas.NotificacionSala;
 import es.unizar.unoforall.model.salas.Sala;
 import es.unizar.unoforall.utils.Serializar;
@@ -531,9 +532,17 @@ public class SocketController {
 		if (usuarioID == null) {
 			return "nulo";
 		}
-	
-		return Serializar.serializar(GestorSalas.obtenerSala(salaID)
-									.setParticipantesVotoAbandono(usuarioID));
+		
+		RespuestaVotacionPausa resp = GestorSalas.obtenerSala(salaID)
+										.setParticipantesVotoAbandono(usuarioID);
+		
+		if (resp.getNumVotos() == resp.getNumVotantes()) {
+			GestorSesiones.getApiInterna()
+				.sendObject("/app/salas/actualizar/" + salaID, "");
+		}
+		
+		return Serializar.serializar(resp);
+		
 	}
 	
 	

@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import es.unizar.unoforall.gestores.GestorSesiones;
 import es.unizar.unoforall.model.UsuarioVO;
 import es.unizar.unoforall.model.partidas.Partida;
 import es.unizar.unoforall.model.partidas.PartidaJugada;
@@ -159,8 +158,6 @@ public class Sala {
 				if (todosListos) {
 					setEnPausa(todosListos);
 				}
-				GestorSesiones.getApiInterna()
-					.sendObject("/app/partidas/votaciones/" + salaID, "");
 				
 			} else {	//Si se va un jugador no listo, y el resto ya lo están 
 						//	-> se empieza la partida
@@ -269,9 +266,6 @@ public class Sala {
 				this.partidaPausada = this.partida;
 				this.partida = null;
 				setEnPartida(false);
-				
-				GestorSesiones.getApiInterna()
-					.sendObject("/app/salas/actualizar/" + salaID, "");
 			}
 		}
 		
