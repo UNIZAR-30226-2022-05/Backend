@@ -1,5 +1,6 @@
 package es.unizar.unoforall.sockets;
 
+import java.util.HashMap;
 import java.util.Timer;
 import java.util.UUID;
 
@@ -329,7 +330,7 @@ public class SocketController {
 		if(partida.estaTerminada()) {
 			String error = GestorSalas.insertarPartidaEnBd(salaID);
 			if (!error.equals("nulo")) {
-				//TODO Tratamiento de error al insertar en base de datos
+				System.err.println("Error al insertar la partida en la BD");
 			}	
 			GestorSalas.cancelTimer(salaID);
 			Sala sala = GestorSalas.obtenerSala(salaID);
@@ -382,7 +383,7 @@ public class SocketController {
 		if(partida.estaTerminada()) {
 			String error = GestorSalas.insertarPartidaEnBd(salaID);
 			if (!error.equals("nulo")) {
-				//TODO Tratamiento de error al insertar en base de datos
+				System.err.println("Error al insertar la partida en la BD");
 			}	
 			GestorSalas.cancelTimer(salaID);
 			Sala sala = GestorSalas.obtenerSala(salaID);
@@ -508,9 +509,7 @@ public class SocketController {
 	 * @param sesionID		Automático
 	 * @param vacio			Cualquier objeto no nulo
 	 * @param esIA			falso (solo true cuando lo llame el backend)
-	 * @return				(Clase UUID) El id del jugador que ha votado 
-	 * 						abandonar, o "nulo" si ha habido un error (ignorar 
-	 * 						por el resto)
+	 * @return				Clase RespuestaVotacionPausa
 	 * @throws Exception
 	 * 
 	 * El frontend debe almacenar un hashmap con la decisión de cada jugador, al
@@ -533,7 +532,8 @@ public class SocketController {
 			return "nulo";
 		}
 	
-		return Serializar.serializar(GestorSalas.obtenerSala(salaID).setParticipantesVotoAbandono(usuarioID));
+		return Serializar.serializar(GestorSalas.obtenerSala(salaID)
+									.setParticipantesVotoAbandono(usuarioID));
 	}
 	
 	
