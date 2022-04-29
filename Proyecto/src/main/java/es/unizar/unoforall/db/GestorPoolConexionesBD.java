@@ -5,11 +5,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class GestorPoolConexionesBD {
-	private static final Object LOCK;
-	private static final Map<Connection, Boolean> conexiones;
+	private static Object LOCK;
+	private static Map<Connection, Boolean> conexiones;
 	private static final int MAX_CONEXIONES = 20;
 
-	static{
+	public static void inicializarPool(){
 	    LOCK = new Object();
 
 	    conexiones = new HashMap<>();

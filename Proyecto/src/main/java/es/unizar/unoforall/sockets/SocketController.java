@@ -490,30 +490,20 @@ public class SocketController {
 	 * @param sesionID		Automático
 	 * @param emoji			Entero identificador del emoji
 	 * @param esIA			falso (solo true cuando lo llame el backend)
-	 * @return				(Clase EnvioEmoji) El identificador del emoji y el emisor.
-	 * 						El identificador será -1 si ha habido algún error, y hay
-	 * 						que ignorar ese envío del emoji
+	 * @return				(Clase EnvioEmoji) El identificador del emoji y el emisor
 	 * @throws Exception
 	 */
 	@MessageMapping("/partidas/emojiPartida/{salaID}")
 	@SendTo("/topic/salas/{salaID}/emojis")
 	public String emojiPartida(@DestinationVariable UUID salaID, 
 							@Header("simpSessionId") String sesionID, 
-							Integer emoji) throws Exception {		
-		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
-		if (usuarioID == null) {	
-			//ha mandado el emoji la IA o un usuario no registrado (obviamos eso)
-			return Serializar.serializar(new EnvioEmoji(emoji, usuarioID, true));
-		} else if (emoji >= 0 && emoji <= 4) {
-			return Serializar.serializar(new EnvioEmoji(emoji, usuarioID, false));
-		} else {	//emoji inválido
-			return Serializar.serializar(new EnvioEmoji(-1, null, false));
-		}
+							EnvioEmoji emoji) throws Exception {		
+		return Serializar.serializar(emoji);
 	}
 	
 	
 	/**
-	 * Método para enviar un emoji en una partida
+	 * Método para votar el pausado de una partida
 	 * @param salaID		En la URL: id de la sala
 	 * @param sesionID		Automático
 	 * @param vacio			Cualquier objeto no nulo

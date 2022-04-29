@@ -9,6 +9,7 @@ public class Jugador {
 	private UUID jugadorID;
 	private List<Carta> mano;
 	private boolean protegido_UNO; 
+	private boolean penalizado_UNO; 
 	
 	// Para crear un jugador IA
 	public Jugador() {
@@ -16,6 +17,7 @@ public class Jugador {
 		this.jugadorID = null;
 		this.mano = new ArrayList<>();
 		this.protegido_UNO = false;
+		this.setPenalizado_UNO(false);
 	}
 	
 	// Para crear un jugador real
@@ -24,6 +26,7 @@ public class Jugador {
 		this.jugadorID = jugadorID;
 		this.mano = new ArrayList<>();
 		this.protegido_UNO = false;
+		this.setPenalizado_UNO(false);
 	}
 
 	public boolean isEsIA() {
@@ -75,6 +78,14 @@ public class Jugador {
 	public String toString() {
 		return "Jugador [esIA=" + esIA + ", jugadorID=" + jugadorID + ", mano=" + mano + ", protegido_UNO="
 				+ protegido_UNO + "]";
+	}
+
+	public boolean isPenalizado_UNO() {
+		return penalizado_UNO;
+	}
+
+	public void setPenalizado_UNO(boolean penalizado_UNO) {
+		this.penalizado_UNO = penalizado_UNO;
 	}
 	
 	

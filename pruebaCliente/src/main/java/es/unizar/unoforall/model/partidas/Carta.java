@@ -6,6 +6,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 
+import es.unizar.unoforall.model.partidas.Carta.Color;
+import es.unizar.unoforall.model.partidas.Carta.Tipo;
+
 public class Carta implements Comparable<Carta> {
 	
 	public enum Tipo {n0(10), n1(1), n2(2), n3(3), n4(4), n5(5), n6(6), n7(7), n8(8), n9(9), mas2(11), reversa(12), salta(13), rayosX(14), intercambio(15), x2(16), cambioColor(17), mas4(18); 
@@ -52,9 +55,12 @@ public class Carta implements Comparable<Carta> {
 		return false;
 	}
 	
-	public void setOculta() {
+	public void setDefault() {
 		for (int i = 0; i < visiblePor.size(); i++ ) {
 			visiblePor.put(i,false);
+		}
+		if(this.esDelTipo(Tipo.mas4) || this.esDelTipo(Tipo.cambioColor)) {
+			this.setColor(Color.comodin);
 		}
 	}
 	
@@ -156,6 +162,15 @@ public class Carta implements Comparable<Carta> {
 		} else {
 			return result;
 		}
+	}
+    
+    @Override
+	public Carta clone(){
+		Carta copia = new Carta();
+		copia.color = this.color;
+		copia.tipo = this.tipo;
+		copia.visiblePor = new HashMap<>(this.visiblePor);
+		return copia;
 	}
 
 	@Override

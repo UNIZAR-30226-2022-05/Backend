@@ -16,9 +16,6 @@ import es.unizar.pruebaCliente.utils.HashUtils;
 import es.unizar.unoforall.model.ListaUsuarios;
 import es.unizar.unoforall.model.RespuestaLogin;
 import es.unizar.unoforall.model.UsuarioVO;
-import es.unizar.unoforall.model.partidas.Carta;
-import es.unizar.unoforall.model.partidas.Jugada;
-import es.unizar.unoforall.model.partidas.Partida;
 import es.unizar.unoforall.model.salas.ConfigSala;
 import es.unizar.unoforall.model.salas.NotificacionSala;
 import es.unizar.unoforall.model.salas.ReglasEspeciales;
@@ -502,6 +499,10 @@ public class PruebaClienteApplication {
 			    		}
 			    	});
 			    	
+			    	api.subscribe("/topic/salas/" + salaID + "/emojis", EnvioEmoji.class, p -> {
+			    		System.out.println("Emoji: " + p.getEmoji());
+			    	});
+			    	
 			    	
 				} else if (orden.equals("turno")) {
 					//System.out.println("Introduce id:");
@@ -521,10 +522,11 @@ public class PruebaClienteApplication {
 					} else {
 						System.err.println("No es tu turno");
 					}
-					
-					
 				
 				
+				} else if (orden.equals("enviarEmoji")) {
+					String salaID = miSala;
+					api.sendObject("/app/partidas/emojiPartida/" + salaID, new EnvioEmoji(1, 2, false));
 				
 				
 				
