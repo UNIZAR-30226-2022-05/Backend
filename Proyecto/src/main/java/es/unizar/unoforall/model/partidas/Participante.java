@@ -29,7 +29,6 @@ public class Participante {
 	}
 
 	
-	
 	public int getPuesto() {
 		return puesto;
 	}

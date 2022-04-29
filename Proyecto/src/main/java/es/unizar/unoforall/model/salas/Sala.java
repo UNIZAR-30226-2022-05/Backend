@@ -314,6 +314,7 @@ public class Sala {
 		} else {
 			salaResumida.partida = null;
 		}
+		salaResumida.ultimaPartidaJugada  = ultimaPartidaJugada;
 		
 		//Identificador de cada usuario con su VO
 		salaResumida.participantes = participantes;
