@@ -314,7 +314,7 @@ public class SocketController {
 			return Serializar.serializar(new Sala("La sala de la partida ya no existe"));
 		} else if (!GestorSalas.obtenerSala(salaID).isEnPartida()) {
 			return Serializar.serializar(new Sala("La partida todavía no ha comenzado"));
-		}  else if (!GestorSalas.obtenerSala(salaID).isEnPausa()) {
+		}  else if (GestorSalas.obtenerSala(salaID).isEnPausa()) {
 			return Serializar.serializar(new Sala("La partida está en pausa"));
 		}
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
@@ -371,7 +371,7 @@ public class SocketController {
 			return Serializar.serializar(new Sala("La sala de la partida ya no existe"));
 		} else if (!GestorSalas.obtenerSala(salaID).isEnPartida()) {
 			return Serializar.serializar(new Sala("La partida todavía no ha comenzado"));
-		} else if (!GestorSalas.obtenerSala(salaID).isEnPausa()) {
+		} else if (GestorSalas.obtenerSala(salaID).isEnPausa()) {
 			return Serializar.serializar(new Sala("La partida está en pausa"));
 		}
 				

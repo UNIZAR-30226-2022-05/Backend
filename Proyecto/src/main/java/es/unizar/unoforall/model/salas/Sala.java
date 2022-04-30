@@ -68,6 +68,7 @@ public class Sala {
 					Collections.shuffle(jugadoresID); 
 					this.partida = new Partida(jugadoresID, configuracion, salaID);
 				} else {
+					System.out.println("--- Termina una pausa");
 					this.enPausa = false;
 				}
 					
