@@ -29,6 +29,26 @@ public class Participante {
 	}
 
 	
+	public Participante (UsuarioVO usuario, HaJugadoVO datosPartida, int numParticipantes) {
+		this.usuario=usuario;
+		this.datosPartida=datosPartida;
+		puesto = numParticipantes-datosPartida.getUsrsDebajo();
+		switch(datosPartida.getUsrsDebajo()) {
+		case 3:
+			puntos = 20;
+			break;
+		case 2:
+			puntos = 10;
+			break;
+		case 1: 
+			puntos = 5;
+			break;
+		case 0:
+			puntos = 0;
+			break;
+		}
+	}
+	
 	public int getPuesto() {
 		return puesto;
 	}

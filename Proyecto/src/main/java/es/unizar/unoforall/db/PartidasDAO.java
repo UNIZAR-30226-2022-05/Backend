@@ -41,8 +41,15 @@ public class PartidasDAO {
 				sacarParticipantes.setObject(1,(UUID) rs.getObject("partida"));
 				ResultSet rs2 = sacarParticipantes.executeQuery();
 				ArrayList<Participante> listaParticipantes = new ArrayList<Participante>();
-				int numParticipantes = 0;
-				while(rs2.next()) {
+				
+				//Necesito saber el número de IAs de la partida para saber el número total de participantes
+				PreparedStatement sacarNumIAs = 
+						conn.prepareStatement("SELECT num_ias FROM partidas_acabadas WHERE id = ?;");
+				sacarNumIAs.setObject(1, (UUID) rs.getObject("partida"));
+				ResultSet rs4 = sacarNumIAs.executeQuery();
+				rs4.next();
+				int numParticipantes = (int)rs4.getObject("num_ias"); //Partimos del número de IAs (de cero a tres)
+				while(rs2.next()) { //Mínimo debe ejecutarse una vez.
 					numParticipantes++;
 					UsuarioVO usuario = UsuarioDAO.getUsuario((UUID)rs2.getObject("usuario"));
 					
@@ -50,6 +57,7 @@ public class PartidasDAO {
 									(UUID)rs2.getObject("usuario"), (UUID)rs2.getObject("partida"),
 									rs2.getInt("usrs_debajo"), rs2.getBoolean("ha_ganado"))));
 				}
+				System.out.println("numParticipantes: " + Integer.toString(numParticipantes));
 				for (Participante p : listaParticipantes) {
 					p.setPuesto(numParticipantes);
 				}

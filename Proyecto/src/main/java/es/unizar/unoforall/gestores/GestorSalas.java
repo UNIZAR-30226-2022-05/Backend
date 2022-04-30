@@ -240,7 +240,7 @@ public class GestorSalas {
 			ArrayList<Participante> listaParticipantes = new ArrayList<Participante>();
 			for(HaJugadoVO part : participantes) {
 				UsuarioVO usuario = UsuarioDAO.getUsuario(part.getUsuario());
-				listaParticipantes.add(new Participante(usuario,part));
+				listaParticipantes.add(new Participante(usuario,part,partida.getJugadores().size()));
 			}
 			PartidaJugada pj = new PartidaJugada(pa,listaParticipantes);
 			error = PartidasDAO.insertarPartidaAcabada(pj);
