@@ -646,13 +646,14 @@ public class ApiRestController {
 	@PostMapping("/comprobarUnirseSala")
 	public String comprobarUnirseSala(@RequestParam String sesionID, String salaID){
 		Sala sala = GestorSalas.obtenerSala(Serializar.deserializar(salaID, UUID.class));
-		if (GestorSesiones.obtenerUsuarioID(sesionID) != null 
-				&& sala != null
-				&& !sala.isEnPartida() 
-				&& !sala.isEnPausa()) {
-			return Serializar.serializar(true);
-		} else {
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
+		if (usuarioID == null 
+				|| sala == null
+				|| sala.isEnPartida() 
+				|| (sala.isEnPausa() && !sala.hayParticipante(usuarioID))) {
 			return Serializar.serializar(false);
+		} else {
+			return Serializar.serializar(true);
 		}
 		
     }
