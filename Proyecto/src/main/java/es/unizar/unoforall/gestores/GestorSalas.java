@@ -253,14 +253,11 @@ public class GestorSalas {
 			for(Participante p : pj.getParticipantes()) {
 				listaPuestos.add(p.getPuesto());
 			}
-			Collections.sort(listaPuestos);
 			
-			int anteriorPuesto = 0;
-			for(int puesto : listaPuestos) {
-				if (puesto > anteriorPuesto+1) {
+			for(int puesto = 1; puesto < partida.getJugadores().size(); puesto++) {
+				if (!listaPuestos.contains(puesto)) {
 					pj.agnadirParticipante(new Participante(puesto));
 				}
-				anteriorPuesto = puesto;
 			}
 			
 			obtenerSala(salaID).setUltimaPartidaJugada(pj);
