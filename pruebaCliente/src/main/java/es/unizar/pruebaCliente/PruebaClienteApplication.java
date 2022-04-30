@@ -130,10 +130,7 @@ public class PruebaClienteApplication {
     	ReglasEspeciales reglas = new ReglasEspeciales(false, false, false, false, false, false, true);
     	ConfigSala config = new ConfigSala(ConfigSala.ModoJuego.Original, reglas, 2, true);
 		
-    	
-    	
-		//ACCIONES
-
+    	//ACCIONES
 			while(true) {
 				System.out.println("Introduce una orden: ");
 				String orden = scanner.nextLine();
@@ -530,8 +527,26 @@ public class PruebaClienteApplication {
 				
 				
 				
-				
-				
+				}	else if (orden.equals("doramion")){ //Extrae info de las partidas jugadas del usuario
+					UUID usuario = UUID.fromString("4c2a49ed-48be-4970-9010-edb1faf918f1");
+					apirest = new RestAPI("/api/sacarPartidasJugadas");
+					apirest.addParameter("sesionID", sesionID);
+					
+					apirest.setOnError(e -> {System.out.println(e);});
+					
+					apirest.openConnection();
+			    	ListaPartidas retorno = apirest.receiveObject(ListaPartidas.class);
+			    	if (retorno.getError().equals("nulo")) {
+			    		for(PartidaJugada partida : retorno.getPartidas()) {
+			    			for (Participante p : partida.getParticipantes()) {
+			    				System.out.println("Participante: "+p.getUsuario().getId());
+			    				System.out.println("Puesto: "+p.getPuesto());
+			    				System.out.println("Puntos: "+p.getPuntos());
+			    			}
+			    		}
+			    	} else {
+			    		System.out.println(retorno.getError());
+			    	}
 				} else if (orden.equals("exit")) {
 					break;
 				}
