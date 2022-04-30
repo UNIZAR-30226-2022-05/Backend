@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import java.util.UUID;
 
@@ -700,7 +701,7 @@ public class Partida {
 	// Devuelve -1 si no se ha encontrado
 	public int getIndiceJugador(UUID jugadorID) {
 		for (int i = 0; i < this.jugadores.size() ; i++) {
-			if (jugadores.get(i).getJugadorID().equals(jugadorID)) {
+			if (Objects.equals(jugadores.get(i).getJugadorID(), jugadorID)) {
 				return i;
 			}
 		}

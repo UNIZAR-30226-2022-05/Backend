@@ -637,6 +637,28 @@ public class ApiRestController {
 	
 	
 	/**
+	 * Método para comprobar si un usuario puede unirse a una sala
+	 * @param sesionID			Id de sesión del usuario
+	 * @param salaID			Id de la sala
+	 * @return					(Boolean) True si el usuario se puede unir a la
+	 * 							sala, y false en caso contrario
+	 */
+	@PostMapping("/comprobarUnirseSala")
+	public String comprobarUnirseSala(@RequestParam String sesionID, UUID salaID){		
+		Sala sala = GestorSalas.obtenerSala(salaID);
+		if (GestorSesiones.obtenerUsuarioID(sesionID) != null 
+				&& sala != null
+				&& !sala.isEnPartida() 
+				&& !sala.isEnPausa()) {
+			return Serializar.serializar(true);
+		} else {
+			return Serializar.serializar(false);
+		}
+		
+    }
+	
+	
+	/**
 	 * SOLO PRODUCCIÓN
 	 * Método para cerrar las conexiones de la BD
 	 * @param clave
