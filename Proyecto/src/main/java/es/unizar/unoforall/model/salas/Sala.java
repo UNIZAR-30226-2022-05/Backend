@@ -61,7 +61,7 @@ public class Sala {
 			this.enPartida = enPartida;
 			
 			if (this.enPartida) {  // comienza una partida
-				
+				System.out.println("--- Comienza una partida");
 				if (!isEnPausa()) {
 					List<UUID> jugadoresID = new ArrayList<>();
 					participantes.forEach((k,v) -> jugadoresID.add(k));
@@ -257,6 +257,7 @@ public class Sala {
 			this.enPausa = enPausa;
 			
 			if (this.enPausa) {  // comienza una pausa
+				System.out.println("--- Comienza una pausa");
 				setEnPartida(false);
 			}
 		}
