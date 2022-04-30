@@ -321,6 +321,8 @@ public class Sala {
 		
 		salaResumida.enPausa = enPausa;
 		
+		salaResumida.salaID = salaID;
+		
 		return salaResumida;
 	}
 

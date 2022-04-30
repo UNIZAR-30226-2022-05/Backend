@@ -254,7 +254,7 @@ public class GestorSalas {
 				listaPuestos.add(p.getPuesto());
 			}
 			
-			for(int puesto = 1; puesto < partida.getJugadores().size(); puesto++) {
+			for(Integer puesto = 1; puesto < partida.getJugadores().size()+1; puesto++) {
 				if (!listaPuestos.contains(puesto)) {
 					pj.agnadirParticipante(new Participante(puesto));
 				}
