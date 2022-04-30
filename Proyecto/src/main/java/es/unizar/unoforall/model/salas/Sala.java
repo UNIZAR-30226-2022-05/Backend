@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import es.unizar.unoforall.gestores.GestorSalas;
 import es.unizar.unoforall.model.UsuarioVO;
 import es.unizar.unoforall.model.partidas.Partida;
 import es.unizar.unoforall.model.partidas.PartidaJugada;
@@ -262,6 +263,7 @@ public class Sala {
 			this.enPausa = enPausa;
 			
 			if (this.enPausa) {  // comienza una pausa
+				GestorSalas.cancelTimer(salaID);
 				System.out.println("--- Comienza una pausa");
 				setEnPartida(false);
 			}
