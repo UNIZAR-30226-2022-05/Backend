@@ -145,6 +145,10 @@ public class Sala {
 			participantes_listos.remove(participanteID);
 			participantesVotoAbandono.remove(participanteID);
 			
+			if (participantes.size() == 0) {
+				return;
+			}
+			
 			if (this.enPartida)	 {
 				partida.expulsarJugador(participanteID);
 				
