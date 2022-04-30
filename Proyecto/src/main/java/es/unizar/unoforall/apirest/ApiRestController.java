@@ -625,7 +625,7 @@ public class ApiRestController {
 		if(usuarioID != null) {
 			Sala salaPausada = GestorSalas.getSalaPausada(usuarioID);
 			if (salaPausada != null) {
-				return Serializar.serializar(salaPausada); 
+				return Serializar.serializar(salaPausada.getSalaAEnviar()); 
 			} else {
 				return Serializar.serializar(new Sala("No hay ninguna sala pausada"));
 			}
