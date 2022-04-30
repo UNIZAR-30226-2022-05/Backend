@@ -644,8 +644,8 @@ public class ApiRestController {
 	 * 							sala, y false en caso contrario
 	 */
 	@PostMapping("/comprobarUnirseSala")
-	public String comprobarUnirseSala(@RequestParam String sesionID, UUID salaID){		
-		Sala sala = GestorSalas.obtenerSala(salaID);
+	public String comprobarUnirseSala(@RequestParam String sesionID, String salaID){
+		Sala sala = GestorSalas.obtenerSala(Serializar.deserializar(salaID, UUID.class));
 		if (GestorSesiones.obtenerUsuarioID(sesionID) != null 
 				&& sala != null
 				&& !sala.isEnPartida() 
