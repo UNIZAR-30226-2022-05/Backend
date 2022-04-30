@@ -209,7 +209,7 @@ public class SocketController {
 		if (s == null) {
 			return Serializar.serializar(new Sala("La sala se ha eliminado"));
 		} else {
-			if (s.getPartida() != null && s.getPartida().turnoDeIA()) {
+			if (s.isEnPartida() && s.getPartida().turnoDeIA()) {
 				System.out.println("- - - Preparando turno de la IA");
 				AlarmaTurnoIA alarm = new AlarmaTurnoIA(salaID);
 				Timer t = new Timer();
@@ -369,8 +369,6 @@ public class SocketController {
 		
 		if (GestorSalas.obtenerSala(salaID) == null) {
 			return Serializar.serializar(new Sala("La sala de la partida ya no existe"));
-		} else if (!GestorSalas.obtenerSala(salaID).isEnPartida()) {
-			return Serializar.serializar(new Sala("La partida todavía no ha comenzado"));
 		} else if (GestorSalas.obtenerSala(salaID).isEnPausa()) {
 			return Serializar.serializar(new Sala("La partida está en pausa"));
 		}
@@ -429,9 +427,7 @@ public class SocketController {
 		
 		if (GestorSalas.obtenerSala(salaID) == null) {
 			return Serializar.serializar(new Sala("La sala de la partida ya no existe"));
-		} else if (!GestorSalas.obtenerSala(salaID).isEnPartida()) {
-			return Serializar.serializar(new Sala("La partida todavía no ha comenzado"));
-		}  else if (!GestorSalas.obtenerSala(salaID).isEnPausa()) {
+		}  else if (GestorSalas.obtenerSala(salaID).isEnPausa()) {
 			return Serializar.serializar(new Sala("La partida está en pausa"));
 		}
 		
