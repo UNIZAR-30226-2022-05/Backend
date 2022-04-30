@@ -1,6 +1,7 @@
 package es.unizar.unoforall.model.salas;
 
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -8,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import es.unizar.unoforall.gestores.GestorSalas;
 import es.unizar.unoforall.model.UsuarioVO;
 import es.unizar.unoforall.model.partidas.Partida;
 import es.unizar.unoforall.model.partidas.PartidaJugada;
@@ -263,7 +263,7 @@ public class Sala {
 			this.enPausa = enPausa;
 			
 			if (this.enPausa) {  // comienza una pausa
-				GestorSalas.cancelTimer(salaID);
+				cancelTimer(salaID);
 				System.out.println("--- Comienza una pausa");
 				setEnPartida(false);
 			}
@@ -345,4 +345,17 @@ public class Sala {
 	}
 
 	
+	
+	private static Method cancelTimer = null;
+    public static void cancelTimer(UUID salaID){
+        try{
+            if(cancelTimer == null){
+                cancelTimer = Class.forName("es.unizar.unoforall.gestores.GestorSalas")
+                        .getDeclaredMethod("cancelTimer", UUID.class);
+            }
+            cancelTimer.invoke(null, salaID);
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
+    }
 }
