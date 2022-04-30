@@ -166,6 +166,12 @@ public class SocketController {
 		sala.nuevoParticipanteListo(GestorSesiones.obtenerUsuarioID(sesionID));
 		if(sala.isEnPartida()) {
 			GestorSalas.restartTimer(salaID);
+			
+			if (sala.getPartida().turnoDeIA()) {
+				AlarmaTurnoIA alarm = new AlarmaTurnoIA(salaID);
+				Timer t = new Timer();
+				t.schedule(alarm, DELAY_TURNO_IA);
+			}
 		}
 				
 		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
