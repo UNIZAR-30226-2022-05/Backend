@@ -2,7 +2,9 @@ package es.unizar.unoforall.gestores;
 
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.UUID;
@@ -244,6 +246,23 @@ public class GestorSalas {
 			}
 			PartidaJugada pj = new PartidaJugada(pa,listaParticipantes);
 			error = PartidasDAO.insertarPartidaAcabada(pj);
+			
+			
+			// Para añadir IAs solo en la finalización de partidas (no en la BD)
+			List<Integer> listaPuestos = new ArrayList<>();
+			for(Participante p : pj.getParticipantes()) {
+				listaPuestos.add(p.getPuesto());
+			}
+			Collections.sort(listaPuestos);
+			
+			int anteriorPuesto = 0;
+			for(int puesto : listaPuestos) {
+				if (puesto > anteriorPuesto+1) {
+					pj.agnadirParticipante(new Participante(puesto));
+				}
+				anteriorPuesto = puesto;
+			}
+			
 			obtenerSala(salaID).setUltimaPartidaJugada(pj);
 			
 			return error;

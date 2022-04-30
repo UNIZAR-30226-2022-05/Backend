@@ -30,4 +30,8 @@ public class PartidaJugada {
 		this.participantes = participantes;
 	}
 	
+	public void agnadirParticipante (Participante nuevoParticipante) {
+		this.participantes.add(nuevoParticipante);
+	}
+	
 }
