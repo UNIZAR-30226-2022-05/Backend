@@ -10,7 +10,7 @@ PRIMERA VEZ
 	Fuente:
 	https://stackoverflow.com/questions/67899129/postfix-and-openjdk-11-no-appropriate-protocol-protocol-is-disabled-or-cipher
 
-6. Ejecutar el backend en cmd con  'java -jar target/backend.....'
+6. Ejecutar el backend haciendo doble click en el script ejecutarBackend.bat
 		SI NO SE TIENE LA VARIABLE DE SISTEMA JAVA_HOME: añadirla en panel de control poniendo el directorio de java 17
 
 

@@ -5,7 +5,10 @@ CREATE TABLE IF NOT EXISTS usuarios(
 			nombre VARCHAR(200) NOT NULL,
 			puntos INT NOT NULL,
 			total_partidas INT NOT NULL,
-			num_victorias INT NOT NULL);
+			num_victorias INT NOT NULL,
+			avatar INT NOT NULL,
+			aspectoTablero INT NOT NULL,
+			aspectoCartas INT NOT NULL);
 
 CREATE TABLE IF NOT EXISTS amigo_de(
 			emisor UUID NOT NULL,
@@ -15,7 +18,6 @@ CREATE TABLE IF NOT EXISTS amigo_de(
 			FOREIGN KEY(receptor) REFERENCES usuarios(id) ON DELETE CASCADE,
 			PRIMARY KEY(emisor, receptor));
 
-	
 CREATE TABLE IF NOT EXISTS partidas_acabadas(
 			id UUID PRIMARY KEY,
 			fecha_inicio_partida DATE NOT NULL,
@@ -31,12 +33,6 @@ CREATE TABLE IF NOT EXISTS ha_jugado(
 			FOREIGN KEY(usuario) REFERENCES usuarios(id) ON DELETE CASCADE,
 			FOREIGN KEY(partida) REFERENCES partidas_acabadas(id) ON DELETE CASCADE,
 			PRIMARY KEY(usuario, partida));
-
-
-CREATE TABLE IF NOT EXISTS salas_pausadas (
-			id UUID PRIMARY KEY,
-			max_participantes INT NOT NULL,
-			sala BYTEA NOT NULL);
 			
 CREATE TABLE IF NOT EXISTS es_miembro(
 			usuario UUID NOT NULL,
@@ -44,20 +40,3 @@ CREATE TABLE IF NOT EXISTS es_miembro(
 			FOREIGN KEY(usuario) REFERENCES usuarios(id) ON DELETE CASCADE,
 			FOREIGN KEY(sala) REFERENCES salas(id) ON DELETE CASCADE,
 			PRIMARY KEY(usuario, sala));
-
-
-
-/* CREATE TABLE IF NOT EXISTS reglas(
-			id UUID PRIMARY KEY,
-			modo INT NOT NULL,	-- 1, 2, 3
-			penaliza_al_negro BOOLEAN NOT NULL,
-			acumular_robo BOOLEAN NOT NULL,
-			reflejo_robo BOOLEAN NOT NULL,
-			jugadas_combinadas BOOLEAN NOT NULL,
-			cartas_especiales BOOLEAN NOT NULL); */
-
-/* CREATE TABLE IF NOT EXISTS iconos(
-			id UUID PRIMARY KEY,
-			imagen BYTEA NOT NULL,	
-			coste INT NOT NULL); */
--- FALTA DESBLOQUEADO
