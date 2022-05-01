@@ -496,11 +496,14 @@ public class Partida {
 		
 	}
 	
-	public void ejecutarJugadaJugador(Jugada jugada, UUID jugadorID) {
+	public boolean ejecutarJugadaJugador(Jugada jugada, UUID jugadorID) {
 		if (validarJugada(jugada) && 
 				this.jugadores.get(turno).getJugadorID() != null &&
 				this.jugadores.get(turno).getJugadorID().equals(jugadorID)) {
 			ejecutarJugada(jugada);
+			return true;
+		} else {
+			return false;
 		}
 	}
 	
@@ -785,16 +788,12 @@ public class Partida {
 			} else { //Cartas con efecto o en general sin poder jugar varias cartas
 				if (jugada.getCartas().size()>1) {
 					valida = false; //Solo se puede jugar una si no son números. (o si no se permite jugar más de una).
-				}else { //Decía true aun con más de una carta sin este else
-					return Carta.compartenTipo(jugada.getCartas().get(0),anterior) 
+				}else {
+					valida = Carta.compartenTipo(jugada.getCartas().get(0),anterior) 
 							|| Carta.compartenColor(anterior,jugada.getCartas().get(0))
 							|| jugada.getCartas().get(0).esDelTipo(Carta.Tipo.mas4)
 							|| jugada.getCartas().get(0).esDelTipo(Carta.Tipo.cambioColor);
 				}
-				return Carta.compartenTipo(jugada.getCartas().get(0),anterior) 
-						|| Carta.compartenColor(anterior,jugada.getCartas().get(0))
-						|| jugada.getCartas().get(0).esDelTipo(Carta.Tipo.mas4)
-						|| jugada.getCartas().get(0).esDelTipo(Carta.Tipo.cambioColor);
 			}
 			
 			return valida;

@@ -318,7 +318,11 @@ public class SocketController {
 		
 		Partida partida = GestorSalas.obtenerSala(salaID).getPartida();
 		int turnoAnterior = partida.getTurno();
-		partida.ejecutarJugadaJugador(jugada, usuarioID);
+		boolean jugadaValida = partida.ejecutarJugadaJugador(jugada, usuarioID);
+		
+		if (!jugadaValida) {
+			return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
+		}
 		
 		if(partida.estaTerminada()) {
 			String error = GestorSalas.insertarPartidaEnBd(salaID);

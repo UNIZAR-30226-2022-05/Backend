@@ -96,6 +96,6 @@ public class Participante {
 	public void setDatosPartida(HaJugadoVO datosPartida) {
 		this.datosPartida = datosPartida;
 	}
-	
+
 	
 }
