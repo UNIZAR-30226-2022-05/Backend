@@ -8,6 +8,7 @@ public class Participante {
 	private int puesto;
 	private int puntos;
 	
+	
 	public Participante (UsuarioVO usuario, HaJugadoVO datosPartida) {
 		this.usuario=usuario;
 		this.datosPartida=datosPartida;
@@ -61,6 +62,14 @@ public class Participante {
 		}
 	}
 	
+	// Para añadir IAs solo en la finalización de partidas (no en la BD)
+	public Participante (int puesto) {
+		this.usuario=null;
+		this.datosPartida=null;
+		this.puesto = puesto;
+		this.puntos = 0;
+	}
+	
 	public int getPuesto() {
 		return puesto;
 	}
@@ -111,6 +120,6 @@ public class Participante {
 	public void setDatosPartida(HaJugadoVO datosPartida) {
 		this.datosPartida = datosPartida;
 	}
-	
+
 	
 }

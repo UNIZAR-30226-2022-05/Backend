@@ -625,7 +625,7 @@ public class ApiRestController {
 		if(usuarioID != null) {
 			Sala salaPausada = GestorSalas.getSalaPausada(usuarioID);
 			if (salaPausada != null) {
-				return Serializar.serializar(salaPausada); 
+				return Serializar.serializar(salaPausada.getSalaAEnviar()); 
 			} else {
 				return Serializar.serializar(new Sala("No hay ninguna sala pausada"));
 			}
@@ -633,6 +633,29 @@ public class ApiRestController {
 		} else {
 			return Serializar.serializar(new Sala("No hay ninguna sala pausada"));
 		}
+    }
+	
+	
+	/**
+	 * Método para comprobar si un usuario puede unirse a una sala
+	 * @param sesionID			Id de sesión del usuario
+	 * @param salaID			Id de la sala
+	 * @return					(Boolean) True si el usuario se puede unir a la
+	 * 							sala, y false en caso contrario
+	 */
+	@PostMapping("/comprobarUnirseSala")
+	public String comprobarUnirseSala(@RequestParam String sesionID, String salaID){
+		Sala sala = GestorSalas.obtenerSala(Serializar.deserializar(salaID, UUID.class));
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
+		if (usuarioID == null 
+				|| sala == null
+				|| sala.isEnPartida() 
+				|| (sala.isEnPausa() && !sala.hayParticipante(usuarioID))) {
+			return Serializar.serializar(false);
+		} else {
+			return Serializar.serializar(true);
+		}
+		
     }
 	
 	

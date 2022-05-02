@@ -1,6 +1,7 @@
 package es.unizar.unoforall.model.salas;
 
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -262,6 +263,7 @@ public class Sala {
 			this.enPausa = enPausa;
 			
 			if (this.enPausa) {  // comienza una pausa
+				cancelTimer(salaID);
 				System.out.println("--- Comienza una pausa");
 				setEnPartida(false);
 			}
@@ -321,6 +323,8 @@ public class Sala {
 		
 		salaResumida.enPausa = enPausa;
 		
+		salaResumida.salaID = salaID;
+		
 		return salaResumida;
 	}
 
@@ -341,4 +345,17 @@ public class Sala {
 	}
 
 	
+	
+	private static Method cancelTimer = null;
+    public static void cancelTimer(UUID salaID){
+        try{
+            if(cancelTimer == null){
+                cancelTimer = Class.forName("es.unizar.unoforall.gestores.GestorSalas")
+                        .getDeclaredMethod("cancelTimer", UUID.class);
+            }
+            cancelTimer.invoke(null, salaID);
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
+    }
 }

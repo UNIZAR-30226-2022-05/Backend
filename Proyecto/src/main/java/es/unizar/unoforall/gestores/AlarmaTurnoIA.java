@@ -3,6 +3,8 @@ package es.unizar.unoforall.gestores;
 import java.util.TimerTask;
 import java.util.UUID;
 
+import es.unizar.unoforall.model.salas.Sala;
+
 
 public class AlarmaTurnoIA extends TimerTask {
 	
@@ -15,7 +17,10 @@ public class AlarmaTurnoIA extends TimerTask {
 	@Override
 	public void run() {
 		try {
-			GestorSesiones.getApiInterna().sendObject("/app/partidas/turnosIA/" + salaID, "vacio");
+			Sala sala = GestorSalas.obtenerSala(salaID);
+			if (sala != null && sala.isEnPartida() && !sala.isEnPausa()) {
+				GestorSesiones.getApiInterna().sendObject("/app/partidas/turnosIA/" + salaID, "vacio");
+			}
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
