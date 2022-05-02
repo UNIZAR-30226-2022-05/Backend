@@ -170,10 +170,10 @@ public class GestorSalas {
 				boolean limSup = false;
 				int limite = 0;
 				ArrayList<Integer> auxiliar = new ArrayList<Integer>();
+				auxiliar.add((int) Math.random());
+				auxiliar.add((int) Math.random());
 				if(numImplicados==3) { 						//No hay riesgo de generar empates
-					auxiliar.add((int) Math.random());
-					auxiliar.add((int) Math.random());
-					auxiliar.add((int) Math.random());
+					auxiliar.add((int) Math.random()); 		//Añadir tercera party
 				} else { 									//Riesgo de generar empates
 					for(Integer p : puntos) {
 						if (p!=empates && p!= 0) {
@@ -184,8 +184,6 @@ public class GestorSalas {
 							break;
 						}
 					}
-					auxiliar.add((int) Math.random());
-					auxiliar.add((int) Math.random());
 				}
 				ArrayList<Integer> orden = sacarOrden(auxiliar,limSup); //Si hay límite superior, genera valores negativos
 				int indice = 0;
@@ -240,7 +238,8 @@ public class GestorSalas {
 			ArrayList<Participante> listaParticipantes = new ArrayList<Participante>();
 			for(HaJugadoVO part : participantes) {
 				UsuarioVO usuario = UsuarioDAO.getUsuario(part.getUsuario());
-				listaParticipantes.add(new Participante(usuario,part,partida.getJugadores().size()));
+				listaParticipantes.add(new Participante(usuario,part,partida.getJugadores().size(),
+												partida.getConfiguracion().getModoJuego().ordinal()));
 			}
 			PartidaJugada pj = new PartidaJugada(pa,listaParticipantes);
 			error = PartidasDAO.insertarPartidaAcabada(pj);

@@ -44,11 +44,12 @@ public class PartidasDAO {
 				
 				//Necesito saber el número de IAs de la partida para saber el número total de participantes
 				PreparedStatement sacarNumIAs = 
-						conn.prepareStatement("SELECT num_ias FROM partidas_acabadas WHERE id = ?;");
+						conn.prepareStatement("SELECT num_ias, modo_juego FROM partidas_acabadas WHERE id = ?;");
 				sacarNumIAs.setObject(1, (UUID) rs.getObject("partida"));
 				ResultSet rs4 = sacarNumIAs.executeQuery();
 				rs4.next();
 				int numParticipantes = (int)rs4.getObject("num_ias"); //Partimos del número de IAs (de cero a tres)
+				int modo_juego = (int)rs4.getObject("modo_juego");
 				while(rs2.next()) { //Mínimo debe ejecutarse una vez.
 					numParticipantes++;
 					UsuarioVO usuario = UsuarioDAO.getUsuario((UUID)rs2.getObject("usuario"));
@@ -59,7 +60,7 @@ public class PartidasDAO {
 				}
 				System.out.println("numParticipantes: " + Integer.toString(numParticipantes));
 				for (Participante p : listaParticipantes) {
-					p.setPuesto(numParticipantes);
+					p.setPuesto(numParticipantes, modo_juego);
 				}
 				//Saca los datos de la partida
 				PreparedStatement sacarPartida = 

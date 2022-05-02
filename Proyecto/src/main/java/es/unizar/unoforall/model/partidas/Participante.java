@@ -29,10 +29,22 @@ public class Participante {
 	}
 
 	
-	public Participante (UsuarioVO usuario, HaJugadoVO datosPartida, int numParticipantes) {
+	public Participante (UsuarioVO usuario, HaJugadoVO datosPartida, int numParticipantes, int modoJuego) {
 		this.usuario=usuario;
 		this.datosPartida=datosPartida;
-		puesto = numParticipantes-datosPartida.getUsrsDebajo();
+		if(modoJuego!=2) {
+			puesto = numParticipantes-datosPartida.getUsrsDebajo();
+		} else {
+			switch(datosPartida.getUsrsDebajo()) {
+			case 2:
+				puesto = 1;
+				break;
+			case 0:
+				puesto = 2;
+				break;
+			}
+		}
+		
 		switch(datosPartida.getUsrsDebajo()) {
 		case 3:
 			puntos = 20;
@@ -54,8 +66,20 @@ public class Participante {
 	}
 
 
-	public void setPuesto(int numParticipantes) {
+	public void setPuesto(int numParticipantes, int modoJuego) {
 		puesto = numParticipantes-datosPartida.getUsrsDebajo();
+		if(modoJuego!=2) {
+			puesto = numParticipantes-datosPartida.getUsrsDebajo();
+		} else {
+			switch(datosPartida.getUsrsDebajo()) {
+			case 2:
+				puesto = 1;
+				break;
+			case 0:
+				puesto = 2;
+				break;
+			}
+		}
 	}
 
 
