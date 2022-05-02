@@ -168,30 +168,35 @@ public class GestorSalas {
 			}
 			
 			//Caso empates
-			if(empates != 0 && !parejas) {
+			if(empates != 0) {
 				boolean limSup = false;
 				int limite = 0;
 				ArrayList<Integer> auxiliar = new ArrayList<Integer>();
-				auxiliar.add((int) Math.random());
-				auxiliar.add((int) Math.random());
+				auxiliar.add((int)(Math.random()*10000 + 1));
+				auxiliar.add((int)(Math.random()*10000 + 1));
 				if(numImplicados==3) { 						//No hay riesgo de generar empates
-					auxiliar.add((int) Math.random()); 		//Añadir tercera party
-				} else { 									//Riesgo de generar empates
+					auxiliar.add((int)(Math.random()*10000 + 1)); 		//Añadir tercera party
+				} else {//Riesgo de generar empates
+					int j = 0; //Para conocer la componente a actualizar en caso de limite superior.
 					for(Integer p : puntos) {
 						if (p!=empates && p!= 0) {
-							limite=p;
 							if(p>empates) { //Si los valores a generar deben ser menores
 								limSup=true;
+								puntos.set(j, p+1); //para evitar caso 0, empate a 1, 2.
+								limite=p+1;
+							} else {
+								limite=p;
 							}
 							break;
 						}
+						j++;
 					}
 				}
 				ArrayList<Integer> orden = sacarOrden(auxiliar,limSup); //Si hay límite superior, genera valores negativos
 				int indice = 0;
-				for(Integer p : puntos) {
-					if (p==empates) {
-						p=limite + orden.get(indice);
+				for(int j = 0; j < puntos.size(); j++) {
+					if (puntos.get(j)==empates) {
+						puntos.set(j, limite + orden.get(indice));
 						indice++;
 					}
 				}
