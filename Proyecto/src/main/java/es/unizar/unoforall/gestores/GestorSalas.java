@@ -253,20 +253,66 @@ public class GestorSalas {
 			
 			
 			// Para añadir IAs solo en la finalización de partidas (no en la BD)
-			List<Integer> listaPuestos = new ArrayList<>();
-			for(Participante p : pj.getParticipantes()) {
-				listaPuestos.add(p.getPuesto());
-			}
-			
-			for(Integer puesto = 1; puesto < partida.getJugadores().size()+1; puesto++) {
-				if (!listaPuestos.contains(puesto)) {
-					pj.agnadirParticipante(new Participante(puesto));
-				}
-			}
+			anyadirIAsParticipantes(pj, parejas, partida.getJugadores().size());
 			
 			obtenerSala(salaID).setUltimaPartidaJugada(pj);
 			
 			return error;
+		}
+	}
+	
+	/**
+	 * Dados la partida jugada, si el modo es por parejas y el numero de jugadores total, añade a la lista de participantes las IAs
+	 * que falten y adapta los puestos en caso de jugar en modo por parejas.
+	 * 
+	 * @param pj
+	 * @param parejas
+	 * @param numJugadores
+	 */
+	public static void anyadirIAsParticipantes(PartidaJugada pj, boolean parejas, int numJugadores) {
+		List<Integer> listaPuestos = new ArrayList<>();
+		int cuentaUno=0;
+		int cuentaDos=0;
+		for(Participante p : pj.getParticipantes()) {
+			listaPuestos.add(p.getPuesto());
+			if(p.getPuesto()==1) {
+				cuentaUno++;
+			} else if(p.getPuesto()==2) {
+				cuentaDos++;
+			}
+		}
+		
+		if(!parejas) {
+			for(Integer puesto = 1; puesto < numJugadores+1; puesto++) {
+				if (!listaPuestos.contains(puesto)) {
+					pj.agnadirParticipante(new Participante(puesto));
+				}
+			}
+		} else {
+			for (int j = cuentaUno; j < 2; j++) {
+				pj.agnadirParticipante(new Participante(j));
+			}
+			for (int j = cuentaDos; j < 2; j++) {
+				pj.agnadirParticipante(new Participante(j));
+			}
+			boolean primeraVez = true;
+			for(int j = 0; j < 4; j++) {
+				if(pj.getParticipantes().get(j).getPuesto()==2) {
+					if(primeraVez) {
+						pj.getParticipantes().get(j).setPuesto(3);
+						primeraVez = false;
+					} else {
+						pj.getParticipantes().get(j).setPuesto(4);
+						break;
+					}
+				}
+			}
+			for(int j = 0; j < 4; j++) {
+				if(pj.getParticipantes().get(j).getPuesto()==1) {
+					pj.getParticipantes().get(j).setPuesto(2);
+					break;
+				}
+			}
 		}
 	}
 	

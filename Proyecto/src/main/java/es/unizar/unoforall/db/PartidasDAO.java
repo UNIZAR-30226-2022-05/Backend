@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import es.unizar.unoforall.gestores.GestorSalas;
 import es.unizar.unoforall.model.PartidasAcabadasVO;
 import es.unizar.unoforall.model.UsuarioVO;
 import es.unizar.unoforall.model.partidas.HaJugadoVO;
@@ -62,15 +63,19 @@ public class PartidasDAO {
 				for (Participante p : listaParticipantes) {
 					p.setPuesto(numParticipantes, modo_juego);
 				}
+				
 				//Saca los datos de la partida
 				PreparedStatement sacarPartida = 
 						conn.prepareStatement("SELECT * FROM partidas_acabadas WHERE id = ?;");
 				sacarPartida.setObject(1,(UUID) rs.getObject("partida"));
 				ResultSet rs3 = sacarPartida.executeQuery();
 				if(rs3.next()) {
-					partidas.add(new PartidaJugada(new PartidasAcabadasVO((UUID)rs3.getObject("id"),
+					PartidaJugada pj = new PartidaJugada(new PartidasAcabadasVO((UUID)rs3.getObject("id"),
 							rs3.getDate("fecha_inicio_partida"),rs3.getDate("fecha_fin_partida"),
-							rs3.getInt("num_ias"),rs3.getInt("modo_juego")),listaParticipantes));
+							rs3.getInt("num_ias"),rs3.getInt("modo_juego")),listaParticipantes);
+					//Añade las IAs necesarias y modifica los puestos si es el modo por parejas.
+					GestorSalas.anyadirIAsParticipantes(pj, modo_juego==2, numParticipantes);
+					partidas.add(pj);
 				}
 			}
 			lp.setPartidas(partidas);

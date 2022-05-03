@@ -74,7 +74,10 @@ public class Participante {
 		return puesto;
 	}
 
-
+	public void setPuesto(int puesto) {
+		this.puesto=puesto;
+	}
+	
 	public void setPuesto(int numParticipantes, int modoJuego) {
 		puesto = numParticipantes-datosPartida.getUsrsDebajo();
 		if(modoJuego!=2) {
@@ -91,19 +94,13 @@ public class Participante {
 		}
 	}
 
-
-
 	public int getPuntos() {
 		return puntos;
 	}
 
-
-
 	public void setPuntos(int puntos) {
 		this.puntos = puntos;
 	}
-
-
 
 	public UsuarioVO getUsuario() {
 		return usuario;
