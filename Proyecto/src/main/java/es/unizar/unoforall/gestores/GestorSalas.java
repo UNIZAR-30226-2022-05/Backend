@@ -290,10 +290,10 @@ public class GestorSalas {
 			}
 		} else {
 			for (int j = cuentaUno; j < 2; j++) {
-				pj.agnadirParticipante(new Participante(j));
+				pj.agnadirParticipante(new Participante(1));
 			}
 			for (int j = cuentaDos; j < 2; j++) {
-				pj.agnadirParticipante(new Participante(j));
+				pj.agnadirParticipante(new Participante(2));
 			}
 			boolean primeraVez = true;
 			for(int j = 0; j < 4; j++) {

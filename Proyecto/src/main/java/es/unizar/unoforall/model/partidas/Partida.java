@@ -110,14 +110,14 @@ public class Partida {
 //		listaCartasBaraja.add(new Carta(Carta.Tipo.n2, Carta.Color.rojo));
 //		listaCartasBaraja.add(new Carta(Carta.Tipo.n3, Carta.Color.rojo));
 //		listaCartasBaraja.add(new Carta(Carta.Tipo.mas2, Carta.Color.rojo));
-//		listaCartasBaraja.add(new Carta(Carta.Tipo.reversa, Carta.Color.rojo));
+//		listaCartasBaraja.add(new Carta(Carta.Tipo.n4, Carta.Color.rojo));
 //		
 //		for (Carta c : listaCartasBaraja) {
 //			for(int i = 0; i < 20; i++) {
 //				this.mazo.add(c.clone());
 //			}
 //		}
-//		
+		
 		
 		Collections.shuffle(this.mazo); 
 		

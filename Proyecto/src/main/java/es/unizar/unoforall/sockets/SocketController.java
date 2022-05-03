@@ -140,7 +140,7 @@ public class SocketController {
 			nuevoParticipante(UsuarioDAO.getUsuario(GestorSesiones.obtenerUsuarioID(sesionID)));
 		
 		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
-	}
+	} 
 	
 	/**
 	 * Método para indicar que el usuario está listo para jugar
@@ -313,15 +313,24 @@ public class SocketController {
 			return Serializar.serializar(new Sala("La sesión ha caducado. Vuelva a iniciar sesión"));
 		}
 		
-		System.out.println("- - - " + sesionID + " envia un turno a la sala " + salaID);
-		System.out.println("- - - Jugada: " + jugada);
 		
+		System.out.println("- - - " + sesionID + " envia un turno a la sala " + salaID);
+				
 		Partida partida = GestorSalas.obtenerSala(salaID).getPartida();
+		
+		if (partida.turnoDeIA()) {
+			System.out.println("- - - Jugada en turno incorrecto");
+			return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
+		}
+		
 		int turnoAnterior = partida.getTurno();
 		boolean jugadaValida = partida.ejecutarJugadaJugador(jugada, usuarioID);
 		
 		if (!jugadaValida) {
+			System.out.println("- - - Jugada inválida");
 			return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
+		} else {
+			System.out.println("- - - Jugada: " + jugada);
 		}
 		
 		if(partida.estaTerminada()) {
