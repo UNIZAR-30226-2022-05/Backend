@@ -21,10 +21,9 @@ public class Partida {
 	private List<Carta> cartasJugadas = null;
 	
 	private Jugada ultimaJugada = null;
-	public Jugada getUltimaJugada(){
-		return this.ultimaJugada;
-	}
-	
+	private int turnoUltimaJugada;
+
+
 	private List<Jugador> jugadores = null;
 	private int turno = 0;
 	private boolean sentidoHorario = true;
@@ -80,6 +79,7 @@ public class Partida {
 		this.terminada = false;
 		this.salaID = salaID;
 		ultimaJugada = null;
+		turnoUltimaJugada = 0;
 				
 				
 		//Marcamos fecha de inicio
@@ -433,6 +433,7 @@ public class Partida {
 	
 	public void ejecutarJugada(Jugada jugada) {
 		ultimaJugada = jugada;
+		turnoUltimaJugada = turno;
 		repeticionTurno = false;
 		if(modoJugarCartaRobada) { //FUNCIONA
 			if(jugada.getCartas()!=null && jugada.getCartas().size()==1) {
@@ -898,6 +899,7 @@ public class Partida {
 		}
 		
 		partidaResumida.ultimaJugada = this.ultimaJugada;
+		partidaResumida.turnoUltimaJugada = this.turnoUltimaJugada;
 		
 		
 		partidaResumida.jugadores = jugadores;
@@ -942,5 +944,13 @@ public class Partida {
 
 	public int getRoboAcumulado() {
 		return roboAcumulado;
+	}
+	
+	public Jugada getUltimaJugada(){
+		return this.ultimaJugada;
+	}
+	
+	public int getTurnoUltimaJugada() {
+		return turnoUltimaJugada;
 	}
 }
