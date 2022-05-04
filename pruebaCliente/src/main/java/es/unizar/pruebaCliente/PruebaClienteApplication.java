@@ -261,7 +261,7 @@ public class PruebaClienteApplication {
 			    		System.out.println("Ha sucedido el siguiente error:"+retorno.getError());
 			    	} else {
 			    		System.out.println("Datos del usuario: ");
-			    		System.out.println("Correo: "+ retorno.getUsuarios().get(0).getId());
+			    		System.out.println("ID: "+ retorno.getUsuarios().get(0).getId());
 			    		System.out.println("Correo: "+ retorno.getUsuarios().get(0).getCorreo());
 			    		System.out.println("Nombre: "+ retorno.getUsuarios().get(0).getNombre());
 			    		System.out.println("Puntos: "+ retorno.getUsuarios().get(0).getPuntos());
