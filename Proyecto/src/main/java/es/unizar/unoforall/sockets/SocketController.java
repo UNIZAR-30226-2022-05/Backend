@@ -381,10 +381,16 @@ public class SocketController {
 		int turnoAnterior = partida.getTurno();
 		partida.ejecutarJugadaIA();
 		
+		System.out.println("aaaaaaaaaaaaaaaa");
+		Jugada ultimaJugada = partida.getUltimaJugada();
 		//Envía un emoji si ha tirado un +4
-		if (partida.getUltimaCartaJugada().esDelTipo(Carta.Tipo.mas4)) {
+		if (ultimaJugada != null
+			&& ultimaJugada.getCartas() != null
+			&& ultimaJugada.getCartas().size() == 1
+			&& ultimaJugada.getCartas().get(0).esDelTipo(Carta.Tipo.mas4)) {
 			GestorSesiones.getApiInterna().sendObject("/app/partidas/emojiPartida/" + salaID, new EnvioEmoji(0,turnoAnterior,true));
 		}
+		System.out.println("bbbbbbbbbbbbbbbb");
 		
 		if(partida.estaTerminada()) {
 			String error = GestorSalas.insertarPartidaEnBd(salaID);
