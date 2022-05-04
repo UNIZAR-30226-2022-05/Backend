@@ -21,6 +21,9 @@ public class Partida {
 	private List<Carta> cartasJugadas = null;
 	
 	private Jugada ultimaJugada = null;
+	public Jugada getUltimaJugada(){
+		return this.ultimaJugada;
+	}
 	
 	private List<Jugador> jugadores = null;
 	private int turno = 0;
