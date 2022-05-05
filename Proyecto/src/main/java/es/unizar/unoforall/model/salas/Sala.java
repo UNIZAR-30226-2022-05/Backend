@@ -12,7 +12,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
 
-import es.unizar.unoforall.gestores.AlarmaACK;
 import es.unizar.unoforall.model.UsuarioVO;
 import es.unizar.unoforall.model.partidas.Partida;
 import es.unizar.unoforall.model.partidas.PartidaJugada;
