@@ -145,7 +145,7 @@ public class GestorSalas {
 			String error = null;
 			PartidasAcabadasVO pa = new PartidasAcabadasVO(null, 
 					partida.getFechaInicio(), 
-					new Date(System.currentTimeMillis()), 
+					System.currentTimeMillis(), 
 					partida.getNumIAs(),
 					partida.getConfiguracion().getModoJuego().ordinal());
 			

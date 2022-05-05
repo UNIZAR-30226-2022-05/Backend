@@ -73,8 +73,8 @@ public class PartidasDAO {
 				if(rs3.next()) {
 					PartidaJugada pj = new PartidaJugada(new PartidasAcabadasVO(
 							(UUID)rs3.getObject("id"),
-							new Date(rs3.getLong("fecha_inicio_partida")),
-							new Date(rs3.getLong("fecha_fin_partida")),
+							rs3.getLong("fecha_inicio_partida"),
+							rs3.getLong("fecha_fin_partida"),
 							rs3.getInt("num_ias"),
 							rs3.getInt("modo_juego")),
 							listaParticipantes);
@@ -110,8 +110,8 @@ public class PartidasDAO {
 			PreparedStatement insertarPartida = 
 					conn.prepareStatement("Insert Into partidas_acabadas Values(?,?,?,?,?);");
 			insertarPartida.setObject(1, partida.getPartida().getId());
-			insertarPartida.setLong(2, partida.getPartida().getFechaInicioPartida().getTime());
-			insertarPartida.setLong(3, partida.getPartida().getFechaFinPartida().getTime());
+			insertarPartida.setLong(2, partida.getPartida().getFechaInicioPartida());
+			insertarPartida.setLong(3, partida.getPartida().getFechaFinPartida());
 			insertarPartida.setInt(4, partida.getPartida().getNumIas());
 			insertarPartida.setInt(5, partida.getPartida().getModoJuego());
 			

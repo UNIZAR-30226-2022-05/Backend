@@ -32,7 +32,7 @@ public class Partida {
 	private boolean terminada = false;	
 	
 	//Fecha de inicio de la partida (Ya en formato sql porque no la necesita el frontend en este punto). 
-	private Date fechaInicio = null; 
+	private Long fechaInicio = null; 
 	
 	//Variables para extraer resultados de efectos
 	private boolean modoAcumulandoRobo = false;
@@ -82,7 +82,7 @@ public class Partida {
 				
 				
 		//Marcamos fecha de inicio
-		fechaInicio = new Date(System.currentTimeMillis()); //Fecha actual.
+		fechaInicio = System.currentTimeMillis(); //Fecha actual.
 		
 		//Mazo
 		this.mazo = new LinkedList<>();
@@ -835,7 +835,7 @@ public class Partida {
 		this.error = error;
 	}
 
-	public Date getFechaInicio() {
+	public Long getFechaInicio() {
 		return fechaInicio;
 	}
 

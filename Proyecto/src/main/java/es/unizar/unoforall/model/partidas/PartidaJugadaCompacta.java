@@ -8,8 +8,8 @@ import es.unizar.unoforall.model.salas.ConfigSala;
 public class PartidaJugadaCompacta{
 	private static final ConfigSala.ModoJuego[] modosJuego = ConfigSala.ModoJuego.values();
 	
-	private Date fechaInicio;
-	private Date fechaFin;
+	private Long fechaInicio;
+	private Long fechaFin;
 	private ConfigSala.ModoJuego modoJuego;
 	private List<Participante> participantes;
 	
@@ -20,11 +20,11 @@ public class PartidaJugadaCompacta{
 		this.participantes = partidaJugada.getParticipantes();
 	}
 
-	public Date getFechaInicio(){
+	public Long getFechaInicio(){
 		return fechaInicio;
 	}
 
-	public Date getFechaFin(){
+	public Long getFechaFin(){
 		return fechaFin;
 	}
 
