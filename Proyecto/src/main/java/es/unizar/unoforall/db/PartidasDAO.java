@@ -1,6 +1,7 @@
 package es.unizar.unoforall.db;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -70,9 +71,13 @@ public class PartidasDAO {
 				sacarPartida.setObject(1,(UUID) rs.getObject("partida"));
 				ResultSet rs3 = sacarPartida.executeQuery();
 				if(rs3.next()) {
-					PartidaJugada pj = new PartidaJugada(new PartidasAcabadasVO((UUID)rs3.getObject("id"),
-							rs3.getDate("fecha_inicio_partida"),rs3.getDate("fecha_fin_partida"),
-							rs3.getInt("num_ias"),rs3.getInt("modo_juego")),listaParticipantes);
+					PartidaJugada pj = new PartidaJugada(new PartidasAcabadasVO(
+							(UUID)rs3.getObject("id"),
+							new Date(rs3.getLong("fecha_inicio_partida")),
+							new Date(rs3.getLong("fecha_fin_partida")),
+							rs3.getInt("num_ias"),
+							rs3.getInt("modo_juego")),
+							listaParticipantes);
 					//Añade las IAs necesarias y modifica los puestos si es el modo por parejas.
 					GestorSalas.anyadirIAsParticipantes(pj, modo_juego==2, numParticipantes);
 					partidas.add(pj);
@@ -95,7 +100,7 @@ public class PartidasDAO {
 	 * @return 				"nulo" si no hay problemas, y un mensaje de error en caso de que los
 	 * 						haya.
 	 */
-	public static String insertarPartidaAcabada(PartidaJugada partida) {
+	public static String insertarPartidaAcabada(PartidaJugada partida) { 
 		String error = "nulo";
 		Connection conn = null;
 		
@@ -105,8 +110,8 @@ public class PartidasDAO {
 			PreparedStatement insertarPartida = 
 					conn.prepareStatement("Insert Into partidas_acabadas Values(?,?,?,?,?);");
 			insertarPartida.setObject(1, partida.getPartida().getId());
-			insertarPartida.setDate(2, partida.getPartida().getFechaInicioPartida());
-			insertarPartida.setDate(3, partida.getPartida().getFechaFinPartida());
+			insertarPartida.setLong(2, partida.getPartida().getFechaInicioPartida().getTime());
+			insertarPartida.setLong(3, partida.getPartida().getFechaFinPartida().getTime());
 			insertarPartida.setInt(4, partida.getPartida().getNumIas());
 			insertarPartida.setInt(5, partida.getPartida().getModoJuego());
 			
