@@ -283,7 +283,8 @@ public class ApiRestController {
 	 */
 	@PostMapping("/actualizarCuentaStepOne")
 	public String actualizarCuentaStepOne(@RequestParam String sesionID,
-								String correoNuevo, String nombre, String contrasenna){
+			@RequestParam String correoNuevo, @RequestParam String nombre, 
+			@RequestParam String contrasenna){
 		String error = "nulo";
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
 		if(usuarioID != null) {
@@ -627,11 +628,11 @@ public class ApiRestController {
 			if (salaPausada != null) {
 				return Serializar.serializar(salaPausada.getSalaAEnviar()); 
 			} else {
-				return Serializar.serializar(new Sala("No hay ninguna sala pausada"));
+				return Serializar.serializar(new Sala("No hay ninguna sala pausada").getSalaAEnviar());
 			}
 
 		} else {
-			return Serializar.serializar(new Sala("No hay ninguna sala pausada"));
+			return Serializar.serializar(new Sala("No hay ninguna sala pausada").getSalaAEnviar());
 		}
     }
 	
@@ -644,7 +645,7 @@ public class ApiRestController {
 	 * 							sala, y false en caso contrario
 	 */
 	@PostMapping("/comprobarUnirseSala")
-	public String comprobarUnirseSala(@RequestParam String sesionID, String salaID){
+	public String comprobarUnirseSala(@RequestParam String sesionID, @RequestParam String salaID){
 		Sala sala = GestorSalas.obtenerSala(Serializar.deserializar(salaID, UUID.class));
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
 		if (usuarioID == null 
@@ -656,6 +657,27 @@ public class ApiRestController {
 			return Serializar.serializar(true);
 		}
 		
+    }
+	
+	
+	/**
+	 * Método para comprobar si un usuario puede unirse a una sala
+	 * @param sesionID			Id de sesión del usuario
+	 * @param salaID			Id de la sala
+	 * @return					(Boolean) True si es correcto, false en caso
+	 * 							contrario
+	 */
+	@PostMapping("/ack")
+	public String ack(@RequestParam String sesionID, @RequestParam String salaID){
+		System.out.println("ACK recibido");
+		Sala sala = GestorSalas.obtenerSala(Serializar.deserializar(salaID, UUID.class));
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
+		if (sala != null && usuarioID != null) {
+			sala.ack(usuarioID);
+			return Serializar.serializar(true);
+		} else {
+			return Serializar.serializar(false);
+		}
     }
 	
 	

@@ -139,6 +139,7 @@ public class SocketController {
 		GestorSalas.obtenerSala(salaID).
 			nuevoParticipante(UsuarioDAO.getUsuario(GestorSesiones.obtenerUsuarioID(sesionID)));
 		
+		GestorSalas.obtenerSala(salaID).initAckTimers();
 		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
 	} 
 	
@@ -173,7 +174,7 @@ public class SocketController {
 				t.schedule(alarm, DELAY_TURNO_IA);
 			}
 		}
-				
+		sala.initAckTimers();		
 		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
 	}
 	
@@ -214,6 +215,7 @@ public class SocketController {
 				GestorSalas.restartTimer(salaID);
 			}
 			
+			s.initAckTimers();
 			return Serializar.serializar(s.getSalaAEnviar());
 		}
 	}
@@ -248,7 +250,7 @@ public class SocketController {
 			GestorSalas.eliminarSala(salaID);
 			return Serializar.serializar(new Sala("La sala se ha eliminado"));
 		}
-				
+		s.initAckTimers();		
 		return Serializar.serializar(s.getSalaAEnviar());
 	}
 	
@@ -265,7 +267,6 @@ public class SocketController {
 	@SendTo("/topic/salas/{salaID}")
 	public String actualizarSala(@DestinationVariable UUID salaID,  
 							Object vacio) throws Exception {
-		
 		Sala s = GestorSalas.obtenerSala(salaID);
 		
 		if (s == null) {
@@ -273,8 +274,10 @@ public class SocketController {
 		} else {
 			if(s.isEnPartida()) {
 				GestorSalas.restartTimer(salaID);
+				s.getPartida().resetUltimaJugada(); 
 			}
 			
+			s.initAckTimers();
 			return Serializar.serializar(s.getSalaAEnviar());
 		}
 	}
@@ -315,11 +318,13 @@ public class SocketController {
 		
 		
 		System.out.println("- - - " + sesionID + " envia un turno a la sala " + salaID);
-				
-		Partida partida = GestorSalas.obtenerSala(salaID).getPartida();
+		
+		Sala sala = GestorSalas.obtenerSala(salaID);
+		Partida partida = sala.getPartida();
 		
 		if (partida.turnoDeIA()) {
 			System.out.println("- - - Jugada en turno incorrecto");
+			sala.initAckTimers();
 			return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
 		}
 		
@@ -328,6 +333,7 @@ public class SocketController {
 		
 		if (!jugadaValida) {
 			System.out.println("- - - Jugada inválida");
+			sala.initAckTimers();
 			return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
 		} else {
 			System.out.println("- - - Jugada: " + jugada);
@@ -339,7 +345,6 @@ public class SocketController {
 				System.err.println("Error al insertar la partida en la BD");
 			}	
 			GestorSalas.cancelTimer(salaID);
-			Sala sala = GestorSalas.obtenerSala(salaID);
 			sala.setEnPartida(false);
 			
 		} else {
@@ -354,7 +359,7 @@ public class SocketController {
 				GestorSalas.restartTimer(salaID);
 			}
 		}
-		
+		sala.initAckTimers();
 		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
 	}
 	
@@ -376,8 +381,9 @@ public class SocketController {
 		} else if (GestorSalas.obtenerSala(salaID).isEnPausa()) {
 			return Serializar.serializar(new Sala("La partida está pausada"));
 		}
-				
-		Partida partida = GestorSalas.obtenerSala(salaID).getPartida();
+		
+		Sala sala = GestorSalas.obtenerSala(salaID);
+		Partida partida = sala.getPartida();
 		int turnoAnterior = partida.getTurno();
 		partida.ejecutarJugadaIA();
 		
@@ -396,7 +402,6 @@ public class SocketController {
 				System.err.println("Error al insertar la partida en la BD");
 			}	
 			GestorSalas.cancelTimer(salaID);
-			Sala sala = GestorSalas.obtenerSala(salaID);
 			sala.setEnPartida(false);
 			
 		} else {
@@ -415,7 +420,7 @@ public class SocketController {
 				GestorSalas.restartTimer(salaID);
 			}
 		}
-		
+		sala.initAckTimers();
 		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
 	}
 	
@@ -439,7 +444,8 @@ public class SocketController {
 			return Serializar.serializar(new Sala("La partida está en pausa ..."));
 		}
 		
-		Partida partida = GestorSalas.obtenerSala(salaID).getPartida();
+		Sala sala = GestorSalas.obtenerSala(salaID);
+		Partida partida = sala.getPartida();
 		partida.saltarTurno();
 		
 		if (partida.turnoDeIA()) {
@@ -454,7 +460,7 @@ public class SocketController {
 		}
 		
 		GestorSalas.restartTimer(salaID);
-		
+		sala.initAckTimers();
 		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
 	}
 	
@@ -488,9 +494,11 @@ public class SocketController {
 		
 		System.out.println("El usuario " + usuarioID + " ha pulsado el botón UNO");
 		
-		Partida partida = GestorSalas.obtenerSala(salaID).getPartida();
+		Sala sala = GestorSalas.obtenerSala(salaID);
+		Partida partida = sala.getPartida();
 		partida.pulsarBotonUNO(usuarioID);
 		
+		sala.ack(usuarioID);
 		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
 	}
 	

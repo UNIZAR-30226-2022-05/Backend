@@ -159,7 +159,7 @@ public class WebSocketAPI {
         }
     }
     
-    public <T> void sendObject(String topic, T object){
+    public synchronized <T> void sendObject(String topic, T object){
     	if(closed){
             return;
         }

@@ -1,14 +1,18 @@
 package es.unizar.unoforall.model.salas;
 
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.UUID;
 
+import es.unizar.unoforall.gestores.AlarmaACK;
 import es.unizar.unoforall.model.UsuarioVO;
 import es.unizar.unoforall.model.partidas.Partida;
 import es.unizar.unoforall.model.partidas.PartidaJugada;
@@ -30,12 +34,16 @@ public class Sala {
 	private HashMap<UUID, UsuarioVO> participantes;
 	//Conjunto de participantes con el indicador de si están listos o no
 	private HashMap<UUID, Boolean> participantes_listos;
+	private HashMap<UUID, Object> participantesAck;
 	
 	//Conjunto de participantes con el indicador de si están listos o no
 	private HashMap<UUID, Boolean> participantesVotoAbandono;
 	private boolean enPausa;
 	
-
+	private final static int TIMEOUT_ACK = 1000;	//1 segundo
+	
+	private static final Object LOCK = new Object();
+	
 	private Sala() {
 		
 	}
@@ -44,6 +52,7 @@ public class Sala {
 		participantes = new HashMap<>();
 		participantes_listos = new HashMap<>();
 		participantesVotoAbandono = new HashMap<>();
+		participantesAck = new HashMap<>();
 		noExiste = true;
 		setError(mensajeError);
 		partida = null;
@@ -58,26 +67,28 @@ public class Sala {
 	}
 	
 	public void setEnPartida(boolean enPartida) {
-		if (this.enPartida != enPartida) {
-			this.enPartida = enPartida;
-			
-			if (this.enPartida) {  // comienza una partida
-				System.out.println("--- Comienza una partida");
-				if (!isEnPausa()) {
-					List<UUID> jugadoresID = new ArrayList<>();
-					participantes.forEach((k,v) -> jugadoresID.add(k));
-					Collections.shuffle(jugadoresID); 
-					this.partida = new Partida(jugadoresID, configuracion, salaID);
-				} else {
-					System.out.println("--- Termina una pausa");
-					this.enPausa = false;
-				}
-					
-				participantes.forEach((k,v) -> participantesVotoAbandono.put(k, false));
+		synchronized (LOCK) {
+			if (this.enPartida != enPartida) {
+				this.enPartida = enPartida;
 				
-			} else {			   // termina una partida
-				for (Map.Entry<UUID, Boolean> entry : participantes_listos.entrySet()) {
-					entry.setValue(false);
+				if (this.enPartida) {  // comienza una partida
+					System.out.println("--- Comienza una partida");
+					if (!isEnPausa()) {
+						List<UUID> jugadoresID = new ArrayList<>();
+						participantes.forEach((k,v) -> jugadoresID.add(k));
+						Collections.shuffle(jugadoresID); 
+						this.partida = new Partida(jugadoresID, configuracion, salaID);
+					} else {
+						System.out.println("--- Termina una pausa");
+						this.enPausa = false;
+					}
+						
+					participantes.forEach((k,v) -> participantesVotoAbandono.put(k, false));
+					
+				} else {			   // termina una partida
+					for (Map.Entry<UUID, Boolean> entry : participantes_listos.entrySet()) {
+						entry.setValue(false);
+					}
 				}
 			}
 		}
@@ -94,85 +105,97 @@ public class Sala {
 	
 	// Devuelve false si no es posible añadir un nuevo participante
 	public boolean nuevoParticipante(UsuarioVO participante) {
-		if (isEnPausa()) {
-			return false;
+		synchronized (LOCK) {
+			if (isEnPausa()) {
+				return false;
+			}
+			
+			if(participantes.size() < configuracion.getMaxParticipantes()) {
+				participantes.putIfAbsent(participante.getId(), participante);
+				participantes_listos.putIfAbsent(participante.getId(), false);
+				participantesAck.putIfAbsent(participante.getId(), null);
+				return true;
+			} else {
+				return false;
+			}
 		}
-		
-		if(participantes.size() < configuracion.getMaxParticipantes()) {
-			participantes.putIfAbsent(participante.getId(), participante);
-			participantes_listos.putIfAbsent(participante.getId(), false);
-			return true;
-		} else {
-			return false;
-		}
+	}
+	
+	private void eliminarParticipanteInterno(UUID participanteID) {
+		participantes.remove(participanteID);
+		participantes_listos.remove(participanteID);
+		ack(participanteID);
+		participantesAck.remove(participanteID);
 	}
 	
 	// Para eliminar un participante definitivamente mientras la partida está
 	// pausada (también se elimimnará definitivamente si ha pulsado 'listo' y
 	// luego se ha desconectado)
 	public void eliminarParticipanteDefinitivamente(UUID participanteID) {
-		if (isEnPausa()) {
-			if(participantes.containsKey(participanteID)) {
-				participantes.remove(participanteID);
-				participantes_listos.remove(participanteID);
-				partida.expulsarJugador(participanteID);
-				
-				boolean todosListos = true;
-				for (Map.Entry<UUID, Boolean> entry : participantes_listos.entrySet()) {
-					if (entry.getValue() == false) { 
-						todosListos = false; 
+		synchronized (LOCK) {
+			if (isEnPausa()) {
+				if(participantes.containsKey(participanteID)) {
+					eliminarParticipanteInterno(participanteID);
+					participantesVotoAbandono.remove(participanteID);
+					partida.expulsarJugador(participanteID);
+					
+					boolean todosListos = true;
+					for (Map.Entry<UUID, Boolean> entry : participantes_listos.entrySet()) {
+						if (entry.getValue() == false) { 
+							todosListos = false; 
+						}
 					}
-				}
-				if (todosListos) {
-					setEnPartida(true);
+					if (todosListos) {
+						setEnPartida(true);
+					}
 				}
 			}
 		}
 	}
 	
 	public void eliminarParticipante(UUID participanteID) {
-		if (isEnPausa()) {
-			if(participantes_listos.containsKey(participanteID)
-						&& participantes_listos.get(participanteID)) {
-				participantes.remove(participanteID);
-				participantes_listos.remove(participanteID);
-				partida.expulsarJugador(participanteID);
-			}
-			return;
-		}
-		
-		if(participantes.containsKey(participanteID)) {
-			participantes.remove(participanteID);
-			participantes_listos.remove(participanteID);
-			participantesVotoAbandono.remove(participanteID);
-			
-			if (participantes.size() == 0) {
+		synchronized (LOCK) {
+			if (isEnPausa()) {
+				if(participantes_listos.containsKey(participanteID)
+							&& participantes_listos.get(participanteID)) {
+					eliminarParticipanteInterno(participanteID);
+					partida.expulsarJugador(participanteID);
+				}
 				return;
 			}
 			
-			if (this.enPartida)	 {
-				partida.expulsarJugador(participanteID);
+			if(participantes.containsKey(participanteID)) {
+				eliminarParticipanteInterno(participanteID);
+				participantesVotoAbandono.remove(participanteID);
 				
-				boolean todosListos = true;
-				for (Map.Entry<UUID, Boolean> entry : participantesVotoAbandono.entrySet()) {
-					if (entry.getValue() == false) { 
-						todosListos = false; 
-					}
-				}
-				if (todosListos) {
-					setEnPausa(todosListos);
+				if (participantes.size() == 0) {
+					return;
 				}
 				
-			} else {	//Si se va un jugador no listo, y el resto ya lo están 
-						//	-> se empieza la partida
-				boolean todosListos = true;
-				for (Map.Entry<UUID, Boolean> entry : participantes_listos.entrySet()) {
-					if (entry.getValue() == false) { 
-						todosListos = false; 
+				if (this.enPartida)	 {
+					partida.expulsarJugador(participanteID);
+					
+					boolean todosListos = true;
+					for (Map.Entry<UUID, Boolean> entry : participantesVotoAbandono.entrySet()) {
+						if (entry.getValue() == false) { 
+							todosListos = false; 
+						}
 					}
-				}
-				if (todosListos) {
-					setEnPartida(true);
+					if (todosListos) {
+						setEnPausa(todosListos);
+					}
+					
+				} else {	//Si se va un jugador no listo, y el resto ya lo están 
+							//	-> se empieza la partida
+					boolean todosListos = true;
+					for (Map.Entry<UUID, Boolean> entry : participantes_listos.entrySet()) {
+						if (entry.getValue() == false) { 
+							todosListos = false; 
+						}
+					}
+					if (todosListos) {
+						setEnPartida(true);
+					}
 				}
 			}
 		}
@@ -181,20 +204,22 @@ public class Sala {
 	// Devuelve true si todos los participantes ya están listos, y por tanto la
 	// partida ha comenzado
 	public boolean nuevoParticipanteListo(UUID participanteID) {
-		if(participantes.containsKey(participanteID)) {
-			participantes_listos.put(participanteID, true);
-			boolean todosListos = true;
-			for (Map.Entry<UUID, Boolean> entry : participantes_listos.entrySet()) {
-				if (entry.getValue() == false) { 
-					todosListos = false; 
+		synchronized (LOCK) {
+			if(participantes.containsKey(participanteID)) {
+				participantes_listos.put(participanteID, true);
+				boolean todosListos = true;
+				for (Map.Entry<UUID, Boolean> entry : participantes_listos.entrySet()) {
+					if (entry.getValue() == false) { 
+						todosListos = false; 
+					}
 				}
+				if (todosListos) {
+					setEnPartida(true);
+				}
+				return todosListos;
+			} else {
+				return false;
 			}
-			if (todosListos) {
-				setEnPartida(true);
-			}
-			return todosListos;
-		} else {
-			return false;
 		}
 	}
 	
@@ -237,11 +262,13 @@ public class Sala {
 	
 	
 	public RespuestaVotacionPausa setParticipantesVotoAbandono(UUID participanteID) {
-		if(participantesVotoAbandono.containsKey(participanteID)) {
-			participantesVotoAbandono.put(participanteID, true);
+		synchronized (LOCK) {
+			if(participantesVotoAbandono.containsKey(participanteID)) {
+				participantesVotoAbandono.put(participanteID, true);
+			}
+			
+			return getParticipantesVotoAbandono();
 		}
-		
-		return getParticipantesVotoAbandono();
 	}
 	
 	public RespuestaVotacionPausa getParticipantesVotoAbandono() {
@@ -300,32 +327,34 @@ public class Sala {
 
 	
 	public Sala getSalaAEnviar() {
-		Sala salaResumida = new Sala();
-		
-		salaResumida.noExiste = noExiste;
-		salaResumida.error = error;
-		
-		salaResumida.configuracion = configuracion;
-		
-		salaResumida.enPartida = enPartida;
-		
-		if (partida != null) {
-			salaResumida.partida = partida.getPartidaAEnviar();
-		} else {
-			salaResumida.partida = null;
+		synchronized (LOCK) {
+			Sala salaResumida = new Sala();
+			
+			salaResumida.noExiste = noExiste;
+			salaResumida.error = error;
+			
+			salaResumida.configuracion = configuracion;
+			
+			salaResumida.enPartida = enPartida;
+			
+			if (partida != null) {
+				salaResumida.partida = partida.getPartidaAEnviar();
+			} else {
+				salaResumida.partida = null;
+			}
+			salaResumida.ultimaPartidaJugada  = ultimaPartidaJugada;
+			
+			//Identificador de cada usuario con su VO
+			salaResumida.participantes = participantes;
+			//Conjunto de participantes con el indicador de si están listos o no
+			salaResumida.participantes_listos = participantes_listos;
+			
+			salaResumida.enPausa = enPausa;
+			
+			salaResumida.salaID = salaID;
+			
+			return salaResumida;
 		}
-		salaResumida.ultimaPartidaJugada  = ultimaPartidaJugada;
-		
-		//Identificador de cada usuario con su VO
-		salaResumida.participantes = participantes;
-		//Conjunto de participantes con el indicador de si están listos o no
-		salaResumida.participantes_listos = participantes_listos;
-		
-		salaResumida.enPausa = enPausa;
-		
-		salaResumida.salaID = salaID;
-		
-		return salaResumida;
 	}
 
 	public PartidaJugada getUltimaPartidaJugada() {
@@ -344,7 +373,44 @@ public class Sala {
 		this.salaID = salaID;
 	}
 
+	public void ack(UUID usuarioID) {
+		synchronized (LOCK) {
+			Timer timerAck = (Timer) participantesAck.get(usuarioID);
+		
+			if(timerAck != null)
+				timerAck.cancel();
+			
+			participantesAck.put(usuarioID, null);
+		}
+    	
+    }
 	
+	public void initAckTimers() {
+		synchronized (LOCK) {
+			for (UUID usuario : participantesAck.keySet()) {
+				Object alarm = newAlarmaACK(this.salaID);
+				Timer t = new Timer();
+				t.schedule((TimerTask)alarm, TIMEOUT_ACK);
+				participantesAck.put(usuario, t);
+			}
+		}
+	}
+	
+	
+	private static Constructor newAlarmaACK = null;
+    public static Object newAlarmaACK(UUID salaID){
+        try{
+            if(newAlarmaACK == null){
+            	newAlarmaACK = Class.forName("es.unizar.unoforall.gestores.AlarmaACK")
+                        .getConstructor(UUID.class);
+            }
+            return newAlarmaACK.newInstance(salaID);
+        }catch(Exception ex){
+            ex.printStackTrace();
+            return null;
+        }
+    }
+    
 	
 	private static Method cancelTimer = null;
     public static void cancelTimer(UUID salaID){
@@ -358,4 +424,5 @@ public class Sala {
             ex.printStackTrace();
         }
     }
+    
 }

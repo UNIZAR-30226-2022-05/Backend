@@ -2,7 +2,6 @@ package es.unizar.unoforall.gestores;
 
 import java.sql.Date;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -393,4 +392,5 @@ public class GestorSalas {
 		
 		timersSalas.remove(salaID);
 	}
+	
 }
