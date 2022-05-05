@@ -226,16 +226,19 @@ public class ApiRestController {
 	 * Función a la que llamar para sacar el listado de las partidas que ha terminado el
 	 * usuario, junto a los datos de cada participante humano que jugó cada una.
 	 * @param sesionID		contiene el id de sesión del usuario.
+	 * @param usuarioID		id del usuario del que se quiere obtener el historial
 	 * @return				(clase ListaPartidas) una lista de partidas y sus participantes que indica si la 
 	 * 						sesión ha expirado, si ha habido un error y la lista de 
 	 * 						partidas que haya podido extraer.
 	 */
 	@PostMapping("/sacarPartidasJugadas")
-	public String sacarPartidasJugadas(@RequestParam String sesionID){
+	public String sacarPartidasJugadas(@RequestParam String sesionID,
+										@RequestParam String usuarioID){
 		ListaPartidas lp = null;
-		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
-		if(usuarioID != null) {
-			lp = PartidasDAO.getPartidas(usuarioID);
+		UUID usuarioEmisorID = GestorSesiones.obtenerUsuarioID(sesionID);
+		if(usuarioEmisorID != null) {
+			UUID _usuarioID = Serializar.deserializar(usuarioID, UUID.class);
+			lp = PartidasDAO.getPartidas(_usuarioID);
 		} else {
 			lp = new ListaPartidas(true);
 			lp.setError("SESION_EXPIRADA");

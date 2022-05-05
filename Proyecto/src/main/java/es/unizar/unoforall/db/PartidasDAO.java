@@ -59,7 +59,7 @@ public class PartidasDAO {
 									(UUID)rs2.getObject("usuario"), (UUID)rs2.getObject("partida"),
 									rs2.getInt("usrs_debajo"), rs2.getBoolean("ha_ganado"))));
 				}
-				System.out.println("numParticipantes: " + Integer.toString(numParticipantes));
+				//System.out.println("numParticipantes: " + Integer.toString(numParticipantes));
 				for (Participante p : listaParticipantes) {
 					p.setPuesto(numParticipantes, modo_juego);
 				}
