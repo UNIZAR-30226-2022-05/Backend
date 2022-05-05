@@ -106,6 +106,7 @@ public class Sala {
 	public boolean nuevoParticipante(UsuarioVO participante) {
 		synchronized (LOCK) {
 			if (isEnPausa()) {
+				participantesAck.putIfAbsent(participante.getId(), null);
 				return false;
 			}
 			
@@ -152,8 +153,9 @@ public class Sala {
 		}
 	}
 	
-	public void eliminarParticipante(UUID participanteID) {
+	public void eliminarParticipante(UUID participanteID) { 
 		synchronized (LOCK) {
+			participantesAck.remove(participanteID);
 			if (isEnPausa()) {
 				if(participantes_listos.containsKey(participanteID)
 							&& participantes_listos.get(participanteID)) {
