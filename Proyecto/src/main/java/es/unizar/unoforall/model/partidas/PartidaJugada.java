@@ -34,4 +34,8 @@ public class PartidaJugada {
 		this.participantes.add(nuevoParticipante);
 	}
 	
+	public PartidaJugadaCompacta getPartidaJugadaCompacta() {
+		return new PartidaJugadaCompacta(this);
+	}
+	
 }
