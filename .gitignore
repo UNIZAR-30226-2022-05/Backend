@@ -30,3 +30,4 @@ hs_err_pid*
 NOTAS.md
 
 Scripts PostgreSQL/*.sh
+ScriptsDespliegue/*.sh
