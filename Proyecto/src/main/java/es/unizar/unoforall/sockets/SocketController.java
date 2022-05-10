@@ -9,6 +9,7 @@ import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import es.unizar.unoforall.db.UsuarioDAO;
@@ -130,17 +131,17 @@ public class SocketController {
 							@Header("simpSessionId") String sesionID, 
 							Object vacio) throws Exception {
 		
-		if (GestorSalas.obtenerSala(salaID) == null) {
+		Sala sala = GestorSalas.obtenerSala(salaID);
+		if (sala == null) {
 			return Serializar.serializar(new Sala("La sala ya no existe"));
 		}
 		
 		System.out.println(sesionID + " se une a la sala " + salaID);
 		
-		GestorSalas.obtenerSala(salaID).
-			nuevoParticipante(UsuarioDAO.getUsuario(GestorSesiones.obtenerUsuarioID(sesionID)));
+		sala.nuevoParticipante(UsuarioDAO.getUsuario(GestorSesiones.obtenerUsuarioID(sesionID)));
 		
-		GestorSalas.obtenerSala(salaID).initAckTimers();
-		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
+		sala.initAckTimers();
+		return Serializar.serializar(sala.getSalaAEnviar());
 	} 
 	
 	/**
@@ -175,7 +176,8 @@ public class SocketController {
 			}
 		}
 		sala.initAckTimers();		
-		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
+		
+		return Serializar.serializar(sala.getSalaAEnviar());
 	}
 	
 	/**
@@ -360,7 +362,7 @@ public class SocketController {
 			}
 		}
 		sala.initAckTimers();
-		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
+		return Serializar.serializar(sala.getSalaAEnviar());
 	}
 	
 	/**
@@ -421,7 +423,7 @@ public class SocketController {
 			}
 		}
 		sala.initAckTimers();
-		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
+		return Serializar.serializar(sala.getSalaAEnviar());
 	}
 	
 	
@@ -461,7 +463,7 @@ public class SocketController {
 		
 		GestorSalas.restartTimer(salaID);
 		sala.initAckTimers();
-		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
+		return Serializar.serializar(sala.getSalaAEnviar());
 	}
 	
 		
@@ -499,7 +501,7 @@ public class SocketController {
 		partida.pulsarBotonUNO(usuarioID);
 		
 		sala.ack(usuarioID);
-		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
+		return Serializar.serializar(sala.getSalaAEnviar());
 	}
 	
 	
@@ -573,18 +575,16 @@ public class SocketController {
 	@SendTo("/topic/salas/{salaID}/votaciones")
 	public String votacionPartidaInterna(@DestinationVariable UUID salaID, 
 							Object vacio) throws Exception {	
-		
-		if (GestorSalas.obtenerSala(salaID) == null) {
+		Sala sala = GestorSalas.obtenerSala(salaID);
+		if (sala == null) {
 			return "nulo";
-		} else if (!GestorSalas.obtenerSala(salaID).isEnPartida()) {
+		} else if (!sala.isEnPartida()) {
 			return "nulo";
 		}
 		
-		return Serializar.serializar(GestorSalas.obtenerSala(salaID)
-											.getParticipantesVotoAbandono());
+		return Serializar.serializar(sala.getParticipantesVotoAbandono());
 		
 	}
-	
 	
 	
 	
@@ -592,9 +592,21 @@ public class SocketController {
 	public void onDisconnectEvent(SessionDisconnectEvent event) throws Exception {
 		String sesionID = event.getSessionId();
 		
+		SessionHandler.logout(sesionID);
 		GestorSalas.eliminarParticipanteSalas(GestorSesiones.obtenerUsuarioID(sesionID));
-		GestorSesiones.eliminarSesion(sesionID);		
+		GestorSesiones.eliminarSesion(sesionID);	
 		
-		System.err.println("Client disconnected with session id: " + sesionID);
+		System.out.println("Client disconnected with session id: " + sesionID);
+	}
+	
+	public static void desconectarUsuario(String sesionID) {
+		SessionHandler.logout(sesionID);
+	}
+	
+	public static void desconectarUsuario(UUID usuarioID) {
+		String sesionID = GestorSesiones.obtenerSesionID(usuarioID);
+		if (sesionID != null) {
+			desconectarUsuario(sesionID);
+		}
 	}
 }

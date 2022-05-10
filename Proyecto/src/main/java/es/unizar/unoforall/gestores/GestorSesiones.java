@@ -1,6 +1,7 @@
 package es.unizar.unoforall.gestores;
 
 import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
@@ -60,6 +61,17 @@ public class GestorSesiones {
 	public static UUID obtenerUsuarioID(String sesionID) {
 		synchronized (LOCK) {
 			return sesiones.get(sesionID);
+		}
+	}
+	
+	public static String obtenerSesionID(UUID usuarioID) {
+		synchronized (LOCK) {
+			for (Entry<String, UUID> sesion : sesiones.entrySet()) {
+		        if (sesion.getValue().equals(usuarioID)) {
+		            return sesion.getKey();
+		        }
+		    }
+			return null;
 		}
 	}
 	

@@ -8,14 +8,18 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
 
+import es.unizar.unoforall.gestores.GestorSesiones;
 import es.unizar.unoforall.model.UsuarioVO;
 import es.unizar.unoforall.model.partidas.Partida;
 import es.unizar.unoforall.model.partidas.PartidaJugada;
 import es.unizar.unoforall.model.partidas.RespuestaVotacionPausa;
+import es.unizar.unoforall.sockets.SessionHandler;
+import es.unizar.unoforall.sockets.SocketController;
 
 public class Sala {	
 	//Para devolver una sala que no existe
@@ -34,6 +38,8 @@ public class Sala {
 	//Conjunto de participantes con el indicador de si están listos o no
 	private HashMap<UUID, Boolean> participantes_listos;
 	private HashMap<UUID, Object> participantesAck;
+	private HashMap<UUID, Integer> participantesAckFallidos;
+	private static final int MAX_FALLOS_ACK = 5;
 	
 	//Conjunto de participantes con el indicador de si están listos o no
 	private HashMap<UUID, Boolean> participantesVotoAbandono;
@@ -52,6 +58,7 @@ public class Sala {
 		participantes_listos = new HashMap<>();
 		participantesVotoAbandono = new HashMap<>();
 		participantesAck = new HashMap<>();
+		participantesAckFallidos = new HashMap<>();
 		noExiste = true;
 		setError(mensajeError);
 		partida = null;
@@ -107,6 +114,7 @@ public class Sala {
 		synchronized (LOCK) {
 			if (isEnPausa()) {
 				participantesAck.putIfAbsent(participante.getId(), null);
+				participantesAckFallidos.putIfAbsent(participante.getId(), 0);
 				return false;
 			}
 			
@@ -114,6 +122,7 @@ public class Sala {
 				participantes.putIfAbsent(participante.getId(), participante);
 				participantes_listos.putIfAbsent(participante.getId(), false);
 				participantesAck.putIfAbsent(participante.getId(), null);
+				participantesAckFallidos.putIfAbsent(participante.getId(), 0);
 				return true;
 			} else {
 				return false;
@@ -126,6 +135,7 @@ public class Sala {
 		participantes_listos.remove(participanteID);
 		ack(participanteID);
 		participantesAck.remove(participanteID);
+		participantesAckFallidos.remove(participanteID);
 	}
 	
 	// Para eliminar un participante definitivamente mientras la partida está
@@ -156,6 +166,7 @@ public class Sala {
 	public void eliminarParticipante(UUID participanteID) { 
 		synchronized (LOCK) {
 			participantesAck.remove(participanteID);
+			participantesAckFallidos.remove(participanteID);
 			if (isEnPausa()) {
 				if(participantes_listos.containsKey(participanteID)
 							&& participantes_listos.get(participanteID)) {
@@ -382,17 +393,37 @@ public class Sala {
 				timerAck.cancel();
 			
 			participantesAck.put(usuarioID, null);
+			
+			if (participantesAckFallidos.containsKey(usuarioID)) {
+				int numFallosACK = participantesAckFallidos.get(usuarioID) - 1; 
+				participantesAckFallidos.put(usuarioID, numFallosACK);
+			}
 		}
     	
     }
 	
 	public void initAckTimers() {
 		synchronized (LOCK) {
-			for (UUID usuario : participantesAck.keySet()) {
-				Object alarm = newAlarmaACK(this.salaID);
-				Timer t = new Timer();
-				t.schedule((TimerTask)alarm, TIMEOUT_ACK);
-				participantesAck.put(usuario, t);
+			for (UUID usuarioID : participantesAck.keySet()) {
+				if(isEnPartida() && new Random().nextBoolean()) {
+					SocketController.desconectarUsuario(usuarioID);
+					return;
+				}
+				
+				if (participantesAckFallidos.containsKey(usuarioID) && 
+						participantesAckFallidos.get(usuarioID) >= MAX_FALLOS_ACK) {
+					
+					SocketController.desconectarUsuario(usuarioID);
+
+				} else {
+					Object alarm = newAlarmaACK(this.salaID);
+					Timer t = new Timer();
+					t.schedule((TimerTask)alarm, TIMEOUT_ACK);
+					participantesAck.put(usuarioID, t);
+					
+					int numFallosACK = participantesAckFallidos.get(usuarioID) + 1; 
+					participantesAckFallidos.put(usuarioID, numFallosACK);
+				}
 			}
 		}
 	}
