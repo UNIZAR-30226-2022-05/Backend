@@ -231,10 +231,11 @@ public class GestorSalas {
 							}					  //cuenta como empate.
 						}
 					}
+					/*//¿Posible modo puntos dobles?
 					error = actualizarPuntosJugador(usuariosDebajo,j.getJugadorID());
 					if (!error.equals("nulo")) {
 						return error;
-					}
+					}*/
 					participantes.add(new HaJugadoVO(j.getJugadorID(),pa.getId(),usuariosDebajo,haGanado));				
 				}
 				i++;
