@@ -394,49 +394,48 @@ public class Sala {
 			
 			participantesAck.put(usuarioID, null);
 			
-			if (participantesAckFallidos.containsKey(usuarioID)) {
-				int numFallosACK = participantesAckFallidos.get(usuarioID) - 1; 
-				participantesAckFallidos.put(usuarioID, numFallosACK);
-			}
+			participantesAckFallidos.put(usuarioID, 0);
 		}
     	
     }
 	
+	public void ack_fallido(UUID usuarioID) {
+		if (participantesAckFallidos.containsKey(usuarioID)) {
+			int numFallosACK = participantesAckFallidos.get(usuarioID) + 1; 
+			participantesAckFallidos.put(usuarioID, numFallosACK);
+			
+			if (numFallosACK >= MAX_FALLOS_ACK) {
+				System.out.println("Cliente desconectado por desconexión"); 
+				SocketController.desconectarUsuario(usuarioID);
+			}
+		}
+	}
+	
 	public void initAckTimers() {
 		synchronized (LOCK) {
 			for (UUID usuarioID : participantesAck.keySet()) {
-				if(isEnPartida() && new Random().nextBoolean()) {
-					SocketController.desconectarUsuario(usuarioID);
-					return;
-				}
+//				if(isEnPartida() && new Random().nextBoolean()) {
+//					SocketController.desconectarUsuario(usuarioID);
+//					return;
+//				}
 				
-				if (participantesAckFallidos.containsKey(usuarioID) && 
-						participantesAckFallidos.get(usuarioID) >= MAX_FALLOS_ACK) {
-					
-					SocketController.desconectarUsuario(usuarioID);
-
-				} else {
-					Object alarm = newAlarmaACK(this.salaID);
-					Timer t = new Timer();
-					t.schedule((TimerTask)alarm, TIMEOUT_ACK);
-					participantesAck.put(usuarioID, t);
-					
-					int numFallosACK = participantesAckFallidos.get(usuarioID) + 1; 
-					participantesAckFallidos.put(usuarioID, numFallosACK);
-				}
+				Object alarm = newAlarmaACK(this, usuarioID);
+				Timer t = new Timer();
+				t.schedule((TimerTask)alarm, TIMEOUT_ACK);
+				participantesAck.put(usuarioID, t);
 			}
 		}
 	}
 	
 	
 	private static Constructor newAlarmaACK = null;
-    public static Object newAlarmaACK(UUID salaID){
+    public static Object newAlarmaACK(Sala sala, UUID usuarioID){
         try{
             if(newAlarmaACK == null){
             	newAlarmaACK = Class.forName("es.unizar.unoforall.gestores.AlarmaACK")
-                        .getConstructor(UUID.class);
+                        .getConstructor(Sala.class, UUID.class);
             }
-            return newAlarmaACK.newInstance(salaID);
+            return newAlarmaACK.newInstance(sala, usuarioID);
         }catch(Exception ex){
             ex.printStackTrace();
             return null;
