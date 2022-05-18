@@ -141,7 +141,7 @@ public class Partida {
 			// Se crean las manos de todos los jugadores
 		for(Jugador j : this.jugadores) {
 			for (int i = 0; i < 7; i++) {
-				j.getMano().add(robarCarta());	
+				robarCartaJugador(j, 1);
 			}
 		}
 	}
@@ -275,6 +275,15 @@ public class Partida {
 		}
 		return c;
 	}
+	
+	private void robarCartaJugador(Jugador j, int numCartas) {
+		for (int i = 0; i < numCartas; i++) {
+			if(j.getMano().size()==20) {
+				break;
+			}
+			j.getMano().add(robarCarta());
+		}
+	}
 
 	private void juegaCarta(Carta c, Jugada jugada) {
 		boolean esSalto = false;
@@ -294,9 +303,7 @@ public class Partida {
 						roboAcumulado+=2;
 					}
 				} else {
-					for (int i = 0; i < 2; i++) {
-						siguienteJugador().getMano().add(robarCarta());
-					}
+					robarCartaJugador(siguienteJugador(), 2);
 					esSalto=true;
 				}
 				break;
@@ -310,21 +317,14 @@ public class Partida {
 						roboAcumulado+=4;
 					}
 				} else {
-					for (int i = 0; i < 4; i++) {
-						siguienteJugador().getMano().add(robarCarta());
-					}
+					robarCartaJugador(siguienteJugador(), 2);
 					esSalto=true;
 				}
 				break;
 				
 			case x2:
 				int numCartas = siguienteJugador().getMano().size();
-				for (int i = 0; i < numCartas; i++) {
-					if(siguienteJugador().getMano().size()==20) {
-						break;
-					}
-					siguienteJugador().getMano().add(robarCarta());
-				}
+				robarCartaJugador(siguienteJugador(), numCartas);
 				esSalto=true;
 				break;
 				
@@ -379,9 +379,7 @@ public class Partida {
 		if(	configuracion.getReglas().isEvitarEspecialFinal() && 
 				this.jugadores.get(turno).getMano().size()==1 &&
 				this.jugadores.get(turno).getMano().get(0).esDelColor(Carta.Color.comodin)) {
-			for (int i = 0; i < 2; i++) {
-				this.jugadores.get(turno).getMano().add(robarCarta());
-			}
+			robarCartaJugador(this.jugadores.get(turno), 2);
 		}
 		if(hayIntercambio) {
 			List<Carta> nuevaMano = new ArrayList<>(jugadores.get(jugada.getJugadorObjetivo()).getMano());
@@ -439,28 +437,21 @@ public class Partida {
 		} else if(jugada.isRobar()) {
 			if(modoAcumulandoRobo) {
 				modoAcumulandoRobo=false;
-				int robo = roboAcumulado;
-				if (this.jugadores.get(turno).getMano().size() + robo > 20) {
-					robo = 20 - this.jugadores.get(turno).getMano().size();
-				}
-				for(int i = 0; i<robo; i++) {
-					this.jugadores.get(turno).getMano().add(robarCarta());
-				}
+				robarCartaJugador(this.jugadores.get(turno), roboAcumulado);
 				roboAcumulado=0;
+				
 			} else if (configuracion.getModoJuego().equals(ConfigSala.ModoJuego.Attack)) {
 				int random_robo = new Random().nextInt(MAX_ROBO_ATTACK)+1;
-				if (this.jugadores.get(turno).getMano().size() + random_robo > 20) {
-					random_robo = 20 - this.jugadores.get(turno).getMano().size();
-				}
-				for (int i = 0; i < random_robo; i++) {
-					this.jugadores.get(turno).getMano().add(robarCarta());
-				}
+				robarCartaJugador(this.jugadores.get(turno), random_robo);
+				
 			} else { //FUNCIONA
-				this.cartaRobada = robarCarta(); //No se usaba la variable global, se usaba una local
-				this.jugadores.get(turno).getMano().add(cartaRobada);
-				if (Carta.compartenColor(cartaRobada, getUltimaCartaJugada()) || cartaRobada.esDelColor(Carta.Color.comodin) 
-						|| Carta.compartenTipo(cartaRobada,getUltimaCartaJugada())) {
-					modoJugarCartaRobada=true;
+				if(this.jugadores.get(turno).getMano().size() < 20) {
+					this.cartaRobada = robarCarta(); 	//No se usaba la variable global, se usaba una local
+					this.jugadores.get(turno).getMano().add(cartaRobada);
+					if (Carta.compartenColor(cartaRobada, getUltimaCartaJugada()) || cartaRobada.esDelColor(Carta.Color.comodin) 
+							|| Carta.compartenTipo(cartaRobada,getUltimaCartaJugada())) {
+						modoJugarCartaRobada=true;
+					}
 				}
 			}
 			
@@ -681,8 +672,7 @@ public class Partida {
 			
 			for (Jugador j2 : this.jugadores) {
 				if(!j2.isProtegido_UNO() && j2.getMano().size()==1) { //Pillado, roba dos cartas.
-					j2.getMano().add(robarCarta());
-					j2.getMano().add(robarCarta());
+					robarCartaJugador(j2, 2);
 					j2.setPenalizado_UNO(true);
 				}	
 			}
