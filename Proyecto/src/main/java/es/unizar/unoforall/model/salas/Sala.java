@@ -47,7 +47,7 @@ public class Sala {
 	
 	private final static int TIMEOUT_ACK = 1000;	//1 segundo
 	
-	private static final Object LOCK = new Object();
+	private final Object LOCK = new Object();
 	
 	private Sala() {
 		
@@ -298,16 +298,17 @@ public class Sala {
 	}
 
 	public void setEnPausa(boolean enPausa) {
-		if (this.enPausa != enPausa && this.enPartida) {
-			this.enPausa = enPausa;
-			
-			if (this.enPausa) {  // comienza una pausa
-				cancelTimer(salaID);
-				System.out.println("--- Comienza una pausa");
-				setEnPartida(false);
+		synchronized (LOCK) {
+			if (this.enPausa != enPausa && this.enPartida) {
+				this.enPausa = enPausa;
+				
+				if (this.enPausa) {  // comienza una pausa
+					cancelTimer(salaID);
+					System.out.println("--- Comienza una pausa");
+					setEnPartida(false);
+				}
 			}
 		}
-		
 	}
 	
 	
@@ -316,9 +317,11 @@ public class Sala {
 
 	@Override
 	public String toString() {
-		return "Sala [noExiste=" + noExiste + ", error=" + error + ", configuracion=" + configuracion + ", enPartida="
-				+ enPartida + ", partida=" + partida + ", participantes=" + participantes + ", participantes_listos="
-				+ participantes_listos + "]";
+		synchronized (LOCK) {
+			return "Sala [noExiste=" + noExiste + ", error=" + error + ", configuracion=" + configuracion + ", enPartida="
+					+ enPartida + ", partida=" + partida + ", participantes=" + participantes + ", participantes_listos="
+					+ participantes_listos + "]";
+		}
 	}
 
 	public boolean isNoExiste() {
@@ -330,7 +333,9 @@ public class Sala {
 	}
 
 	public void setError(String error) {
-		this.error = error;
+		synchronized (LOCK) {
+			this.error = error;
+		}
 	}
 
 	public Partida getPartida() {
@@ -374,7 +379,9 @@ public class Sala {
 	}
 
 	public void setUltimaPartidaJugada(PartidaJugada ultimaPartidaJugada) {
-		this.ultimaPartidaJugada = ultimaPartidaJugada;
+		synchronized (LOCK) {
+			this.ultimaPartidaJugada = ultimaPartidaJugada;
+		}
 	}
 
 	public UUID getSalaID() {
@@ -382,7 +389,9 @@ public class Sala {
 	}
 
 	public void setSalaID(UUID salaID) {
-		this.salaID = salaID;
+		synchronized (LOCK) {
+			this.salaID = salaID;
+		}
 	}
 
 	public void ack(UUID usuarioID) {
@@ -400,13 +409,15 @@ public class Sala {
     }
 	
 	public void ack_fallido(UUID usuarioID) {
-		if (participantesAckFallidos.containsKey(usuarioID)) {
-			int numFallosACK = participantesAckFallidos.get(usuarioID) + 1; 
-			participantesAckFallidos.put(usuarioID, numFallosACK);
-			
-			if (numFallosACK >= MAX_FALLOS_ACK) {
-				System.out.println("Cliente desconectado por desconexión"); 
-				SocketController.desconectarUsuario(usuarioID);
+		synchronized (LOCK) {
+			if (participantesAckFallidos.containsKey(usuarioID)) {
+				int numFallosACK = participantesAckFallidos.get(usuarioID) + 1; 
+				participantesAckFallidos.put(usuarioID, numFallosACK);
+				
+				if (numFallosACK >= MAX_FALLOS_ACK) {
+					System.out.println("Cliente desconectado por desconexión"); 
+					SocketController.desconectarUsuario(usuarioID);
+				}
 			}
 		}
 	}

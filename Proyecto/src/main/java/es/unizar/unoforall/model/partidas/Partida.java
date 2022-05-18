@@ -41,7 +41,7 @@ public class Partida {
 	private Carta cartaRobada = null;
 	private boolean repeticionTurno = false;
 	
-	private static final Object LOCK = new Object();
+	private final Object LOCK = new Object();
 	private static final int MAX_ROBO_ATTACK = 5;
 	
 	private UUID salaID = null;	
