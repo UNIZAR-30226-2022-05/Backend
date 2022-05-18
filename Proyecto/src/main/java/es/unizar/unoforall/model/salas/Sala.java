@@ -8,18 +8,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
 
-import es.unizar.unoforall.gestores.GestorSesiones;
 import es.unizar.unoforall.model.UsuarioVO;
 import es.unizar.unoforall.model.partidas.Partida;
 import es.unizar.unoforall.model.partidas.PartidaJugada;
 import es.unizar.unoforall.model.partidas.RespuestaVotacionPausa;
-import es.unizar.unoforall.sockets.SessionHandler;
-import es.unizar.unoforall.sockets.SocketController;
 
 public class Sala {	
 	//Para devolver una sala que no existe
@@ -415,8 +411,8 @@ public class Sala {
 				participantesAckFallidos.put(usuarioID, numFallosACK);
 				
 				if (numFallosACK >= MAX_FALLOS_ACK) {
-					System.out.println("Cliente desconectado por desconexión"); 
-					SocketController.desconectarUsuario(usuarioID);
+					System.out.println("Cliente desconectado por desconexión");
+					desconectarUsuario(usuarioID);
 				}
 			}
 		}
@@ -438,6 +434,18 @@ public class Sala {
 		}
 	}
 	
+	private static Method desconectarUsuario = null;
+	public static void desconectarUsuario(UUID usuarioID) {
+		try {
+			if(desconectarUsuario == null){
+				desconectarUsuario = Class.forName("es.unizar.unoforall.sockets.SocketController")
+						.getMethod("desconectarUsuario", UUID.class);
+			}
+			desconectarUsuario.invoke(null, usuarioID);
+		}catch(Exception ex){
+			ex.printStackTrace();
+		}
+	}
 	
 	private static Constructor newAlarmaACK = null;
     public static Object newAlarmaACK(Sala sala, UUID usuarioID){
