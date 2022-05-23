@@ -497,7 +497,7 @@ public class SocketController {
 		Partida partida = sala.getPartida();
 		partida.pulsarBotonUNO(usuarioID);
 		
-		sala.ack(usuarioID);
+		sala.initAckTimers();
 		return Serializar.serializar(sala.getSalaAEnviar());
 	}
 	
