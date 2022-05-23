@@ -326,7 +326,6 @@ public class SocketController {
 		
 		if (partida.turnoDeIA()) {
 			System.out.println("- - - Jugada en turno incorrecto");
-			sala.initAckTimers();
 			return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
 		}
 		
@@ -335,7 +334,6 @@ public class SocketController {
 		
 		if (!jugadaValida) {
 			System.out.println("- - - Jugada inválida");
-			sala.initAckTimers();
 			return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
 		} else {
 			System.out.println("- - - Jugada: " + jugada);
