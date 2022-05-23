@@ -42,7 +42,7 @@ public class NotificacionSala {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(remitente, salaID);
+		return Objects.hash(remitente.getNombre(), salaID);
 	}
 
 	@Override
@@ -54,6 +54,6 @@ public class NotificacionSala {
 		if (getClass() != obj.getClass())
 			return false;
 		NotificacionSala other = (NotificacionSala) obj;
-		return Objects.equals(remitente, other.remitente) && Objects.equals(salaID, other.salaID);
+		return Objects.equals(remitente.getNombre(), other.remitente.getNombre()) && Objects.equals(salaID, other.salaID);
 	}
 }
