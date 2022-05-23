@@ -1,5 +1,6 @@
 package es.unizar.unoforall.model.salas;
 
+import java.util.Objects;
 import java.util.UUID;
 
 import es.unizar.unoforall.model.UsuarioVO;
@@ -37,5 +38,22 @@ public class NotificacionSala {
 	@Override
 	public String toString() {
 		return "NotificacionSala [salaID=" + salaID + ", remitente=" + remitente + "]";
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(remitente, salaID);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		NotificacionSala other = (NotificacionSala) obj;
+		return Objects.equals(remitente, other.remitente) && Objects.equals(salaID, other.salaID);
 	}
 }
