@@ -430,6 +430,11 @@ public class Sala {
 //					SocketController.desconectarUsuario(usuarioID);
 //					return;
 //				}
+				Timer timerAck = (Timer) participantesAck.get(usuarioID);
+				
+				if(timerAck != null) {
+					timerAck.cancel();
+				}
 				
 				Object alarm = newAlarmaACK(this, usuarioID);
 				Timer t = new Timer();
