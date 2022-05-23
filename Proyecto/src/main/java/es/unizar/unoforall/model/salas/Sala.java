@@ -68,33 +68,36 @@ public class Sala {
 		this.salaID = salaID;
 	}
 	
-	public void setEnPartida(boolean enPartida) {
+	public void setEnPartidaExterno(boolean enPartida) {
 		synchronized (LOCK) {
-			if (this.enPartida != enPartida) {
-				this.enPartida = enPartida;
-				
-				if (this.enPartida) {  // comienza una partida
-					System.out.println("--- Comienza una partida");
-					if (!isEnPausa()) {
-						List<UUID> jugadoresID = new ArrayList<>();
-						participantes.forEach((k,v) -> jugadoresID.add(k));
-						Collections.shuffle(jugadoresID); 
-						this.partida = new Partida(jugadoresID, configuracion, salaID);
-					} else {
-						System.out.println("--- Termina una pausa");
-						this.enPausa = false;
-					}
-						
-					participantes.forEach((k,v) -> participantesVotoAbandono.put(k, false));
+			this.setEnPartida(enPartida);
+		}
+	}
+	
+	private void setEnPartida(boolean enPartida) {
+		if (this.enPartida != enPartida) {
+			this.enPartida = enPartida;
+			
+			if (this.enPartida) {  // comienza una partida
+				System.out.println("--- Comienza una partida");
+				if (!isEnPausa()) {
+					List<UUID> jugadoresID = new ArrayList<>();
+					participantes.forEach((k,v) -> jugadoresID.add(k));
+					Collections.shuffle(jugadoresID); 
+					this.partida = new Partida(jugadoresID, configuracion, salaID);
+				} else {
+					System.out.println("--- Termina una pausa");
+					this.enPausa = false;
+				}
 					
-				} else {			   // termina una partida
-					for (Map.Entry<UUID, Boolean> entry : participantes_listos.entrySet()) {
-						entry.setValue(false);
-					}
+				participantes.forEach((k,v) -> participantesVotoAbandono.put(k, false));
+				
+			} else {			   // termina una partida
+				for (Map.Entry<UUID, Boolean> entry : participantes_listos.entrySet()) {
+					entry.setValue(false);
 				}
 			}
 		}
-		
 	}
 
 	public boolean isEnPartida() {
@@ -279,7 +282,13 @@ public class Sala {
 		}
 	}
 	
-	public RespuestaVotacionPausa getParticipantesVotoAbandono() {
+	public RespuestaVotacionPausa getParticipantesVotoAbandonoExterno() {
+		synchronized (LOCK) {
+			return getParticipantesVotoAbandono();
+		}
+	}
+	
+	private RespuestaVotacionPausa getParticipantesVotoAbandono() {
 		int numListos = (int)participantesVotoAbandono.values()
 								.stream().filter(listo -> listo).count();
 		if (numListos == participantesVotoAbandono.size()) {
@@ -293,16 +302,14 @@ public class Sala {
 		return enPausa;
 	}
 
-	public void setEnPausa(boolean enPausa) {
-		synchronized (LOCK) {
-			if (this.enPausa != enPausa && this.enPartida) {
-				this.enPausa = enPausa;
-				
-				if (this.enPausa) {  // comienza una pausa
-					cancelTimer(salaID);
-					System.out.println("--- Comienza una pausa");
-					setEnPartida(false);
-				}
+	private void setEnPausa(boolean enPausa) {
+		if (this.enPausa != enPausa && this.enPartida) {
+			this.enPausa = enPausa;
+			
+			if (this.enPausa) {  // comienza una pausa
+				cancelTimer(salaID);
+				System.out.println("--- Comienza una pausa");
+				setEnPartida(false);
 			}
 		}
 	}
@@ -328,10 +335,8 @@ public class Sala {
 		return error;
 	}
 
-	public void setError(String error) {
-		synchronized (LOCK) {
-			this.error = error;
-		}
+	private void setError(String error) {
+		this.error = error;
 	}
 
 	public Partida getPartida() {
@@ -391,17 +396,14 @@ public class Sala {
 	}
 
 	public void ack(UUID usuarioID) {
-		synchronized (LOCK) {
-			Timer timerAck = (Timer) participantesAck.get(usuarioID);
+		Timer timerAck = (Timer) participantesAck.get(usuarioID);
+	
+		if(timerAck != null)
+			timerAck.cancel();
 		
-			if(timerAck != null)
-				timerAck.cancel();
-			
-			participantesAck.put(usuarioID, null);
-			
-			participantesAckFallidos.put(usuarioID, 0);
-		}
-    	
+		participantesAck.put(usuarioID, null);
+		
+		participantesAckFallidos.put(usuarioID, 0);
     }
 	
 	public void ack_fallido(UUID usuarioID) {

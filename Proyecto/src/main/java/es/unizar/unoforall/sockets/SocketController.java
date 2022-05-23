@@ -9,7 +9,6 @@ import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import es.unizar.unoforall.db.UsuarioDAO;
@@ -200,7 +199,7 @@ public class SocketController {
 			return Serializar.serializar(new Sala("La sala ya no existe"));
 		}
 		
-		Sala s = GestorSalas.eliminarParticipanteSala(salaID, 
+		Sala s = GestorSalas.eliminarParticipanteSalaExterno(salaID, 
 				GestorSesiones.obtenerUsuarioID(sesionID));
 		
 		if (s == null) {
@@ -345,7 +344,7 @@ public class SocketController {
 				System.err.println("Error al insertar la partida en la BD");
 			}	
 			GestorSalas.cancelTimer(salaID);
-			sala.setEnPartida(false);
+			sala.setEnPartidaExterno(false);
 			
 		} else {
 			if (partida.turnoDeIA()) {
@@ -402,7 +401,7 @@ public class SocketController {
 				System.err.println("Error al insertar la partida en la BD");
 			}	
 			GestorSalas.cancelTimer(salaID);
-			sala.setEnPartida(false);
+			sala.setEnPartidaExterno(false);
 			
 		} else {
 			
@@ -580,7 +579,7 @@ public class SocketController {
 			return "nulo";
 		}
 		
-		return Serializar.serializar(sala.getParticipantesVotoAbandono());
+		return Serializar.serializar(sala.getParticipantesVotoAbandonoExterno());
 		
 	}
 	

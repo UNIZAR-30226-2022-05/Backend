@@ -663,22 +663,20 @@ public class Partida {
 		}
 	}
 	
-	public void pulsarBotonUNOInterno(int jugador) { 
-		synchronized (LOCK) {
-			Jugador j = jugadores.get(jugador);
-			if ((jugador == turno 
-				 && compruebaPuedeJugar(jugador))
-					|| j.getMano().size()==1) { 
-				//Si es su turno y puede jugar la penultima carta, o solo tiene una, se protege
-				j.setProtegido_UNO(true);
-			}
-			
-			for (Jugador j2 : this.jugadores) {
-				if(!j2.isProtegido_UNO() && j2.getMano().size()==1) { //Pillado, roba dos cartas.
-					robarCartaJugador(j2, 2);
-					j2.setPenalizado_UNO(true);
-				}	
-			}
+	private void pulsarBotonUNOInterno(int jugador) { 
+		Jugador j = jugadores.get(jugador);
+		if ((jugador == turno 
+			 && compruebaPuedeJugar(jugador))
+				|| j.getMano().size()==1) { 
+			//Si es su turno y puede jugar la penultima carta, o solo tiene una, se protege
+			j.setProtegido_UNO(true);
+		}
+		
+		for (Jugador j2 : this.jugadores) {
+			if(!j2.isProtegido_UNO() && j2.getMano().size()==1) { //Pillado, roba dos cartas.
+				robarCartaJugador(j2, 2);
+				j2.setPenalizado_UNO(true);
+			}	
 		}
 	}
 	
@@ -820,10 +818,8 @@ public class Partida {
 		return hayError;
 	}
 
-	public void setHayError(boolean hayError) {
-		synchronized (LOCK) {
-			this.hayError = hayError;
-		}
+	private void setHayError(boolean hayError) {
+		this.hayError = hayError;
 	}
 
 	public String getError() {
@@ -851,17 +847,15 @@ public class Partida {
 
 	@Override
 	public String toString() {
-		synchronized (LOCK) {
-			final int maxLen = 5;
-			return "Partida [hayError=" + hayError + ", error=" + error + ", mazo="
-					+ (mazo != null ? mazo.subList(0, Math.min(mazo.size(), maxLen)) : null) + ", cartasJugadas="
-					+ (cartasJugadas != null ? cartasJugadas.subList(0, Math.min(cartasJugadas.size(), maxLen)) : null)
-					+ ", jugadores=" + (jugadores != null ? jugadores.subList(0, Math.min(jugadores.size(), maxLen)) : null)
-					+ ", turno=" + turno + ", sentidoHorario=" + sentidoHorario + ", configuracion=" + configuracion
-					+ ", terminada=" + terminada + ", fechaInicio=" + fechaInicio + ", modoAcumulandoRobo="
-					+ modoAcumulandoRobo + ", roboAcumulado=" + roboAcumulado + ", modoJugarCartaRobada="
-					+ modoJugarCartaRobada + ", cartaRobada=" + cartaRobada + "]";
-		}
+		final int maxLen = 5;
+		return "Partida [hayError=" + hayError + ", error=" + error + ", mazo="
+				+ (mazo != null ? mazo.subList(0, Math.min(mazo.size(), maxLen)) : null) + ", cartasJugadas="
+				+ (cartasJugadas != null ? cartasJugadas.subList(0, Math.min(cartasJugadas.size(), maxLen)) : null)
+				+ ", jugadores=" + (jugadores != null ? jugadores.subList(0, Math.min(jugadores.size(), maxLen)) : null)
+				+ ", turno=" + turno + ", sentidoHorario=" + sentidoHorario + ", configuracion=" + configuracion
+				+ ", terminada=" + terminada + ", fechaInicio=" + fechaInicio + ", modoAcumulandoRobo="
+				+ modoAcumulandoRobo + ", roboAcumulado=" + roboAcumulado + ", modoJugarCartaRobada="
+				+ modoJugarCartaRobada + ", cartaRobada=" + cartaRobada + "]";
 	}
 
 	public Carta.Color getColorActual() {
@@ -900,44 +894,46 @@ public class Partida {
 	}
 
 	public Partida getPartidaAEnviar() {
-		Partida partidaResumida = new Partida();
-		
-		partidaResumida.hayError = hayError;
-		partidaResumida.error = error;
-		
-		partidaResumida.mazo = null;
-		
-		if (cartasJugadas != null && !cartasJugadas.isEmpty()) {
-			partidaResumida.cartasJugadas = this.cartasJugadas.subList(this.cartasJugadas.size()-1, this.cartasJugadas.size());
-		} else {
-			partidaResumida.cartasJugadas = this.cartasJugadas;
+		synchronized (LOCK) {
+			Partida partidaResumida = new Partida();
+			
+			partidaResumida.hayError = hayError;
+			partidaResumida.error = error;
+			
+			partidaResumida.mazo = null;
+			
+			if (cartasJugadas != null && !cartasJugadas.isEmpty()) {
+				partidaResumida.cartasJugadas = this.cartasJugadas.subList(this.cartasJugadas.size()-1, this.cartasJugadas.size());
+			} else {
+				partidaResumida.cartasJugadas = this.cartasJugadas;
+			}
+			
+			partidaResumida.ultimaJugada = this.ultimaJugada;
+			partidaResumida.turnoUltimaJugada = this.turnoUltimaJugada;
+			
+			
+			partidaResumida.jugadores = jugadores;
+			partidaResumida.turno = turno;
+			partidaResumida.sentidoHorario = sentidoHorario;
+			
+			partidaResumida.configuracion = configuracion;
+			partidaResumida.terminada = terminada;	
+			
+			//Fecha de inicio de la partida (Ya en formato sql porque no la necesita el frontend en este punto). 
+			partidaResumida.fechaInicio = fechaInicio; 
+			
+			//Variables para extraer resultados de efectos
+			partidaResumida.modoAcumulandoRobo = modoAcumulandoRobo;
+			partidaResumida.roboAcumulado = roboAcumulado;
+			partidaResumida.modoJugarCartaRobada = modoJugarCartaRobada;
+			partidaResumida.cartaRobada = cartaRobada;
+			
+			partidaResumida.repeticionTurno = repeticionTurno;
+			
+			partidaResumida.salaID = null;
+			
+			return partidaResumida;
 		}
-		
-		partidaResumida.ultimaJugada = this.ultimaJugada;
-		partidaResumida.turnoUltimaJugada = this.turnoUltimaJugada;
-		
-		
-		partidaResumida.jugadores = jugadores;
-		partidaResumida.turno = turno;
-		partidaResumida.sentidoHorario = sentidoHorario;
-		
-		partidaResumida.configuracion = configuracion;
-		partidaResumida.terminada = terminada;	
-		
-		//Fecha de inicio de la partida (Ya en formato sql porque no la necesita el frontend en este punto). 
-		partidaResumida.fechaInicio = fechaInicio; 
-		
-		//Variables para extraer resultados de efectos
-		partidaResumida.modoAcumulandoRobo = modoAcumulandoRobo;
-		partidaResumida.roboAcumulado = roboAcumulado;
-		partidaResumida.modoJugarCartaRobada = modoJugarCartaRobada;
-		partidaResumida.cartaRobada = cartaRobada;
-		
-		partidaResumida.repeticionTurno = repeticionTurno;
-		
-		partidaResumida.salaID = null;
-		
-		return partidaResumida;
 	}
 
 	public UUID getSalaID() {
