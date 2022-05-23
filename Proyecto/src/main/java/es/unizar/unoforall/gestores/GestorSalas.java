@@ -1,6 +1,5 @@
 package es.unizar.unoforall.gestores;
 
-import java.sql.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -128,14 +127,16 @@ public class GestorSalas {
 	}
 	
 	public static Sala getSalaPausada(UUID usuarioID) {
-		for(Map.Entry<UUID, Sala> entry : salas.entrySet()) {
-			Sala sala = entry.getValue();
-		    
-			if (sala.isEnPausa() && sala.hayParticipante(usuarioID)) {
-				return sala;
+		synchronized (LOCK) {
+			for(Map.Entry<UUID, Sala> entry : salas.entrySet()) {
+				Sala sala = entry.getValue();
+			    
+				if (sala.isEnPausa() && sala.hayParticipante(usuarioID)) {
+					return sala;
+				}
 			}
+			return null;
 		}
-		return null;
 	}
 	
 	public static String insertarPartidaEnBd(UUID salaID) {
@@ -270,69 +271,71 @@ public class GestorSalas {
 	 * @param numJugadores
 	 */
 	public static void anyadirIAsParticipantes(PartidaJugada pj, boolean parejas, int numJugadores) {
-		List<Integer> listaPuestos = new ArrayList<>();
-		int cuentaUno=0;
-		int cuentaDos=0;
-		for(Participante p : pj.getParticipantes()) {
-			listaPuestos.add(p.getPuesto());
-			if(p.getPuesto()==1) {
-				cuentaUno++;
-			} else if(p.getPuesto()==2) {
-				cuentaDos++;
-			}
-		}
-		
-		if(!parejas) {
-			for(Integer puesto = 1; puesto < numJugadores+1; puesto++) {
-				if (!listaPuestos.contains(puesto)) {
-					pj.agnadirParticipante(new Participante(puesto));
+		synchronized (LOCK) {
+			List<Integer> listaPuestos = new ArrayList<>();
+			int cuentaUno=0;
+			int cuentaDos=0;
+			for(Participante p : pj.getParticipantes()) {
+				listaPuestos.add(p.getPuesto());
+				if(p.getPuesto()==1) {
+					cuentaUno++;
+				} else if(p.getPuesto()==2) {
+					cuentaDos++;
 				}
 			}
-		} else {
-			for (int j = cuentaUno; j < 2; j++) {
-				pj.agnadirParticipante(new Participante(1));
-			}
-			for (int j = cuentaDos; j < 2; j++) {
-				pj.agnadirParticipante(new Participante(2));
-			}
-			boolean primeraVez = true;
-			for(int j = 0; j < 4; j++) {
-				if(pj.getParticipantes().get(j).getPuesto()==2) {
-					if(primeraVez) {
-						pj.getParticipantes().get(j).setPuesto(3);
-						primeraVez = false;
-					} else {
-						pj.getParticipantes().get(j).setPuesto(4);
-						break;
+			
+			if(!parejas) {
+				for(Integer puesto = 1; puesto < numJugadores+1; puesto++) {
+					if (!listaPuestos.contains(puesto)) {
+						pj.agnadirParticipante(new Participante(puesto));
 					}
 				}
-			}
-			for(int j = 0; j < 4; j++) {
-				if(pj.getParticipantes().get(j).getPuesto()==1) {
-					pj.getParticipantes().get(j).setPuesto(2);
-					break;
+			} else {
+				for (int j = cuentaUno; j < 2; j++) {
+					pj.agnadirParticipante(new Participante(1));
+				}
+				for (int j = cuentaDos; j < 2; j++) {
+					pj.agnadirParticipante(new Participante(2));
+				}
+				boolean primeraVez = true;
+				for(int j = 0; j < 4; j++) {
+					if(pj.getParticipantes().get(j).getPuesto()==2) {
+						if(primeraVez) {
+							pj.getParticipantes().get(j).setPuesto(3);
+							primeraVez = false;
+						} else {
+							pj.getParticipantes().get(j).setPuesto(4);
+							break;
+						}
+					}
+				}
+				for(int j = 0; j < 4; j++) {
+					if(pj.getParticipantes().get(j).getPuesto()==1) {
+						pj.getParticipantes().get(j).setPuesto(2);
+						break;
+					}
 				}
 			}
 		}
 	}
 	
-	private static String actualizarPuntosJugador(int usuariosDebajo, UUID jugadorID) {
-		synchronized (LOCK) {
-			String error = "nulo";
-			switch(usuariosDebajo) {
-				case 1://5
-					error = UsuarioDAO.actualizarPuntos(5, jugadorID);
-					break;
-				case 2://10
-					error = UsuarioDAO.actualizarPuntos(10, jugadorID);
-					break;
-				case 3://20
-					error = UsuarioDAO.actualizarPuntos(20, jugadorID);
-					break;
-			}
-			return error;
-		}
-	}
+//	private static String actualizarPuntosJugador(int usuariosDebajo, UUID jugadorID) {
+//		synchronized (LOCK) {
+//			String error = "nulo";
+//			switch(usuariosDebajo) {
+//				case 1://5
+//					error = UsuarioDAO.actualizarPuntos(5, jugadorID);
+//					break;
+//				case 2://10
+//					error = UsuarioDAO.actualizarPuntos(10, jugadorID);
+//					break;
+//				case 3://20
+//					error = UsuarioDAO.actualizarPuntos(20, jugadorID);
+//					break;
+//			}
+//			return error;
+//		}
+//	}
 	
 	private static ArrayList<Integer> sacarOrden(ArrayList<Integer> valores, boolean limSup) {
 		ArrayList<Integer> orden = new ArrayList<Integer>();
@@ -371,27 +374,32 @@ public class GestorSalas {
 	}
 	
 	public static void restartTimer(UUID salaID) {
-		Timer timerTurno = timersSalas.get(salaID);		
-		
-		AlarmaFinTurno alarm = new AlarmaFinTurno(salaID);
-		if(timerTurno != null)
-			timerTurno.cancel();
-		
-		if(obtenerSala(salaID).isEnPartida()) {
-			timerTurno = new Timer();
-			timerTurno.schedule(alarm, Partida.TIMEOUT_TURNO);
+		synchronized (LOCK) {
+			Timer timerTurno = timersSalas.get(salaID);		
 			
-			timersSalas.put(salaID, timerTurno);
+			AlarmaFinTurno alarm = new AlarmaFinTurno(salaID);
+			if(timerTurno != null)
+				timerTurno.cancel();
+			
+			Sala sala = obtenerSala(salaID);
+			if(sala.isEnPartida()) {
+				timerTurno = new Timer();
+				timerTurno.schedule(alarm, Partida.TIMEOUT_TURNO);
+				
+				timersSalas.put(salaID, timerTurno);
+			}
 		}
 	}
 	
 	public static void cancelTimer(UUID salaID) {
-		Timer timerTurno = timersSalas.get(salaID);
-		
-		if(timerTurno != null)
-			timerTurno.cancel();
-		
-		timersSalas.remove(salaID);
+		synchronized (LOCK) {
+			Timer timerTurno = timersSalas.get(salaID);
+			
+			if(timerTurno != null)
+				timerTurno.cancel();
+			
+			timersSalas.remove(salaID);
+		}
 	}
 	
 }

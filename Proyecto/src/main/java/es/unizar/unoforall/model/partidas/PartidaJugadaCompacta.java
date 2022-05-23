@@ -1,6 +1,5 @@
 package es.unizar.unoforall.model.partidas;
 
-import java.sql.Date;
 import java.util.List;
 
 import es.unizar.unoforall.model.salas.ConfigSala;
