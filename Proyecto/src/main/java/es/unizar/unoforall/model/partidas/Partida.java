@@ -334,13 +334,13 @@ public class Partida {
 						List<Carta> mano = j.getMano();
 						Collections.shuffle(mano);
 						boolean hecho = false;
-						int carta = 0;
-						while(!hecho && carta<mano.size()) {
+						for (int carta = 0; carta < mano.size() && !hecho; carta++) {
 							if(!mano.get(carta).isVisiblePor(turno)) {
 								mano.get(carta).marcarVisible(turno);
 								hecho = true;
 							}
 						}
+						System.out.println("Termina el computo del rayos X");
 					}
 				}
 				break;
