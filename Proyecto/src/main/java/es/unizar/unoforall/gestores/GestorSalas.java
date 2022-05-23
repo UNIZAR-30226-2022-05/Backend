@@ -380,11 +380,12 @@ public class GestorSalas {
 			Timer timerTurno = timersSalas.get(salaID);		
 			
 			AlarmaFinTurno alarm = new AlarmaFinTurno(salaID);
-			if(timerTurno != null)
+			if(timerTurno != null) {
 				timerTurno.cancel();
+			}
 			
 			Sala sala = salas.get(salaID);
-			if(sala.isEnPartida()) {
+			if(sala != null && sala.isEnPartida()) {
 				timerTurno = new Timer();
 				timerTurno.schedule(alarm, Partida.TIMEOUT_TURNO);
 				

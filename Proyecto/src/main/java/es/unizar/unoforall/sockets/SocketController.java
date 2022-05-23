@@ -22,7 +22,7 @@ import es.unizar.unoforall.model.partidas.Partida;
 import es.unizar.unoforall.model.partidas.RespuestaVotacionPausa;
 import es.unizar.unoforall.model.salas.NotificacionSala;
 import es.unizar.unoforall.model.salas.Sala;
-import es.unizar.unoforall.utils.Serializar;
+import es.unizar.unoforall.api.*;
 
 @Controller
 public class SocketController {	

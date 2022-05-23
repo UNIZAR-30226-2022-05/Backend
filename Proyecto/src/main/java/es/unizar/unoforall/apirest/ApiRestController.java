@@ -25,7 +25,7 @@ import es.unizar.unoforall.model.salas.RespuestaSala;
 import es.unizar.unoforall.model.salas.RespuestaSalas;
 import es.unizar.unoforall.model.salas.Sala;
 import es.unizar.unoforall.utils.CaracteresInvalidos;
-import es.unizar.unoforall.utils.Serializar;
+import es.unizar.unoforall.api.*;
 import es.unizar.unoforall.model.ListaUsuarios;
 
 
@@ -609,7 +609,7 @@ public class ApiRestController {
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
 		if(usuarioID != null) {
 			ConfigSala _configuracion = Serializar.deserializar(configuracion, ConfigSala.class);
-			return Serializar.serializar(new RespuestaSalas(GestorSalas.buscarSalas(_configuracion)));
+			return Serializar.serializar(new RespuestaSalas(GestorSalas.buscarSalas(_configuracion)).getRespuestaAEnviar());
 		} else {
 			return Serializar.serializar(new RespuestaSalas());
 		}
