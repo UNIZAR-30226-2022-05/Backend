@@ -589,12 +589,14 @@ public class ApiRestController {
 		if(usuarioID != null) {
 			Sala salaADevolver = GestorSalas.buscarSalaID(_salaID);
 			if (salaADevolver == null) {
+				return Serializar.serializar(new Sala("No se ha encontrado la sala"));
+			} else if (!salaADevolver.puedeUnirse()){
 				return Serializar.serializar(new Sala("La sala no es pública"));
-			} else {
+			}else{
 				return Serializar.serializar(salaADevolver);
 			}
 		} else {
-			return Serializar.serializar(new Sala("No se ha encontrado la sala"));
+			return Serializar.serializar(new Sala("Sesión expirada"));
 		}
     }
 	

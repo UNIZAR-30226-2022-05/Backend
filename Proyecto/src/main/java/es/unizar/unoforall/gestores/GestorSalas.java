@@ -51,11 +51,7 @@ public class GestorSalas {
 	public static Sala buscarSalaID(UUID salaID) {
 		synchronized (LOCK) {
 			Sala sala = salas.get(salaID);
-			if (sala.puedeUnirse()) {
-				return sala;
-			} else {
-				return null;
-			}
+			return sala;
 		}
 	}
 	
