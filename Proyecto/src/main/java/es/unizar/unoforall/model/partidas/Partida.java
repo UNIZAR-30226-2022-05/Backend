@@ -316,7 +316,7 @@ public class Partida {
 						roboAcumulado+=4;
 					}
 				} else {
-					robarCartaJugador(siguienteJugador(), 2);
+					robarCartaJugador(siguienteJugador(), 4);
 					esSalto=true;
 				}
 				break;
