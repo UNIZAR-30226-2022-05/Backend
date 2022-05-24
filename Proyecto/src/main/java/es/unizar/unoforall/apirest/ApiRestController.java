@@ -583,6 +583,7 @@ public class ApiRestController {
 		try {
 			_salaID = Serializar.deserializar(salaID, UUID.class);
 		} catch (IllegalArgumentException e) {
+			System.out.println("Ha llegado un UUID inválido");
 			return Serializar.serializar(new Sala("No se ha encontrado la sala"));
 		}
 		if(usuarioID != null) {
