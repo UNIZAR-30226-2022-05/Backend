@@ -1,8 +1,6 @@
 package es.unizar.unoforall.gestores;
 
-import java.sql.Date;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -96,19 +94,23 @@ public class GestorSalas {
 		}
 	}
 	
-	public static Sala eliminarParticipanteSala(UUID salaID, UUID usuarioID) {
+	public static Sala eliminarParticipanteSalaExterno(UUID salaID, UUID usuarioID) {
 		synchronized (LOCK) {
-			GestorSalas.obtenerSala(salaID).eliminarParticipante(usuarioID);
+			return eliminarParticipanteSala(salaID, usuarioID);
+		}
+	}
+	
+	private static Sala eliminarParticipanteSala(UUID salaID, UUID usuarioID) {
+		salas.get(salaID).eliminarParticipante(usuarioID);
+		
+		if(GestorSalas.salas.get(salaID).numParticipantes() == 0) {
+			System.out.println("Eliminando sala " + salaID);
+			salas.remove(salaID);
+			return null;
+		} else {
+			GestorSesiones.getApiInterna().sendObject("/app/partidas/votacionesInternas/" + salaID, "vacio");
 			
-			if(GestorSalas.obtenerSala(salaID).numParticipantes() == 0) {
-				System.out.println("Eliminando sala " + salaID);
-				GestorSalas.eliminarSala(salaID);
-				return null;
-			} else {
-				GestorSesiones.getApiInterna().sendObject("/app/partidas/votacionesInternas/" + salaID, "vacio");
-				
-				return GestorSalas.obtenerSala(salaID);
-			}
+			return salas.get(salaID);
 		}
 	}
 	
@@ -129,24 +131,26 @@ public class GestorSalas {
 	}
 	
 	public static Sala getSalaPausada(UUID usuarioID) {
-		for(Map.Entry<UUID, Sala> entry : salas.entrySet()) {
-			Sala sala = entry.getValue();
-		    
-			if (sala.isEnPausa() && sala.hayParticipante(usuarioID)) {
-				return sala;
+		synchronized (LOCK) {
+			for(Map.Entry<UUID, Sala> entry : salas.entrySet()) {
+				Sala sala = entry.getValue();
+			    
+				if (sala.isEnPausa() && sala.hayParticipante(usuarioID)) {
+					return sala;
+				}
 			}
+			return null;
 		}
-		return null;
 	}
 	
 	public static String insertarPartidaEnBd(UUID salaID) {
 		synchronized (LOCK) {
-			Partida partida = obtenerSala(salaID).getPartida();
+			Partida partida = salas.get(salaID).getPartida();
 			
 			String error = null;
 			PartidasAcabadasVO pa = new PartidasAcabadasVO(null, 
 					partida.getFechaInicio(), 
-					new Date(System.currentTimeMillis()), 
+					System.currentTimeMillis(), 
 					partida.getNumIAs(),
 					partida.getConfiguracion().getModoJuego().ordinal());
 			
@@ -168,32 +172,35 @@ public class GestorSalas {
 			}
 			
 			//Caso empates
-			if(empates != 0 && !parejas) {
+			if(empates != 0) {
 				boolean limSup = false;
 				int limite = 0;
 				ArrayList<Integer> auxiliar = new ArrayList<Integer>();
+				auxiliar.add((int)(Math.random()*10000 + 1));
+				auxiliar.add((int)(Math.random()*10000 + 1));
 				if(numImplicados==3) { 						//No hay riesgo de generar empates
-					auxiliar.add((int) Math.random());
-					auxiliar.add((int) Math.random());
-					auxiliar.add((int) Math.random());
-				} else { 									//Riesgo de generar empates
+					auxiliar.add((int)(Math.random()*10000 + 1)); 		//Añadir tercera party
+				} else {//Riesgo de generar empates
+					int j = 0; //Para conocer la componente a actualizar en caso de limite superior.
 					for(Integer p : puntos) {
 						if (p!=empates && p!= 0) {
-							limite=p;
 							if(p>empates) { //Si los valores a generar deben ser menores
 								limSup=true;
+								puntos.set(j, p+1); //para evitar caso 0, empate a 1, 2.
+								limite=p+1;
+							} else {
+								limite=p;
 							}
 							break;
 						}
+						j++;
 					}
-					auxiliar.add((int) Math.random());
-					auxiliar.add((int) Math.random());
 				}
 				ArrayList<Integer> orden = sacarOrden(auxiliar,limSup); //Si hay límite superior, genera valores negativos
 				int indice = 0;
-				for(Integer p : puntos) {
-					if (p==empates) {
-						p=limite + orden.get(indice);
+				for(int j = 0; j < puntos.size(); j++) {
+					if (puntos.get(j)==empates) {
+						puntos.set(j, limite + orden.get(indice));
 						indice++;
 					}
 				}
@@ -229,10 +236,11 @@ public class GestorSalas {
 							}					  //cuenta como empate.
 						}
 					}
+					/*//¿Posible modo puntos dobles?
 					error = actualizarPuntosJugador(usuariosDebajo,j.getJugadorID());
 					if (!error.equals("nulo")) {
 						return error;
-					}
+					}*/
 					participantes.add(new HaJugadoVO(j.getJugadorID(),pa.getId(),usuariosDebajo,haGanado));				
 				}
 				i++;
@@ -242,47 +250,94 @@ public class GestorSalas {
 			ArrayList<Participante> listaParticipantes = new ArrayList<Participante>();
 			for(HaJugadoVO part : participantes) {
 				UsuarioVO usuario = UsuarioDAO.getUsuario(part.getUsuario());
-				listaParticipantes.add(new Participante(usuario,part,partida.getJugadores().size()));
+				listaParticipantes.add(new Participante(usuario,part,partida.getJugadores().size(),
+												partida.getConfiguracion().getModoJuego().ordinal()));
 			}
 			PartidaJugada pj = new PartidaJugada(pa,listaParticipantes);
 			error = PartidasDAO.insertarPartidaAcabada(pj);
 			
 			
 			// Para añadir IAs solo en la finalización de partidas (no en la BD)
-			List<Integer> listaPuestos = new ArrayList<>();
-			for(Participante p : pj.getParticipantes()) {
-				listaPuestos.add(p.getPuesto());
-			}
+			anyadirIAsParticipantes(pj, parejas, partida.getJugadores().size());
 			
-			for(Integer puesto = 1; puesto < partida.getJugadores().size()+1; puesto++) {
-				if (!listaPuestos.contains(puesto)) {
-					pj.agnadirParticipante(new Participante(puesto));
-				}
-			}
-			
-			obtenerSala(salaID).setUltimaPartidaJugada(pj);
+			salas.get(salaID).setUltimaPartidaJugada(pj);
 			
 			return error;
 		}
 	}
 	
-	private static String actualizarPuntosJugador(int usuariosDebajo, UUID jugadorID) {
-		synchronized (LOCK) {
-			String error = "nulo";
-			switch(usuariosDebajo) {
-				case 1://5
-					error = UsuarioDAO.actualizarPuntos(5, jugadorID);
-					break;
-				case 2://10
-					error = UsuarioDAO.actualizarPuntos(10, jugadorID);
-					break;
-				case 3://20
-					error = UsuarioDAO.actualizarPuntos(20, jugadorID);
-					break;
+	/**
+	 * Dados la partida jugada, si el modo es por parejas y el numero de jugadores total, añade a la lista de participantes las IAs
+	 * que falten y adapta los puestos en caso de jugar en modo por parejas.
+	 * 
+	 * @param pj
+	 * @param parejas
+	 * @param numJugadores
+	 */
+	public static void anyadirIAsParticipantes(PartidaJugada pj, boolean parejas, int numJugadores) {
+		List<Integer> listaPuestos = new ArrayList<>();
+		int cuentaUno=0;
+		int cuentaDos=0;
+		for(Participante p : pj.getParticipantes()) {
+			listaPuestos.add(p.getPuesto());
+			if(p.getPuesto()==1) {
+				cuentaUno++;
+			} else if(p.getPuesto()==2) {
+				cuentaDos++;
 			}
-			return error;
+		}
+		
+		if(!parejas) {
+			for(Integer puesto = 1; puesto < numJugadores+1; puesto++) {
+				if (!listaPuestos.contains(puesto)) {
+					pj.agnadirParticipante(new Participante(puesto));
+				}
+			}
+		} else {
+			for (int j = cuentaUno; j < 2; j++) {
+				pj.agnadirParticipante(new Participante(1));
+			}
+			for (int j = cuentaDos; j < 2; j++) {
+				pj.agnadirParticipante(new Participante(2));
+			}
+			boolean primeraVez = true;
+			for(int j = 0; j < 4; j++) {
+				if(pj.getParticipantes().get(j).getPuesto()==2) {
+					if(primeraVez) {
+						pj.getParticipantes().get(j).setPuesto(3);
+						primeraVez = false;
+					} else {
+						pj.getParticipantes().get(j).setPuesto(4);
+						break;
+					}
+				}
+			}
+			for(int j = 0; j < 4; j++) {
+				if(pj.getParticipantes().get(j).getPuesto()==1) {
+					pj.getParticipantes().get(j).setPuesto(2);
+					break;
+				}
+			}
 		}
 	}
+	
+//	private static String actualizarPuntosJugador(int usuariosDebajo, UUID jugadorID) {
+//		synchronized (LOCK) {
+//			String error = "nulo";
+//			switch(usuariosDebajo) {
+//				case 1://5
+//					error = UsuarioDAO.actualizarPuntos(5, jugadorID);
+//					break;
+//				case 2://10
+//					error = UsuarioDAO.actualizarPuntos(10, jugadorID);
+//					break;
+//				case 3://20
+//					error = UsuarioDAO.actualizarPuntos(20, jugadorID);
+//					break;
+//			}
+//			return error;
+//		}
+//	}
 	
 	private static ArrayList<Integer> sacarOrden(ArrayList<Integer> valores, boolean limSup) {
 		ArrayList<Integer> orden = new ArrayList<Integer>();
@@ -321,26 +376,33 @@ public class GestorSalas {
 	}
 	
 	public static void restartTimer(UUID salaID) {
-		Timer timerTurno = timersSalas.get(salaID);		
-		
-		AlarmaFinTurno alarm = new AlarmaFinTurno(salaID);
-		if(timerTurno != null)
-			timerTurno.cancel();
-		
-		if(obtenerSala(salaID).isEnPartida()) {
-			timerTurno = new Timer();
-			timerTurno.schedule(alarm, Partida.TIMEOUT_TURNO);
+		synchronized (LOCK) {
+			Timer timerTurno = timersSalas.get(salaID);		
 			
-			timersSalas.put(salaID, timerTurno);
+			AlarmaFinTurno alarm = new AlarmaFinTurno(salaID);
+			if(timerTurno != null) {
+				timerTurno.cancel();
+			}
+			
+			Sala sala = salas.get(salaID);
+			if(sala != null && sala.isEnPartida()) {
+				timerTurno = new Timer();
+				timerTurno.schedule(alarm, Partida.TIMEOUT_TURNO);
+				
+				timersSalas.put(salaID, timerTurno);
+			}
 		}
 	}
 	
 	public static void cancelTimer(UUID salaID) {
-		Timer timerTurno = timersSalas.get(salaID);
-		
-		if(timerTurno != null)
-			timerTurno.cancel();
-		
-		timersSalas.remove(salaID);
+		synchronized (LOCK) {
+			Timer timerTurno = timersSalas.get(salaID);
+			
+			if(timerTurno != null)
+				timerTurno.cancel();
+			
+			timersSalas.remove(salaID);
+		}
 	}
+	
 }

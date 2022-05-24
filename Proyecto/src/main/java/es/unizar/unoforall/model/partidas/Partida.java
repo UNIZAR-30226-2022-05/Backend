@@ -1,6 +1,5 @@
 package es.unizar.unoforall.model.partidas;
 
-import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -21,7 +20,9 @@ public class Partida {
 	private List<Carta> cartasJugadas = null;
 	
 	private Jugada ultimaJugada = null;
-	
+	private int turnoUltimaJugada;
+
+
 	private List<Jugador> jugadores = null;
 	private int turno = 0;
 	private boolean sentidoHorario = true;
@@ -30,7 +31,7 @@ public class Partida {
 	private boolean terminada = false;	
 	
 	//Fecha de inicio de la partida (Ya en formato sql porque no la necesita el frontend en este punto). 
-	private Date fechaInicio = null; 
+	private Long fechaInicio = null; 
 	
 	//Variables para extraer resultados de efectos
 	private boolean modoAcumulandoRobo = false;
@@ -39,11 +40,10 @@ public class Partida {
 	private Carta cartaRobada = null;
 	private boolean repeticionTurno = false;
 	
-	private static final Object LOCK = new Object();
+	private final Object LOCK = new Object();
 	private static final int MAX_ROBO_ATTACK = 5;
 	
 	private UUID salaID = null;	
-	
 	
 	private class PosiblesTiposJugadas {
 		public boolean esEscalera;
@@ -77,10 +77,11 @@ public class Partida {
 		this.terminada = false;
 		this.salaID = salaID;
 		ultimaJugada = null;
+		turnoUltimaJugada = 0;
 				
 				
 		//Marcamos fecha de inicio
-		fechaInicio = new Date(System.currentTimeMillis()); //Fecha actual.
+		fechaInicio = System.currentTimeMillis(); //Fecha actual.
 		
 		//Mazo
 		this.mazo = new LinkedList<>();
@@ -110,14 +111,14 @@ public class Partida {
 //		listaCartasBaraja.add(new Carta(Carta.Tipo.n2, Carta.Color.rojo));
 //		listaCartasBaraja.add(new Carta(Carta.Tipo.n3, Carta.Color.rojo));
 //		listaCartasBaraja.add(new Carta(Carta.Tipo.mas2, Carta.Color.rojo));
-//		listaCartasBaraja.add(new Carta(Carta.Tipo.reversa, Carta.Color.rojo));
+//		listaCartasBaraja.add(new Carta(Carta.Tipo.n4, Carta.Color.rojo));
 //		
 //		for (Carta c : listaCartasBaraja) {
 //			for(int i = 0; i < 20; i++) {
 //				this.mazo.add(c.clone());
 //			}
 //		}
-//		
+		
 		
 		Collections.shuffle(this.mazo); 
 		
@@ -139,7 +140,7 @@ public class Partida {
 			// Se crean las manos de todos los jugadores
 		for(Jugador j : this.jugadores) {
 			for (int i = 0; i < 7; i++) {
-				j.getMano().add(robarCarta());	
+				robarCartaJugador(j, 1);
 			}
 		}
 	}
@@ -273,6 +274,15 @@ public class Partida {
 		}
 		return c;
 	}
+	
+	private void robarCartaJugador(Jugador j, int numCartas) {
+		for (int i = 0; i < numCartas; i++) {
+			if(j.getMano().size()==20) {
+				break;
+			}
+			j.getMano().add(robarCarta());
+		}
+	}
 
 	private void juegaCarta(Carta c, Jugada jugada) {
 		boolean esSalto = false;
@@ -292,9 +302,7 @@ public class Partida {
 						roboAcumulado+=2;
 					}
 				} else {
-					for (int i = 0; i < 2; i++) {
-						siguienteJugador().getMano().add(robarCarta());
-					}
+					robarCartaJugador(siguienteJugador(), 2);
 					esSalto=true;
 				}
 				break;
@@ -308,21 +316,14 @@ public class Partida {
 						roboAcumulado+=4;
 					}
 				} else {
-					for (int i = 0; i < 4; i++) {
-						siguienteJugador().getMano().add(robarCarta());
-					}
+					robarCartaJugador(siguienteJugador(), 2);
 					esSalto=true;
 				}
 				break;
 				
 			case x2:
 				int numCartas = siguienteJugador().getMano().size();
-				for (int i = 0; i < numCartas; i++) {
-					if(siguienteJugador().getMano().size()==20) {
-						break;
-					}
-					siguienteJugador().getMano().add(robarCarta());
-				}
+				robarCartaJugador(siguienteJugador(), numCartas);
 				esSalto=true;
 				break;
 				
@@ -333,13 +334,13 @@ public class Partida {
 						List<Carta> mano = j.getMano();
 						Collections.shuffle(mano);
 						boolean hecho = false;
-						int carta = 0;
-						while(!hecho && carta<mano.size()) {
+						for (int carta = 0; carta < mano.size() && !hecho; carta++) {
 							if(!mano.get(carta).isVisiblePor(turno)) {
 								mano.get(carta).marcarVisible(turno);
 								hecho = true;
 							}
 						}
+						System.out.println("Termina el computo del rayos X");
 					}
 				}
 				break;
@@ -377,9 +378,7 @@ public class Partida {
 		if(	configuracion.getReglas().isEvitarEspecialFinal() && 
 				this.jugadores.get(turno).getMano().size()==1 &&
 				this.jugadores.get(turno).getMano().get(0).esDelColor(Carta.Color.comodin)) {
-			for (int i = 0; i < 2; i++) {
-				this.jugadores.get(turno).getMano().add(robarCarta());
-			}
+			robarCartaJugador(this.jugadores.get(turno), 2);
 		}
 		if(hayIntercambio) {
 			List<Carta> nuevaMano = new ArrayList<>(jugadores.get(jugada.getJugadorObjetivo()).getMano());
@@ -422,14 +421,10 @@ public class Partida {
 		return false;
 	}
 	
-	
-	
-	/**************************************************************************/
-	// Funciones públicas
-	/**************************************************************************/
-	
-	public void ejecutarJugada(Jugada jugada) {
+		
+	private void ejecutarJugada(Jugada jugada) {
 		ultimaJugada = jugada;
+		turnoUltimaJugada = turno;
 		repeticionTurno = false;
 		if(modoJugarCartaRobada) { //FUNCIONA
 			if(jugada.getCartas()!=null && jugada.getCartas().size()==1) {
@@ -441,28 +436,21 @@ public class Partida {
 		} else if(jugada.isRobar()) {
 			if(modoAcumulandoRobo) {
 				modoAcumulandoRobo=false;
-				int robo = roboAcumulado;
-				if (this.jugadores.get(turno).getMano().size() + robo > 20) {
-					robo = 20 - this.jugadores.get(turno).getMano().size();
-				}
-				for(int i = 0; i<robo; i++) {
-					this.jugadores.get(turno).getMano().add(robarCarta());
-				}
+				robarCartaJugador(this.jugadores.get(turno), roboAcumulado);
 				roboAcumulado=0;
+				
 			} else if (configuracion.getModoJuego().equals(ConfigSala.ModoJuego.Attack)) {
 				int random_robo = new Random().nextInt(MAX_ROBO_ATTACK)+1;
-				if (this.jugadores.get(turno).getMano().size() + random_robo > 20) {
-					random_robo = 20 - this.jugadores.get(turno).getMano().size();
-				}
-				for (int i = 0; i < random_robo; i++) {
-					this.jugadores.get(turno).getMano().add(robarCarta());
-				}
+				robarCartaJugador(this.jugadores.get(turno), random_robo);
+				
 			} else { //FUNCIONA
-				this.cartaRobada = robarCarta(); //No se usaba la variable global, se usaba una local
-				this.jugadores.get(turno).getMano().add(cartaRobada);
-				if (Carta.compartenColor(cartaRobada, getUltimaCartaJugada()) || cartaRobada.esDelColor(Carta.Color.comodin) 
-						|| Carta.compartenTipo(cartaRobada,getUltimaCartaJugada())) {
-					modoJugarCartaRobada=true;
+				if(this.jugadores.get(turno).getMano().size() < 20) {
+					this.cartaRobada = robarCarta(); 	//No se usaba la variable global, se usaba una local
+					this.jugadores.get(turno).getMano().add(cartaRobada);
+					if (Carta.compartenColor(cartaRobada, getUltimaCartaJugada()) || cartaRobada.esDelColor(Carta.Color.comodin) 
+							|| Carta.compartenTipo(cartaRobada,getUltimaCartaJugada())) {
+						modoJugarCartaRobada=true;
+					}
 				}
 			}
 			
@@ -496,18 +484,7 @@ public class Partida {
 		
 	}
 	
-	public boolean ejecutarJugadaJugador(Jugada jugada, UUID jugadorID) {
-		if (validarJugada(jugada) && 
-				this.jugadores.get(turno).getJugadorID() != null &&
-				this.jugadores.get(turno).getJugadorID().equals(jugadorID)) {
-			ejecutarJugada(jugada);
-			return true;
-		} else {
-			return false;
-		}
-	}
-	
-	
+
 	private void cambiarColorAleatorioIA(Carta c) {
 		int random_color = new Random().nextInt(4);
 		switch(random_color) {
@@ -526,165 +503,193 @@ public class Partida {
 		}
 	}
 	
-	public void ejecutarJugadaIA() {
-		if (this.jugadores.get(turno).isEsIA()) {
-			Jugada jugadaIA = new Jugada();	// por defecto, robar
-			
-			if (compruebaPuedeJugar()) {	
-				Carta cartaCentral = getUltimaCartaJugada();
-				
-				if (modoAcumulandoRobo) {
-					for (Carta c : this.jugadores.get(turno).getMano()) {
-						if(compatibleAcumulador(c) && 
-								((Carta.compartenTipo(c, cartaCentral)) 	//Si la carta es usable según las reglas
-										|| Carta.compartenColor(getUltimaCartaJugada(),c)  
-										|| c.esDelTipo(Carta.Tipo.mas4))) {
-							
-							List<Carta> listaCartas = new ArrayList<>();
-							listaCartas.add(c);
-							jugadaIA.setCartas(listaCartas);
-							jugadaIA.setRobar(false);
-							
-							if (c.esDelColor(Carta.Color.comodin)) {
-								cambiarColorAleatorioIA(c);
-							}
-							break;
-						}
-					}
-					
-				} else if (modoJugarCartaRobada) {		
-					List<Carta> listaCartas = new ArrayList<>();
-					listaCartas.add(cartaRobada);
-					jugadaIA.setCartas(listaCartas);
-					jugadaIA.setRobar(false);
-					
-					if (cartaRobada.esDelColor(Carta.Color.comodin)) {
-						cambiarColorAleatorioIA(cartaRobada);
-					}
-					
-				} else {
-					for (Carta c : this.jugadores.get(turno).getMano()) {
-						if (c.esCompatible(cartaCentral)) {
-							List<Carta> listaCartas = new ArrayList<>();
-							listaCartas.add(c);
-							jugadaIA.setCartas(listaCartas);
-							jugadaIA.setRobar(false);
-							
-							if (c.esDelColor(Carta.Color.comodin)) {
-								cambiarColorAleatorioIA(c);
-							}
-							break;
-						}
-					}
-				}	
-				
-				if (!validarJugada(jugadaIA)) {
-					System.err.println("ERROR: la IA ha elegido una jugada no válida");
-				}
-				
-				if (!jugadaIA.isRobar() && 
-						this.jugadores.get(turno).getMano().size() - jugadaIA.getCartas().size() == 1) {
-					pulsarBotonUNOInterno(turno);		// Se protege
-				}
-				
-				if (!jugadaIA.isRobar() && 
-						jugadaIA.getCartas().get(0).esDelTipo(Carta.Tipo.intercambio)) {
-					int mejorJugador = 0;
-					int menorNumCartas = 300;
-						
-					//busca el jugador con menos cartas
-					for (int indice = 0; indice < jugadores.size(); indice++) { 	
-						if (jugadores.get(indice).getMano().size() < menorNumCartas) {
-							mejorJugador = indice;
-							menorNumCartas = jugadores.get(indice).getMano().size();
-						}
-					}
-					
-					jugadaIA.setJugadorObjetivo(mejorJugador);
-				}
+	
+	/**************************************************************************/
+	// Funciones públicas
+	/**************************************************************************/
+	
+	public boolean ejecutarJugadaJugador(Jugada jugada, UUID jugadorID) {
+		synchronized (LOCK) {
+			if (validarJugada(jugada) && 
+					!this.jugadores.get(turno).isEsIA() &&
+					this.jugadores.get(turno).getJugadorID().equals(jugadorID)) {
+				ejecutarJugada(jugada);
+				return true;
+			} else {
+				return false;
 			}
-			
-			System.out.println("* * * Jugada elegida por la IA: " + jugadaIA);
-			ejecutarJugada(jugadaIA);
-			
-			
-			// Comprueba si puede denunciar a alguien (por simplicidad solo lo hace en su turno)
-			for (Jugador j : this.jugadores) {
-				if(!j.isProtegido_UNO() && j.getMano().size()==1) { //Pillado
-					pulsarBotonUNOInterno(turno);		// Se protege
-					System.out.println("* * * La IA pulsa el botón de 1");
-				}	
+		}
+	}
+	
+	
+	public void ejecutarJugadaIA() {
+		synchronized (LOCK) {
+			if (this.jugadores.get(turno).isEsIA()) {
+				Jugada jugadaIA = new Jugada();	// por defecto, robar
+				
+				if (compruebaPuedeJugar()) {	
+					Carta cartaCentral = getUltimaCartaJugada();
+					
+					if (modoAcumulandoRobo) {
+						for (Carta c : this.jugadores.get(turno).getMano()) {
+							if(compatibleAcumulador(c) && 
+									((Carta.compartenTipo(c, cartaCentral)) 	//Si la carta es usable según las reglas
+											|| Carta.compartenColor(getUltimaCartaJugada(),c)  
+											|| c.esDelTipo(Carta.Tipo.mas4))) {
+								
+								List<Carta> listaCartas = new ArrayList<>();
+								listaCartas.add(c);
+								jugadaIA.setCartas(listaCartas);
+								jugadaIA.setRobar(false);
+								
+								if (c.esDelColor(Carta.Color.comodin)) {
+									cambiarColorAleatorioIA(c);
+								}
+								break;
+							}
+						}
+						
+					} else if (modoJugarCartaRobada) {		
+						List<Carta> listaCartas = new ArrayList<>();
+						listaCartas.add(cartaRobada);
+						jugadaIA.setCartas(listaCartas);
+						jugadaIA.setRobar(false);
+						
+						if (cartaRobada.esDelColor(Carta.Color.comodin)) {
+							cambiarColorAleatorioIA(cartaRobada);
+						}
+						
+					} else {
+						for (Carta c : this.jugadores.get(turno).getMano()) {
+							if (c.esCompatible(cartaCentral)) {
+								List<Carta> listaCartas = new ArrayList<>();
+								listaCartas.add(c);
+								jugadaIA.setCartas(listaCartas);
+								jugadaIA.setRobar(false);
+								
+								if (c.esDelColor(Carta.Color.comodin)) {
+									cambiarColorAleatorioIA(c);
+								}
+								break;
+							}
+						}
+					}	
+					
+					if (!validarJugada(jugadaIA)) {
+						System.err.println("ERROR: la IA ha elegido una jugada no válida");
+					}
+					
+					if (!jugadaIA.isRobar() && 
+							this.jugadores.get(turno).getMano().size() - jugadaIA.getCartas().size() == 1) {
+						pulsarBotonUNOInterno(turno);		// Se protege
+					}
+					
+					if (!jugadaIA.isRobar() && 
+							jugadaIA.getCartas().get(0).esDelTipo(Carta.Tipo.intercambio)) {
+						int mejorJugador = 0;
+						int menorNumCartas = 300;
+							
+						//busca el jugador con menos cartas
+						for (int indice = 0; indice < jugadores.size(); indice++) { 	
+							if (jugadores.get(indice).getMano().size() < menorNumCartas) {
+								mejorJugador = indice;
+								menorNumCartas = jugadores.get(indice).getMano().size();
+							}
+						}
+						
+						jugadaIA.setJugadorObjetivo(mejorJugador);
+					}
+				}
+				
+				System.out.println("* * * Jugada elegida por la IA: " + jugadaIA);
+				ejecutarJugada(jugadaIA);
+				
+				
+				// Comprueba si puede denunciar a alguien (por simplicidad solo lo hace en su turno)
+				for (Jugador j : this.jugadores) {
+					if(!j.isProtegido_UNO() && j.getMano().size()==1) { //Pillado
+						pulsarBotonUNOInterno(turno);		// Se protege
+						System.out.println("* * * La IA pulsa el botón de 1");
+					}	
+				}
 			}
 		}
 	}
 	
 	//Cuando un jugador se pasa del tiempo de turno
 	public void saltarTurno() {
-		ejecutarJugada(new Jugada());
-		if (modoJugarCartaRobada) {
-			modoJugarCartaRobada = false;
-			avanzarTurno();
+		synchronized (LOCK) {
+			ejecutarJugada(new Jugada());
+			if (modoJugarCartaRobada) {
+				modoJugarCartaRobada = false;
+				avanzarTurno();
+			}
 		}
 		
 	}
 	
 	
 	public boolean turnoDeIA() {
-		return this.jugadores.get(turno).isEsIA();
+		synchronized (LOCK) {
+			return this.jugadores.get(turno).isEsIA();
+		}
 	}
 	
 	public void expulsarJugador(UUID jugadorID) {
-		//se sustituye por IA
-		for (Jugador j : jugadores) {
-			if(!j.isEsIA() && j.getJugadorID().equals(jugadorID)) {
-				j.setEsIA(true);
-				j.setJugadorID(null);
-				break;
+		synchronized (LOCK) {
+			//se sustituye por IA
+			for (Jugador j : jugadores) {
+				if(!j.isEsIA() && j.getJugadorID().equals(jugadorID)) {
+					j.setEsIA(true);
+					j.setJugadorID(null);
+					break;
+				}
 			}
 		}
 	}
 	
 	
 	public void pulsarBotonUNO(UUID jugadorID) { 
-		repeticionTurno = false;
-		ultimaJugada = null;
-		for (int indice = 0; indice < jugadores.size(); indice++) {
-			if (jugadores.get(indice).getJugadorID() != null && 
-					jugadores.get(indice).getJugadorID().equals(jugadorID)) {
-				pulsarBotonUNOInterno(indice);
-				break;
+		synchronized (LOCK) {
+			repeticionTurno = false;
+			ultimaJugada = null;
+			for (int indice = 0; indice < jugadores.size(); indice++) {
+				if (jugadores.get(indice).getJugadorID() != null && 
+						jugadores.get(indice).getJugadorID().equals(jugadorID)) {
+					pulsarBotonUNOInterno(indice);
+					break;
+				}
 			}
 		}
 	}
 	
-	public void pulsarBotonUNOInterno(int jugador) { 
-		synchronized (LOCK) {
-			Jugador j = jugadores.get(jugador);
-			if ((jugador == turno 
-				 && compruebaPuedeJugar(jugador))
-					|| j.getMano().size()==1) { 
-				//Si es su turno y puede jugar la penultima carta, o solo tiene una, se protege
-				j.setProtegido_UNO(true);
-			}
-			
-			for (Jugador j2 : this.jugadores) {
-				if(!j2.isProtegido_UNO() && j2.getMano().size()==1) { //Pillado, roba dos cartas.
-					j2.getMano().add(robarCarta());
-					j2.getMano().add(robarCarta());
-					j2.setPenalizado_UNO(true);
-				}	
-			}
+	private void pulsarBotonUNOInterno(int jugador) { 
+		Jugador j = jugadores.get(jugador);
+		if ((jugador == turno 
+			 && compruebaPuedeJugar(jugador))
+				|| j.getMano().size()==1) { 
+			//Si es su turno y puede jugar la penultima carta, o solo tiene una, se protege
+			j.setProtegido_UNO(true);
+		}
+		
+		for (Jugador j2 : this.jugadores) {
+			if(!j2.isProtegido_UNO() && j2.getMano().size()==1) { //Pillado, roba dos cartas.
+				robarCartaJugador(j2, 2);
+				j2.setPenalizado_UNO(true);
+			}	
 		}
 	}
 	
 	public int getNumIAs() {
-		int numIAs = 0;
-		for (Jugador j : this.jugadores) {
-			if (j.isEsIA()) {
-				numIAs++;
+		synchronized (LOCK) {
+			int numIAs = 0;
+			for (Jugador j : this.jugadores) {
+				if (j.isEsIA()) {
+					numIAs++;
+				}
 			}
+			return numIAs;
 		}
-		return numIAs;
 	}
 	
 	
@@ -720,7 +725,9 @@ public class Partida {
 	}
 
 	public void setSentidoHorario(boolean sentidoHorario) {
-		this.sentidoHorario = sentidoHorario;
+		synchronized (LOCK) {
+			this.sentidoHorario = sentidoHorario;
+		}
 	}
 
 	
@@ -811,7 +818,7 @@ public class Partida {
 		return hayError;
 	}
 
-	public void setHayError(boolean hayError) {
+	private void setHayError(boolean hayError) {
 		this.hayError = hayError;
 	}
 
@@ -823,7 +830,7 @@ public class Partida {
 		this.error = error;
 	}
 
-	public Date getFechaInicio() {
+	public Long getFechaInicio() {
 		return fechaInicio;
 	}
 
@@ -860,7 +867,9 @@ public class Partida {
 	}
 
 	public void setModoAcumulandoRobo(boolean modoAcumulandoRobo) {
-		this.modoAcumulandoRobo = modoAcumulandoRobo;
+		synchronized (LOCK) {
+			this.modoAcumulandoRobo = modoAcumulandoRobo;
+		}
 	}
 
 	public boolean isModoJugarCartaRobada() {
@@ -868,7 +877,9 @@ public class Partida {
 	}
 
 	public void setModoJugarCartaRobada(boolean modoJugarCartaRobada) {
-		this.modoJugarCartaRobada = modoJugarCartaRobada;
+		synchronized (LOCK) {
+			this.modoJugarCartaRobada = modoJugarCartaRobada;
+		}
 	}
 
 	
@@ -877,47 +888,52 @@ public class Partida {
 	}
 
 	public void setCartaRobada(Carta cartaRobada) {
-		this.cartaRobada = cartaRobada;
+		synchronized (LOCK) {
+			this.cartaRobada = cartaRobada;
+		}
 	}
 
 	public Partida getPartidaAEnviar() {
-		Partida partidaResumida = new Partida();
-		
-		partidaResumida.hayError = hayError;
-		partidaResumida.error = error;
-		
-		partidaResumida.mazo = null;
-		
-		if (cartasJugadas != null && !cartasJugadas.isEmpty()) {
-			partidaResumida.cartasJugadas = this.cartasJugadas.subList(this.cartasJugadas.size()-1, this.cartasJugadas.size());
-		} else {
-			partidaResumida.cartasJugadas = this.cartasJugadas;
+		synchronized (LOCK) {
+			Partida partidaResumida = new Partida();
+			
+			partidaResumida.hayError = hayError;
+			partidaResumida.error = error;
+			
+			partidaResumida.mazo = null;
+			
+			if (cartasJugadas != null && !cartasJugadas.isEmpty()) {
+				partidaResumida.cartasJugadas = this.cartasJugadas.subList(this.cartasJugadas.size()-1, this.cartasJugadas.size());
+			} else {
+				partidaResumida.cartasJugadas = this.cartasJugadas;
+			}
+			
+			partidaResumida.ultimaJugada = this.ultimaJugada;
+			partidaResumida.turnoUltimaJugada = this.turnoUltimaJugada;
+			
+			
+			partidaResumida.jugadores = jugadores;
+			partidaResumida.turno = turno;
+			partidaResumida.sentidoHorario = sentidoHorario;
+			
+			partidaResumida.configuracion = configuracion;
+			partidaResumida.terminada = terminada;	
+			
+			//Fecha de inicio de la partida (Ya en formato sql porque no la necesita el frontend en este punto). 
+			partidaResumida.fechaInicio = fechaInicio; 
+			
+			//Variables para extraer resultados de efectos
+			partidaResumida.modoAcumulandoRobo = modoAcumulandoRobo;
+			partidaResumida.roboAcumulado = roboAcumulado;
+			partidaResumida.modoJugarCartaRobada = modoJugarCartaRobada;
+			partidaResumida.cartaRobada = cartaRobada;
+			
+			partidaResumida.repeticionTurno = repeticionTurno;
+			
+			partidaResumida.salaID = null;
+			
+			return partidaResumida;
 		}
-		
-		partidaResumida.ultimaJugada = this.ultimaJugada;
-		
-		
-		partidaResumida.jugadores = jugadores;
-		partidaResumida.turno = turno;
-		partidaResumida.sentidoHorario = sentidoHorario;
-		
-		partidaResumida.configuracion = configuracion;
-		partidaResumida.terminada = terminada;	
-		
-		//Fecha de inicio de la partida (Ya en formato sql porque no la necesita el frontend en este punto). 
-		partidaResumida.fechaInicio = fechaInicio; 
-		
-		//Variables para extraer resultados de efectos
-		partidaResumida.modoAcumulandoRobo = modoAcumulandoRobo;
-		partidaResumida.roboAcumulado = roboAcumulado;
-		partidaResumida.modoJugarCartaRobada = modoJugarCartaRobada;
-		partidaResumida.cartaRobada = cartaRobada;
-		
-		partidaResumida.repeticionTurno = repeticionTurno;
-		
-		partidaResumida.salaID = null;
-		
-		return partidaResumida;
 	}
 
 	public UUID getSalaID() {
@@ -925,7 +941,9 @@ public class Partida {
 	}
 
 	public void setSalaID(UUID salaID) {
-		this.salaID = salaID;
+		synchronized (LOCK) {
+			this.salaID = salaID;
+		}
 	}
 	
 	
@@ -934,10 +952,26 @@ public class Partida {
 	}
 
 	public void setRepeticionTurno(boolean repeticionTurno) {
-		this.repeticionTurno = repeticionTurno;
+		synchronized (LOCK) {
+			this.repeticionTurno = repeticionTurno;
+		}
 	}
 
 	public int getRoboAcumulado() {
 		return roboAcumulado;
+	}
+	
+	public Jugada getUltimaJugada(){
+		return this.ultimaJugada;
+	}
+	
+	public int getTurnoUltimaJugada() {
+		return turnoUltimaJugada;
+	}
+	
+	public void resetUltimaJugada() {
+		synchronized (LOCK) {
+			this.ultimaJugada = null;
+		}
 	}
 }

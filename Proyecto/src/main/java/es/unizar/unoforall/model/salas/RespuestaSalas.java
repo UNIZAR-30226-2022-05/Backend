@@ -29,4 +29,16 @@ public class RespuestaSalas {
 	public boolean isExito() {
 		return exito;
 	}
+	
+	public RespuestaSalas getRespuestaAEnviar() {
+		RespuestaSalas respuestaResumida = new RespuestaSalas();
+		
+		respuestaResumida.exito = this.exito;
+
+		respuestaResumida.salas = new HashMap<>();
+		this.salas.forEach((uuid, sala) -> 
+			respuestaResumida.salas.put(uuid, sala.getSalaAEnviar()));
+		
+		return respuestaResumida;
+	}
 }

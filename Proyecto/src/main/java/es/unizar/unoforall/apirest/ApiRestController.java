@@ -25,7 +25,7 @@ import es.unizar.unoforall.model.salas.RespuestaSala;
 import es.unizar.unoforall.model.salas.RespuestaSalas;
 import es.unizar.unoforall.model.salas.Sala;
 import es.unizar.unoforall.utils.CaracteresInvalidos;
-import es.unizar.unoforall.utils.Serializar;
+import es.unizar.unoforall.api.*;
 import es.unizar.unoforall.model.ListaUsuarios;
 
 
@@ -226,16 +226,19 @@ public class ApiRestController {
 	 * Función a la que llamar para sacar el listado de las partidas que ha terminado el
 	 * usuario, junto a los datos de cada participante humano que jugó cada una.
 	 * @param sesionID		contiene el id de sesión del usuario.
+	 * @param usuarioID		id del usuario del que se quiere obtener el historial
 	 * @return				(clase ListaPartidas) una lista de partidas y sus participantes que indica si la 
 	 * 						sesión ha expirado, si ha habido un error y la lista de 
 	 * 						partidas que haya podido extraer.
 	 */
 	@PostMapping("/sacarPartidasJugadas")
-	public String sacarPartidasJugadas(@RequestParam String sesionID){
+	public String sacarPartidasJugadas(@RequestParam String sesionID,
+										@RequestParam String usuarioID){
 		ListaPartidas lp = null;
-		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
-		if(usuarioID != null) {
-			lp = PartidasDAO.getPartidas(usuarioID);
+		UUID usuarioEmisorID = GestorSesiones.obtenerUsuarioID(sesionID);
+		if(usuarioEmisorID != null) {
+			UUID _usuarioID = Serializar.deserializar(usuarioID, UUID.class);
+			lp = PartidasDAO.getPartidas(_usuarioID);
 		} else {
 			lp = new ListaPartidas(true);
 			lp.setError("SESION_EXPIRADA");
@@ -283,7 +286,8 @@ public class ApiRestController {
 	 */
 	@PostMapping("/actualizarCuentaStepOne")
 	public String actualizarCuentaStepOne(@RequestParam String sesionID,
-								String correoNuevo, String nombre, String contrasenna){
+			@RequestParam String correoNuevo, @RequestParam String nombre, 
+			@RequestParam String contrasenna){
 		String error = "nulo";
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
 		if(usuarioID != null) {
@@ -605,7 +609,7 @@ public class ApiRestController {
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
 		if(usuarioID != null) {
 			ConfigSala _configuracion = Serializar.deserializar(configuracion, ConfigSala.class);
-			return Serializar.serializar(new RespuestaSalas(GestorSalas.buscarSalas(_configuracion)));
+			return Serializar.serializar(new RespuestaSalas(GestorSalas.buscarSalas(_configuracion)).getRespuestaAEnviar());
 		} else {
 			return Serializar.serializar(new RespuestaSalas());
 		}
@@ -627,11 +631,11 @@ public class ApiRestController {
 			if (salaPausada != null) {
 				return Serializar.serializar(salaPausada.getSalaAEnviar()); 
 			} else {
-				return Serializar.serializar(new Sala("No hay ninguna sala pausada"));
+				return Serializar.serializar(new Sala("No hay ninguna sala pausada").getSalaAEnviar());
 			}
 
 		} else {
-			return Serializar.serializar(new Sala("No hay ninguna sala pausada"));
+			return Serializar.serializar(new Sala("No hay ninguna sala pausada").getSalaAEnviar());
 		}
     }
 	
@@ -644,7 +648,7 @@ public class ApiRestController {
 	 * 							sala, y false en caso contrario
 	 */
 	@PostMapping("/comprobarUnirseSala")
-	public String comprobarUnirseSala(@RequestParam String sesionID, String salaID){
+	public String comprobarUnirseSala(@RequestParam String sesionID, @RequestParam String salaID){
 		Sala sala = GestorSalas.obtenerSala(Serializar.deserializar(salaID, UUID.class));
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
 		if (usuarioID == null 
@@ -656,6 +660,27 @@ public class ApiRestController {
 			return Serializar.serializar(true);
 		}
 		
+    }
+	
+	
+	/**
+	 * Método para comprobar si un usuario puede unirse a una sala
+	 * @param sesionID			Id de sesión del usuario
+	 * @param salaID			Id de la sala
+	 * @return					(Boolean) True si es correcto, false en caso
+	 * 							contrario
+	 */
+	@PostMapping("/ack")
+	public String ack(@RequestParam String sesionID, @RequestParam String salaID){
+		System.out.println("ACK recibido");
+		Sala sala = GestorSalas.obtenerSala(Serializar.deserializar(salaID, UUID.class));
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
+		if (sala != null && usuarioID != null) {
+			sala.ack(usuarioID);
+			return Serializar.serializar(true);
+		} else {
+			return Serializar.serializar(false);
+		}
     }
 	
 	

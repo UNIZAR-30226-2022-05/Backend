@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import es.unizar.unoforall.gestores.GestorSalas;
 import es.unizar.unoforall.model.PartidasAcabadasVO;
 import es.unizar.unoforall.model.UsuarioVO;
 import es.unizar.unoforall.model.partidas.HaJugadoVO;
@@ -44,11 +45,12 @@ public class PartidasDAO {
 				
 				//Necesito saber el número de IAs de la partida para saber el número total de participantes
 				PreparedStatement sacarNumIAs = 
-						conn.prepareStatement("SELECT num_ias FROM partidas_acabadas WHERE id = ?;");
+						conn.prepareStatement("SELECT num_ias, modo_juego FROM partidas_acabadas WHERE id = ?;");
 				sacarNumIAs.setObject(1, (UUID) rs.getObject("partida"));
 				ResultSet rs4 = sacarNumIAs.executeQuery();
 				rs4.next();
 				int numParticipantes = (int)rs4.getObject("num_ias"); //Partimos del número de IAs (de cero a tres)
+				int modo_juego = (int)rs4.getObject("modo_juego");
 				while(rs2.next()) { //Mínimo debe ejecutarse una vez.
 					numParticipantes++;
 					UsuarioVO usuario = UsuarioDAO.getUsuario((UUID)rs2.getObject("usuario"));
@@ -57,19 +59,27 @@ public class PartidasDAO {
 									(UUID)rs2.getObject("usuario"), (UUID)rs2.getObject("partida"),
 									rs2.getInt("usrs_debajo"), rs2.getBoolean("ha_ganado"))));
 				}
-				System.out.println("numParticipantes: " + Integer.toString(numParticipantes));
+				//System.out.println("numParticipantes: " + Integer.toString(numParticipantes));
 				for (Participante p : listaParticipantes) {
-					p.setPuesto(numParticipantes);
+					p.setPuesto(numParticipantes, modo_juego);
 				}
+				
 				//Saca los datos de la partida
 				PreparedStatement sacarPartida = 
 						conn.prepareStatement("SELECT * FROM partidas_acabadas WHERE id = ?;");
 				sacarPartida.setObject(1,(UUID) rs.getObject("partida"));
 				ResultSet rs3 = sacarPartida.executeQuery();
 				if(rs3.next()) {
-					partidas.add(new PartidaJugada(new PartidasAcabadasVO((UUID)rs3.getObject("id"),
-							rs3.getDate("fecha_inicio_partida"),rs3.getDate("fecha_fin_partida"),
-							rs3.getInt("num_ias"),rs3.getInt("modo_juego")),listaParticipantes));
+					PartidaJugada pj = new PartidaJugada(new PartidasAcabadasVO(
+							(UUID)rs3.getObject("id"),
+							rs3.getLong("fecha_inicio_partida"),
+							rs3.getLong("fecha_fin_partida"),
+							rs3.getInt("num_ias"),
+							rs3.getInt("modo_juego")),
+							listaParticipantes);
+					//Añade las IAs necesarias y modifica los puestos si es el modo por parejas.
+					GestorSalas.anyadirIAsParticipantes(pj, modo_juego==2, numParticipantes);
+					partidas.add(pj);
 				}
 			}
 			lp.setPartidas(partidas);
@@ -89,7 +99,7 @@ public class PartidasDAO {
 	 * @return 				"nulo" si no hay problemas, y un mensaje de error en caso de que los
 	 * 						haya.
 	 */
-	public static String insertarPartidaAcabada(PartidaJugada partida) {
+	public static String insertarPartidaAcabada(PartidaJugada partida) { 
 		String error = "nulo";
 		Connection conn = null;
 		
@@ -99,8 +109,8 @@ public class PartidasDAO {
 			PreparedStatement insertarPartida = 
 					conn.prepareStatement("Insert Into partidas_acabadas Values(?,?,?,?,?);");
 			insertarPartida.setObject(1, partida.getPartida().getId());
-			insertarPartida.setDate(2, partida.getPartida().getFechaInicioPartida());
-			insertarPartida.setDate(3, partida.getPartida().getFechaFinPartida());
+			insertarPartida.setLong(2, partida.getPartida().getFechaInicioPartida());
+			insertarPartida.setLong(3, partida.getPartida().getFechaFinPartida());
 			insertarPartida.setInt(4, partida.getPartida().getNumIas());
 			insertarPartida.setInt(5, partida.getPartida().getModoJuego());
 			

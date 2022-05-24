@@ -22,7 +22,7 @@ import es.unizar.unoforall.model.partidas.Partida;
 import es.unizar.unoforall.model.partidas.RespuestaVotacionPausa;
 import es.unizar.unoforall.model.salas.NotificacionSala;
 import es.unizar.unoforall.model.salas.Sala;
-import es.unizar.unoforall.utils.Serializar;
+import es.unizar.unoforall.api.*;
 
 @Controller
 public class SocketController {	
@@ -130,17 +130,18 @@ public class SocketController {
 							@Header("simpSessionId") String sesionID, 
 							Object vacio) throws Exception {
 		
-		if (GestorSalas.obtenerSala(salaID) == null) {
+		Sala sala = GestorSalas.obtenerSala(salaID);
+		if (sala == null) {
 			return Serializar.serializar(new Sala("La sala ya no existe"));
 		}
 		
 		System.out.println(sesionID + " se une a la sala " + salaID);
 		
-		GestorSalas.obtenerSala(salaID).
-			nuevoParticipante(UsuarioDAO.getUsuario(GestorSesiones.obtenerUsuarioID(sesionID)));
+		sala.nuevoParticipante(UsuarioDAO.getUsuario(GestorSesiones.obtenerUsuarioID(sesionID)));
 		
-		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
-	}
+		sala.initAckTimers();
+		return Serializar.serializar(sala.getSalaAEnviar());
+	} 
 	
 	/**
 	 * Método para indicar que el usuario está listo para jugar
@@ -173,8 +174,9 @@ public class SocketController {
 				t.schedule(alarm, DELAY_TURNO_IA);
 			}
 		}
-				
-		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
+		sala.initAckTimers();		
+		
+		return Serializar.serializar(sala.getSalaAEnviar());
 	}
 	
 	/**
@@ -197,7 +199,7 @@ public class SocketController {
 			return Serializar.serializar(new Sala("La sala ya no existe"));
 		}
 		
-		Sala s = GestorSalas.eliminarParticipanteSala(salaID, 
+		Sala s = GestorSalas.eliminarParticipanteSalaExterno(salaID, 
 				GestorSesiones.obtenerUsuarioID(sesionID));
 		
 		if (s == null) {
@@ -214,6 +216,7 @@ public class SocketController {
 				GestorSalas.restartTimer(salaID);
 			}
 			
+			s.initAckTimers();
 			return Serializar.serializar(s.getSalaAEnviar());
 		}
 	}
@@ -248,7 +251,7 @@ public class SocketController {
 			GestorSalas.eliminarSala(salaID);
 			return Serializar.serializar(new Sala("La sala se ha eliminado"));
 		}
-				
+		s.initAckTimers();		
 		return Serializar.serializar(s.getSalaAEnviar());
 	}
 	
@@ -265,7 +268,6 @@ public class SocketController {
 	@SendTo("/topic/salas/{salaID}")
 	public String actualizarSala(@DestinationVariable UUID salaID,  
 							Object vacio) throws Exception {
-		
 		Sala s = GestorSalas.obtenerSala(salaID);
 		
 		if (s == null) {
@@ -273,8 +275,10 @@ public class SocketController {
 		} else {
 			if(s.isEnPartida()) {
 				GestorSalas.restartTimer(salaID);
+				s.getPartida().resetUltimaJugada(); 
 			}
 			
+			s.initAckTimers();
 			return Serializar.serializar(s.getSalaAEnviar());
 		}
 	}
@@ -313,15 +317,25 @@ public class SocketController {
 			return Serializar.serializar(new Sala("La sesión ha caducado. Vuelva a iniciar sesión"));
 		}
 		
-		System.out.println("- - - " + sesionID + " envia un turno a la sala " + salaID);
-		System.out.println("- - - Jugada: " + jugada);
 		
-		Partida partida = GestorSalas.obtenerSala(salaID).getPartida();
+		System.out.println("- - - " + sesionID + " envia un turno a la sala " + salaID);
+		
+		Sala sala = GestorSalas.obtenerSala(salaID);
+		Partida partida = sala.getPartida();
+		
+		if (partida.turnoDeIA()) {
+			System.out.println("- - - Jugada en turno incorrecto");
+			return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
+		}
+		
 		int turnoAnterior = partida.getTurno();
 		boolean jugadaValida = partida.ejecutarJugadaJugador(jugada, usuarioID);
 		
 		if (!jugadaValida) {
+			System.out.println("- - - Jugada inválida");
 			return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
+		} else {
+			System.out.println("- - - Jugada: " + jugada);
 		}
 		
 		if(partida.estaTerminada()) {
@@ -330,8 +344,7 @@ public class SocketController {
 				System.err.println("Error al insertar la partida en la BD");
 			}	
 			GestorSalas.cancelTimer(salaID);
-			Sala sala = GestorSalas.obtenerSala(salaID);
-			sala.setEnPartida(false);
+			sala.setEnPartidaExterno(false);
 			
 		} else {
 			if (partida.turnoDeIA()) {
@@ -345,8 +358,8 @@ public class SocketController {
 				GestorSalas.restartTimer(salaID);
 			}
 		}
-		
-		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
+		sala.initAckTimers();
+		return Serializar.serializar(sala.getSalaAEnviar());
 	}
 	
 	/**
@@ -367,13 +380,18 @@ public class SocketController {
 		} else if (GestorSalas.obtenerSala(salaID).isEnPausa()) {
 			return Serializar.serializar(new Sala("La partida está pausada"));
 		}
-				
-		Partida partida = GestorSalas.obtenerSala(salaID).getPartida();
+		
+		Sala sala = GestorSalas.obtenerSala(salaID);
+		Partida partida = sala.getPartida();
 		int turnoAnterior = partida.getTurno();
 		partida.ejecutarJugadaIA();
 		
+		Jugada ultimaJugada = partida.getUltimaJugada();
 		//Envía un emoji si ha tirado un +4
-		if (partida.getUltimaCartaJugada().esDelTipo(Carta.Tipo.mas4)) {
+		if (ultimaJugada != null
+			&& ultimaJugada.getCartas() != null
+			&& ultimaJugada.getCartas().size() == 1
+			&& ultimaJugada.getCartas().get(0).esDelTipo(Carta.Tipo.mas4)) {
 			GestorSesiones.getApiInterna().sendObject("/app/partidas/emojiPartida/" + salaID, new EnvioEmoji(0,turnoAnterior,true));
 		}
 		
@@ -383,8 +401,7 @@ public class SocketController {
 				System.err.println("Error al insertar la partida en la BD");
 			}	
 			GestorSalas.cancelTimer(salaID);
-			Sala sala = GestorSalas.obtenerSala(salaID);
-			sala.setEnPartida(false);
+			sala.setEnPartidaExterno(false);
 			
 		} else {
 			
@@ -402,8 +419,8 @@ public class SocketController {
 				GestorSalas.restartTimer(salaID);
 			}
 		}
-		
-		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
+		sala.initAckTimers();
+		return Serializar.serializar(sala.getSalaAEnviar());
 	}
 	
 	
@@ -426,7 +443,8 @@ public class SocketController {
 			return Serializar.serializar(new Sala("La partida está en pausa ..."));
 		}
 		
-		Partida partida = GestorSalas.obtenerSala(salaID).getPartida();
+		Sala sala = GestorSalas.obtenerSala(salaID);
+		Partida partida = sala.getPartida();
 		partida.saltarTurno();
 		
 		if (partida.turnoDeIA()) {
@@ -441,8 +459,8 @@ public class SocketController {
 		}
 		
 		GestorSalas.restartTimer(salaID);
-		
-		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
+		sala.initAckTimers();
+		return Serializar.serializar(sala.getSalaAEnviar());
 	}
 	
 		
@@ -475,10 +493,12 @@ public class SocketController {
 		
 		System.out.println("El usuario " + usuarioID + " ha pulsado el botón UNO");
 		
-		Partida partida = GestorSalas.obtenerSala(salaID).getPartida();
+		Sala sala = GestorSalas.obtenerSala(salaID);
+		Partida partida = sala.getPartida();
 		partida.pulsarBotonUNO(usuarioID);
 		
-		return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
+		sala.initAckTimers();
+		return Serializar.serializar(sala.getSalaAEnviar());
 	}
 	
 	
@@ -552,18 +572,16 @@ public class SocketController {
 	@SendTo("/topic/salas/{salaID}/votaciones")
 	public String votacionPartidaInterna(@DestinationVariable UUID salaID, 
 							Object vacio) throws Exception {	
-		
-		if (GestorSalas.obtenerSala(salaID) == null) {
+		Sala sala = GestorSalas.obtenerSala(salaID);
+		if (sala == null) {
 			return "nulo";
-		} else if (!GestorSalas.obtenerSala(salaID).isEnPartida()) {
+		} else if (!sala.isEnPartida()) {
 			return "nulo";
 		}
 		
-		return Serializar.serializar(GestorSalas.obtenerSala(salaID)
-											.getParticipantesVotoAbandono());
+		return Serializar.serializar(sala.getParticipantesVotoAbandonoExterno());
 		
 	}
-	
 	
 	
 	
@@ -571,9 +589,21 @@ public class SocketController {
 	public void onDisconnectEvent(SessionDisconnectEvent event) throws Exception {
 		String sesionID = event.getSessionId();
 		
+		SessionHandler.logout(sesionID);
 		GestorSalas.eliminarParticipanteSalas(GestorSesiones.obtenerUsuarioID(sesionID));
-		GestorSesiones.eliminarSesion(sesionID);		
+		GestorSesiones.eliminarSesion(sesionID);	
 		
-		System.err.println("Client disconnected with session id: " + sesionID);
+		System.out.println("Client disconnected with session id: " + sesionID);
+	}
+	
+	public static void desconectarUsuario(String sesionID) {
+		SessionHandler.logout(sesionID);
+	}
+	
+	public static void desconectarUsuario(UUID usuarioID) {
+		String sesionID = GestorSesiones.obtenerSesionID(usuarioID);
+		if (sesionID != null) {
+			desconectarUsuario(sesionID);
+		}
 	}
 }

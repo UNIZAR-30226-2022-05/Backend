@@ -13,6 +13,10 @@ public class Serializar {
     private static final boolean DEBUG = false;
 
     public static <T> String serializar(T dato){
+    	if (DEBUG) {
+    		System.out.println("- - - - - - - -" + dato.getClass());
+    	}
+    	
         if(dato instanceof String){
             return (String) dato;
         }else{

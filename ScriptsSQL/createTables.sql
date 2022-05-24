@@ -20,8 +20,8 @@ CREATE TABLE IF NOT EXISTS amigo_de(
 
 CREATE TABLE IF NOT EXISTS partidas_acabadas(
 			id UUID PRIMARY KEY,
-			fecha_inicio_partida DATE NOT NULL,
-			fecha_fin_partida DATE NOT NULL,
+			fecha_inicio_partida BIGINT NOT NULL,
+			fecha_fin_partida BIGINT NOT NULL,
 			num_ias INT NOT NULL,
 			modo_juego INT NOT NULL);
 

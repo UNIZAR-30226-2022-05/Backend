@@ -1,16 +1,15 @@
 package es.unizar.unoforall.model;
 
-import java.sql.Date;
 import java.util.UUID;
 
 public class PartidasAcabadasVO {
 	private final UUID id;
-	private Date fechaInicioPartida;
-	private Date fechaFinPartida;
+	private Long fechaInicioPartida;
+	private Long fechaFinPartida;
 	private int numIas;
 	private int modoJuego;
 	
-	public PartidasAcabadasVO(UUID id, Date fechaInicioPartida, Date fechaFinPartida, int numIas, int modoJuego) {
+	public PartidasAcabadasVO(UUID id, Long fechaInicioPartida, Long fechaFinPartida, int numIas, int modoJuego) {
 		super();
 		if(id == null) {
 			this.id = UUID.randomUUID();
@@ -23,16 +22,16 @@ public class PartidasAcabadasVO {
 		this.modoJuego = modoJuego;
 	}
 	
-	public Date getFechaInicioPartida() {
+	public Long getFechaInicioPartida() {
 		return fechaInicioPartida;
 	}
-	public void setFechaInicioPartida(Date fechaInicioPartida) {
+	public void setFechaInicioPartida(Long fechaInicioPartida) {
 		this.fechaInicioPartida = fechaInicioPartida;
 	}
-	public Date getFechaFinPartida() {
+	public Long getFechaFinPartida() {
 		return fechaFinPartida;
 	}
-	public void setFechaFinPartida(Date fechaFinPartida) {
+	public void setFechaFinPartida(Long fechaFinPartida) {
 		this.fechaFinPartida = fechaFinPartida;
 	}
 	public int getNumIas() {
