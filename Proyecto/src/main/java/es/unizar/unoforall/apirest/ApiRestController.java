@@ -587,7 +587,12 @@ public class ApiRestController {
 			return Serializar.serializar(new Sala("No se ha encontrado la sala"));
 		}
 		if(usuarioID != null) {
-			return Serializar.serializar(GestorSalas.buscarSalaID(_salaID));
+			Sala salaADevolver = GestorSalas.buscarSalaID(_salaID);
+			if (salaADevolver == null) {
+				return Serializar.serializar(new Sala("La sala no es pública"));
+			} else {
+				return Serializar.serializar(salaADevolver);
+			}
 		} else {
 			return Serializar.serializar(new Sala("No se ha encontrado la sala"));
 		}
