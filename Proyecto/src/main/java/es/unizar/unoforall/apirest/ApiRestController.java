@@ -579,7 +579,12 @@ public class ApiRestController {
 	@PostMapping("/buscarSalaID")
 	public String buscarSalaID(@RequestParam String sesionID, @RequestParam String salaID){		
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
-		UUID _salaID = Serializar.deserializar(salaID, UUID.class);
+		UUID _salaID;
+		try {
+			_salaID = Serializar.deserializar(salaID, UUID.class);
+		} catch (IllegalArgumentException e) {
+			return Serializar.serializar(new Sala("No se ha encontrado la sala"));
+		}
 		if(usuarioID != null) {
 			return Serializar.serializar(GestorSalas.buscarSalaID(_salaID));
 		} else {
