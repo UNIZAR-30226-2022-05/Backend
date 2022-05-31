@@ -15,11 +15,13 @@ import es.unizar.unoforall.model.partidas.RespuestaVotacionPausa;
 import es.unizar.unoforall.model.salas.NotificacionSala;
 import es.unizar.unoforall.model.salas.Sala;
 import me.i2000c.web_utils.annotations.PostMapping;
+import me.i2000c.web_utils.annotations.RestController;
 import me.i2000c.web_utils.annotations.WebsocketController;
 import me.i2000c.web_utils.client.RestClient;
 import me.i2000c.web_utils.controllers.Controller;
 import me.i2000c.web_utils.controllers.DisconnectReason;
 
+@RestController("/app")
 @WebsocketController("/topic")
 public class SocketController extends Controller{	
 	

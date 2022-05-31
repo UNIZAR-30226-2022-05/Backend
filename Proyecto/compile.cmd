@@ -49,6 +49,22 @@ if not exist "activation.jar" (
         )
     )
 )
+if not exist "postgresql.jar" (
+    if exist "%librariesDir%\postgresql.jar" (
+        copy "%librariesDir%\postgresql.jar" . 1>nul
+    ) else (
+        java -jar ..\utils\FileDownloader.jar %tempDir%\postgresql.jar https://jdbc.postgresql.org/download/postgresql-42.3.6.jar
+        if not "!errorlevel!"=="0" (
+            echo An error occurred while downloading postgresql.jar 1>&2
+            pause
+            exit 1
+        ) else (
+            mkdir "%librariesDir%" 1>nul 2>nul
+            move "%tempDir%\postgresql.jar" "%librariesDir%\postgresql.jar" 1>nul
+            copy "%librariesDir%\postgresql.jar" . 1>nul
+        )
+    )
+)
 
 cd ..
 

@@ -51,6 +51,24 @@ then
         fi
     fi
 fi
+if [ ! -f "postgresql.jar" ]
+then
+    if [ -f "$librariesDir/postgresql.jar" ]
+    then
+        cp "$librariesDir/postgresql.jar" .
+    else
+        java -jar ../utils/FileDownloader.jar "$tempDir/postgresql.jar" https://jdbc.postgresql.org/download/postgresql-42.3.6.jar
+        if [ $? != 0 ]
+        then
+            echo "An error occurred while downloading postgresql.jar" 1>&2
+            exit 1
+        else
+            mkdir -p "$librariesDir"
+            mv "$tempDir/postgresql.jar" "$librariesDir/postgresql.jar"
+            cp "$librariesDir/postgresql.jar" .
+        fi
+    fi
+fi
 
 cd ..
 
