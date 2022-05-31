@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- File generated with BuildXMLCreator -->
+<project basedir="." default="post_jar" name="BackendApplication">
+    <description>
+        Usage:
+            ant       --> Compile all files and generate jar file
+            ant clean --> Clean compilation files
+    </description>
+    <property name="jarName" value="Backend.jar"/>
+    <property name="mainClassName" value="BackendApplication"/>
+    <property name="mainClassPackage" value="es.unizar.unoforall"/>
+    <property name="buildDir" location="build"/>
+    <property name="distDir" location="dist"/>
+    <property name="libDir" location="lib"/>
+    <property name="srcDir" location="src"/>
+    <property name="build_META_INF_Dir" location="${buildDir}/META-INF"/>
+    <property environment="env"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <path id="Project.classpath">
+        <pathelement location="${buildDir}"/>
+        <pathelement location="${libDir}/WebUtils.jar"/>
+        <pathelement location="${libDir}/mailx.jar"/>
+        <pathelement location="${libDir}/activation.jar"/>
+    </path>
+
+    <target name="init">
+        <mkdir dir="${buildDir}"/>
+        <mkdir dir="${build_META_INF_Dir}"/>
+        <mkdir dir="${distDir}"/>
+        <copy includeemptydirs="false" todir="${buildDir}">
+            <fileset dir="${srcDir}">
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="clean">
+        <delete dir="${buildDir}"/>
+        <delete dir="${distDir}"/>
+    </target>
+
+    <target name="build" depends="init">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="${buildDir}" includeantruntime="false" source="8" target="8">
+            <src path="${srcDir}"/>
+            <classpath refid="Project.classpath"/>
+            <compilerarg value="-Xlint:-unchecked"/>
+            <compilerarg value="-parameters"/>
+        </javac>
+    </target>
+
+    <target name="run" depends="build">
+        <java classpath="${buildDir}; ${libDir}/WebUtils.jar; ${libDir}/mailx.jar; ${libDir}/activation.jar" classname="${mainClassPackage}.${mainClassName}"/>
+    </target>
+
+    <target name="debug" depends="build">
+        <java classpath="${buildDir}; ${libDir}/WebUtils.jar; ${libDir}/mailx.jar; ${libDir}/activation.jar" classname="${mainClassPackage}.${mainClassName}">
+            <jvmarg value="-Xdebug"/>
+            <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5432"/>
+        </java>
+    </target>
+
+    <target name="jar" depends="build">
+        <manifest file="${build_META_INF_Dir}/MANIFEST.MF" >
+            <attribute name="Main-Class" value="${mainClassPackage}.${mainClassName}" />
+        </manifest>
+        <jar manifest="${build_META_INF_Dir}/MANIFEST.MF" jarfile="${distDir}/${jarName}.jar" basedir="build" />
+    </target>
+
+    <target name="post_jar" depends="jar">
+        <jar jarfile="${distDir}/${jarName}_with_dependencies.jar">
+            <zipfileset src="${distDir}/${jarName}.jar" excludes="META-INF/*" />
+
+            <zipfileset src="${libDir}/WebUtils.jar" excludes="META-INF/*" />
+            <zipfileset src="${libDir}/mailx.jar" excludes="META-INF/*" />
+            <zipfileset src="${libDir}/activation.jar" excludes="META-INF/*" />
+            <manifest>
+                <attribute name="Main-Class" value="${mainClassPackage}.${mainClassName}" />
+            </manifest>
+        </jar>
+    </target>
+</project>

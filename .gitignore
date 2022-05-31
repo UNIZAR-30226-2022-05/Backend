@@ -31,3 +31,5 @@ NOTAS.md
 
 Scripts PostgreSQL/*.sh
 ScriptsDespliegue/*.sh
+/Proyecto/Backend/nbproject/private/
+/Proyecto/nbproject/

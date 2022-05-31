@@ -1,0 +1,13 @@
+isRunnable: true
+javaVersion: 8
+jarName: Backend.jar
+mainClassName: BackendApplication
+mainClassPackage: es.unizar.unoforall
+libraries:
+  WebUtils.jar: ''
+  mailx.jar: 'https://repo1.maven.org/maven2/javax/mail/mail/1.4/mail-1.4.jar'
+  activation.jar: 'https://repo1.maven.org/maven2/javax/activation/activation/1.1.1/activation-1.1.1.jar'
+librariesToPack:
+- WebUtils.jar
+- mailx.jar
+- activation.jar

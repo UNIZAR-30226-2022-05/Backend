@@ -1,0 +1,82 @@
+#!/bin/bash
+# File generated with BuildXMLCreator
+
+libDir=lib
+
+baseDir=~/.ant
+librariesDir=$baseDir/cached_libraries
+antDirName=apache-ant
+antDir=$baseDir/$antDirName
+antFile=$antDir/bin/ant
+tempDir=$baseDir/temp
+
+mkdir "$libDir" &>/dev/null
+cd "$libDir"
+
+echo "Downloading libraries..."
+
+if [ ! -f "mailx.jar" ]
+then
+    if [ -f "$librariesDir/mailx.jar" ]
+    then
+        cp "$librariesDir/mailx.jar" .
+    else
+        java -jar ../utils/FileDownloader.jar "$tempDir/mailx.jar" https://repo1.maven.org/maven2/javax/mail/mail/1.4/mail-1.4.jar
+        if [ $? != 0 ]
+        then
+            echo "An error occurred while downloading mailx.jar" 1>&2
+            exit 1
+        else
+            mkdir -p "$librariesDir"
+            mv "$tempDir/mailx.jar" "$librariesDir/mailx.jar"
+            cp "$librariesDir/mailx.jar" .
+        fi
+    fi
+fi
+if [ ! -f "activation.jar" ]
+then
+    if [ -f "$librariesDir/activation.jar" ]
+    then
+        cp "$librariesDir/activation.jar" .
+    else
+        java -jar ../utils/FileDownloader.jar "$tempDir/activation.jar" https://repo1.maven.org/maven2/javax/activation/activation/1.1.1/activation-1.1.1.jar
+        if [ $? != 0 ]
+        then
+            echo "An error occurred while downloading activation.jar" 1>&2
+            exit 1
+        else
+            mkdir -p "$librariesDir"
+            mv "$tempDir/activation.jar" "$librariesDir/activation.jar"
+            cp "$librariesDir/activation.jar" .
+        fi
+    fi
+fi
+
+cd ..
+
+ant=$(which ant)
+if [ $? != 0 ]
+then
+    if [ -f "$antFile" ]
+    then
+        chmod u+x "$antFile"
+        ant="$antFile"
+    else
+        rm -r "$antDir" &>/dev/null
+        rm -r "$tempDir/$antDirName" &>/dev/null
+        java -jar utils/FileDownloader.jar -u "$tempDir/$antDirName" http://archive.apache.org/dist/ant/binaries/apache-ant-1.10.12-bin.zip
+        if [ $? != 0 ]
+        then
+            echo "An error occurred while downloading ant" 1>&2
+            exit 2
+        else
+            mv "$tempDir/$antDirName/apache-ant-1.10.12" "$antDir"
+            rmdir "$tempDir/$antDirName"
+            chmod u+x "$antFile"
+            ant="$antFile"
+        fi
+    fi
+fi
+
+echo "Compiling project..."
+$ant
