@@ -19,6 +19,7 @@ import es.unizar.unoforall.model.partidas.PartidaJugada;
 import es.unizar.unoforall.model.salas.ConfigSala;
 import es.unizar.unoforall.model.salas.ConfigSala.ModoJuego;
 import es.unizar.unoforall.model.salas.Sala;
+import me.i2000c.web_utils.client.RestClient;
 
 public class GestorSalas {
 	private static HashMap<UUID,Sala> salas;
@@ -104,7 +105,9 @@ public class GestorSalas {
 			salas.remove(salaID);
 			return null;
 		} else {
-			GestorSesiones.getApiInterna().sendObject("/app/partidas/votacionesInternas/" + salaID, "vacio");
+                        RestClient client = GestorSesiones.getApiInterna().getRestClient();
+                        client.openConnection("/app/partidas/votacionesInternas/" + salaID);
+                        client.receiveObject(String.class, null);
 			
 			return salas.get(salaID);
 		}
@@ -120,7 +123,9 @@ public class GestorSalas {
 					System.out.println("Eliminando participante desconectado");
 					eliminarParticipanteSala(salaID, usuarioID);
 					
-					GestorSesiones.getApiInterna().sendObject("/app/salas/actualizar/" + salaID, "vacio");
+					RestClient client = GestorSesiones.getApiInterna().getRestClient();
+                                        client.openConnection("/app/salas/actualizar/" + sala.getSalaID());
+                                        client.receiveObject(String.class, null);
 				}
 			}
 		}

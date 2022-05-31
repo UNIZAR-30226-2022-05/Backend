@@ -1,4 +1,4 @@
-package es.unizar.unoforall.sockets;
+/*package es.unizar.unoforall.sockets;
 
 import java.util.List;
 
@@ -94,4 +94,4 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
       });
   }
 
-}
+}*/

@@ -1,4 +1,4 @@
-package es.unizar.unoforall.sockets;
+/*package es.unizar.unoforall.sockets;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,4 +33,4 @@ public class SessionHandler {
     	}
     }
 
-}
+}*/

@@ -4,6 +4,7 @@ import java.util.TimerTask;
 import java.util.UUID;
 
 import es.unizar.unoforall.model.salas.Sala;
+import me.i2000c.web_utils.client.RestClient;
 
 
 public class AlarmaTurnoIA extends TimerTask {
@@ -19,7 +20,9 @@ public class AlarmaTurnoIA extends TimerTask {
 		try {
 			Sala sala = GestorSalas.obtenerSala(salaID);
 			if (sala != null && sala.isEnPartida() && !sala.isEnPausa()) {
-				GestorSesiones.getApiInterna().sendObject("/app/partidas/turnosIA/" + salaID, "vacio");
+                            RestClient client = GestorSesiones.getApiInterna().getRestClient();
+                            client.openConnection("/app/partidas/turnosIA/" + salaID);
+                            client.receiveObject(String.class, null);
 			}
 		} catch (Exception e1) {
 			e1.printStackTrace();

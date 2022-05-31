@@ -4,8 +4,7 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
-
-import es.unizar.unoforall.api.WebSocketAPI;
+import me.i2000c.web_utils.client.WebsocketClient;
 
 public class GestorSesiones {
 	
@@ -17,7 +16,7 @@ public class GestorSesiones {
 	
 	
 	// Conexión propia de WebSockets para llamadas desde el servidor
-	private static WebSocketAPI apiInterna;
+	private static WebsocketClient apiInterna;
 	
 	private static final Object LOCK;
 	
@@ -25,13 +24,8 @@ public class GestorSesiones {
 		sesiones = new HashMap<>();
 		clavesInicio = new HashMap<>();
 		LOCK = new Object();
-		apiInterna = new WebSocketAPI();
-		try {
-			apiInterna.openConnection();
-		} catch (InterruptedException | ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		apiInterna = new WebsocketClient("http://localhost");
+                apiInterna.openConnection("/topic");
 	}
 	
 	public static UUID nuevaClaveInicio(UUID usuarioID) {
@@ -81,7 +75,7 @@ public class GestorSesiones {
 		}
 	}
 
-	public static WebSocketAPI getApiInterna() {
+	public static WebsocketClient getApiInterna() {
 		return apiInterna;
 	}
 

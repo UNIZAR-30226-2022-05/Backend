@@ -1,16 +1,19 @@
 package es.unizar.unoforall;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-
+import es.unizar.unoforall.apirest.ApiRestController;
 import es.unizar.unoforall.db.GestorPoolConexionesBD;
+import es.unizar.unoforall.sockets.SocketController;
+import me.i2000c.web_utils.controllers.HttpManager;
+import me.i2000c.web_utils.multicast_utils.MulticastServer;
 
-@SpringBootApplication
-public class BackendApplication {
-
+public class BackendApplication{
 	public static void main(String[] args) {
-		GestorPoolConexionesBD.inicializarPool();
-		SpringApplication.run(BackendApplication.class, args);
-	}
+            GestorPoolConexionesBD.inicializarPool();
+            HttpManager.getManager().register(new ApiRestController());
+            HttpManager.getManager().register(new SocketController());
+            HttpManager.getManager().start();
 
+            MulticastServer server = new MulticastServer(80);
+            server.start();
+	}
 }
