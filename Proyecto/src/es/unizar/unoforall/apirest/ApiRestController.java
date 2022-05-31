@@ -3,12 +3,6 @@ package es.unizar.unoforall.apirest;
 
 import java.util.UUID;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import es.unizar.unoforall.db.GestorPoolConexionesBD;
 import es.unizar.unoforall.db.PartidasDAO;
 import es.unizar.unoforall.db.UsuarioDAO;
@@ -25,8 +19,10 @@ import es.unizar.unoforall.model.salas.RespuestaSala;
 import es.unizar.unoforall.model.salas.RespuestaSalas;
 import es.unizar.unoforall.model.salas.Sala;
 import es.unizar.unoforall.utils.CaracteresInvalidos;
-import es.unizar.unoforall.api.*;
 import es.unizar.unoforall.model.ListaUsuarios;
+import me.i2000c.web_utils.annotations.PostMapping;
+import me.i2000c.web_utils.annotations.RestController;
+import me.i2000c.web_utils.controllers.Controller;
 
 
 /**
@@ -34,9 +30,8 @@ import es.unizar.unoforall.model.ListaUsuarios;
  * @author unoforall
  *
  */
-@RestController
-@RequestMapping("/api")
-public class ApiRestController {
+@RestController("/api")
+public class ApiRestController extends Controller{
 	
 	/**
 	 * Método para loguear un usuario
@@ -49,8 +44,8 @@ public class ApiRestController {
 	 * 							RespuestaLogin.errorInfo especifica el motivo del error
 	 */
 	@PostMapping("/login")
-	public RespuestaLogin login(@RequestParam String correo, 
-									@RequestParam String contrasenna){
+	public RespuestaLogin login(String correo, 
+									String contrasenna){
 		
 		UsuarioVO usuario = UsuarioDAO.getUsuario(correo);
 		
@@ -79,8 +74,8 @@ public class ApiRestController {
 	 * 						mensaje de error si se ha producido alguno
 	 */
 	@PostMapping("/registerStepOne")
-	public String registerStepOne(@RequestParam String correo, 
-				@RequestParam String contrasenna, @RequestParam String nombre){
+	public String registerStepOne(String correo, 
+				String contrasenna, String nombre){
 		String error = "nulo";
 		if (!CaracteresInvalidos.hayCaracteresInvalidos(correo)
 				&& !CaracteresInvalidos.hayCaracteresInvalidos(contrasenna)
@@ -108,7 +103,7 @@ public class ApiRestController {
 	 * 					mensaje de error si se ha producido alguno
 	 */
 	@PostMapping("/registerStepTwo")
-	public String registerStepTwo(@RequestParam String correo, @RequestParam Integer codigo){
+	public String registerStepTwo(String correo, Integer codigo){
 		String error = GestorRegistros.confirmarRegistro(correo,codigo);	
         return error;
     }
@@ -122,7 +117,7 @@ public class ApiRestController {
 	 * 		   			false en caso contrario (probablemente debido a que ya ha expirado).
 	 */
 	@PostMapping("/registerCancel")
-	public Boolean registerCancel(@RequestParam String correo){
+	public Boolean registerCancel(String correo){
 		boolean exito = false;
         if (GestorRegistros.usuariosPendientes.containsKey(correo)) {
         	exito = true;
@@ -140,7 +135,7 @@ public class ApiRestController {
 	 * 		   			Si ocurre algo, la información estará contenida en el String.
 	 */
 	@PostMapping("/reestablecerContrasennaStepOne")
-	public String reestablecercontrasennaStepOne(@RequestParam String correo){
+	public String reestablecercontrasennaStepOne(String correo){
 		String error = "nulo";
 		if (!CaracteresInvalidos.hayCaracteresInvalidos(correo)) { //Esto cuando esté definida la clase CaracteresInvalidos
 			UsuarioVO user = UsuarioDAO.getUsuario(correo);
@@ -168,8 +163,8 @@ public class ApiRestController {
 	 * 		   			Si ocurre algo, la información estará contenida en el String.
 	 */
 	@PostMapping("/reestablecerContrasennaStepTwo")
-	public String reestablecerContrasennaStepTwo(@RequestParam String correo,
-												 @RequestParam Integer codigo){		
+	public String reestablecerContrasennaStepTwo(String correo,
+												 Integer codigo){		
 		String error = GestorContrasennas.confirmarCodigo(correo, codigo);
         return error;
     }
@@ -184,8 +179,8 @@ public class ApiRestController {
 	 * 		   				Si ocurre algo, la información estará contenida en el String.
 	 */
 	@PostMapping("/reestablecerContrasennaStepThree")
-	public String reestablecercontrasennaStepThree(@RequestParam String correo,
-												 @RequestParam String contrasenna){		
+	public String reestablecercontrasennaStepThree(String correo,
+												 String contrasenna){		
 		UsuarioVO user = UsuarioDAO.getUsuario(correo);
 		String error = "nulo";
 		if (user!=null) {
@@ -211,13 +206,13 @@ public class ApiRestController {
 	 * 						tendrá el atributo 'exito' a false
 	 */
 	@PostMapping("/sacarUsuarioVO")
-	public String sacarUsuarioVO(@RequestParam String sesionID){
-		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
+	public UsuarioVO sacarUsuarioVO(UUID sessionID){
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID.toString());
 		
 		if (usuarioID == null) {
-			return Serializar.serializar(new UsuarioVO());
+			return new UsuarioVO();
 		} else {
-			return Serializar.serializar(UsuarioDAO.getUsuario(usuarioID));
+			return UsuarioDAO.getUsuario(usuarioID);
 		}
     }
 	
@@ -232,18 +227,17 @@ public class ApiRestController {
 	 * 						partidas que haya podido extraer.
 	 */
 	@PostMapping("/sacarPartidasJugadas")
-	public String sacarPartidasJugadas(@RequestParam String sesionID,
-										@RequestParam String usuarioID){
+	public ListaPartidas sacarPartidasJugadas(UUID sessionID,
+										UUID usuarioID){
 		ListaPartidas lp = null;
-		UUID usuarioEmisorID = GestorSesiones.obtenerUsuarioID(sesionID);
+		UUID usuarioEmisorID = GestorSesiones.obtenerUsuarioID(sessionID.toString());
 		if(usuarioEmisorID != null) {
-			UUID _usuarioID = Serializar.deserializar(usuarioID, UUID.class);
-			lp = PartidasDAO.getPartidas(_usuarioID);
+			lp = PartidasDAO.getPartidas(usuarioID);
 		} else {
 			lp = new ListaPartidas(true);
 			lp.setError("SESION_EXPIRADA");
 		}
-		return Serializar.serializar(lp);
+		return lp;
 	}
 		
 	
@@ -255,15 +249,15 @@ public class ApiRestController {
 	 * 						Un mensaje de error si no ha tenido éxito.
 	 */
 	@PostMapping("/borrarCuenta")
-	public String borrarCuenta(@RequestParam String sesionID) {
+	public String borrarCuenta(UUID sessionID) {
 		String resultado = "BORRADA";
-		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID.toString());
 		if(usuarioID != null) {
 			boolean exito = UsuarioDAO.eliminarUsuario(new UsuarioVO(usuarioID,null,null,null,0,0,0,0,0,0));
 			if (!exito) {
 				resultado = "Ha surgido un problema al intentar borrar la cuenta.";
 			} else {
-				GestorSesiones.eliminarSesion(sesionID);
+				GestorSesiones.eliminarSesion(sessionID.toString());
 			}
 		} else {
 			resultado = "SESION_EXPIRADA";
@@ -285,11 +279,11 @@ public class ApiRestController {
 	 * 		   				En cualquier otro caso, la información estará contenida en el String.
 	 */
 	@PostMapping("/actualizarCuentaStepOne")
-	public String actualizarCuentaStepOne(@RequestParam String sesionID,
-			@RequestParam String correoNuevo, @RequestParam String nombre, 
-			@RequestParam String contrasenna){
+	public String actualizarCuentaStepOne(UUID sessionID,
+			String correoNuevo, String nombre, 
+			String contrasenna){
 		String error = "nulo";
-		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID.toString());
 		if(usuarioID != null) {
 			if (!CaracteresInvalidos.hayCaracteresInvalidos(correoNuevo) &&
 						!CaracteresInvalidos.hayCaracteresInvalidos(nombre) &&
@@ -327,10 +321,10 @@ public class ApiRestController {
 	 * 					Devuelve un mensaje con información del error si se ha producido alguno.
 	 */
 	@PostMapping("/actualizarCuentaStepTwo")
-	public String actualizarCuentaStepTwo(@RequestParam String sesionID,
-												 @RequestParam Integer codigo){		
+	public String actualizarCuentaStepTwo(UUID sessionID,
+												 Integer codigo){		
 		String error = "nulo";
-		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID.toString());
 		if(usuarioID != null) {
 			error = GestorActualizaCuentas.confirmarCodigo(usuarioID, codigo);
 		} else {
@@ -349,9 +343,9 @@ public class ApiRestController {
 	 * 					un String especificando el error que haya sucedido.
 	 */
 	@PostMapping("/actualizarCancel")
-	public String actualizarCancel(@RequestParam String sesionID){
+	public String actualizarCancel(UUID sessionID){
 		String error = "nulo";
-		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID.toString());
 		if(usuarioID != null) {
 			error = GestorActualizaCuentas.cancelarActualizacion(usuarioID);
 		} else {
@@ -372,14 +366,14 @@ public class ApiRestController {
 	 * 					un String especificando el error que haya sucedido.
 	 */
 	@PostMapping("/cambiarAvatar")
-	public String cambiarPersonalizacion(@RequestParam String sesionID,
-											@RequestParam Integer avatar,
-											@RequestParam Integer aspectoCartas,
-											@RequestParam Integer aspectoFondo){
+	public String cambiarPersonalizacion(UUID sessionID,
+											Integer avatar,
+											Integer aspectoCartas,
+											Integer aspectoFondo){
 		
 		
 		String error = "nulo";
-		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID.toString());
 		if(usuarioID != null) {
 			error = UsuarioDAO.cambiarAvatar(usuarioID, avatar, aspectoCartas, aspectoFondo);
 		} else {
@@ -405,16 +399,16 @@ public class ApiRestController {
 	 * 					extraer.
 	 */
 	@PostMapping("/sacarPeticionesEnviadas")
-	public String sacarPeticionesEnviadas(@RequestParam String sesionID) {
+	public ListaUsuarios sacarPeticionesEnviadas(UUID sessionID) {
 		ListaUsuarios lu = null;
 		
-		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID.toString());
 		if(usuarioID != null) {
 			lu = UsuarioDAO.sacarPeticionesEnviadas(usuarioID);		
 		} else {
 			lu = new ListaUsuarios(true);
 		}
-		return Serializar.serializar(lu);
+		return lu;
 	}
 	
 	
@@ -427,15 +421,15 @@ public class ApiRestController {
 	 * 					extraer.
 	 */
 	@PostMapping("/sacarPeticionesRecibidas")
-	public String sacarPeticionesRecibidas(@RequestParam String sesionID) {
+	public ListaUsuarios sacarPeticionesRecibidas(UUID sessionID) {
 		ListaUsuarios lu = null;
-		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID.toString());
 		if(usuarioID != null) {
 			lu = UsuarioDAO.sacarPeticionesRecibidas(usuarioID);		
 		} else {
 			lu = new ListaUsuarios(true);
 		}
-		return Serializar.serializar(lu);
+		return lu;
 	}
 	
 	
@@ -447,15 +441,15 @@ public class ApiRestController {
 	 * 					extraer.
 	 */
 	@PostMapping("/sacarAmigos")
-	public String sacarAmigos(@RequestParam String sesionID) {
+	public ListaUsuarios sacarAmigos(UUID sessionID) {
 		ListaUsuarios lu = null;
-		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID.toString());
 		if(usuarioID != null) {
 			lu = UsuarioDAO.sacarAmigos(usuarioID);		
 		} else {
 			lu = new ListaUsuarios(true);
 		}
-		return Serializar.serializar(lu);
+		return lu;
 	}
 	
 	
@@ -469,13 +463,12 @@ public class ApiRestController {
 	 * 					Devuelve un mensaje de error en otro caso.	 
 	 */
 	@PostMapping("/aceptarPeticionAmistad")
-	public String aceptarPeticionAmistad(@RequestParam String sesionID,
-															 @RequestParam String amigo) {
+	public String aceptarPeticionAmistad(UUID sessionID,
+								UUID amigo) {
 		String error = "nulo";
-		UUID _amigo = Serializar.deserializar(amigo, UUID.class);
-		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID.toString());
 		if(usuarioID != null) {
-			error = UsuarioDAO.mandarPeticion(usuarioID,_amigo); //Acepta porque ya existe la petición.		
+			error = UsuarioDAO.mandarPeticion(usuarioID, amigo); //Acepta porque ya existe la petición.		
 		} else {
 			error = "SESION_EXPIRADA";
 		}
@@ -492,13 +485,12 @@ public class ApiRestController {
 	 * 					Devuelve un mensaje de error en otro caso.	 
 	 */
 	@PostMapping("/cancelarPeticionAmistad")
-	public String cancelarPeticionAmistad(@RequestParam String sesionID,
-															 @RequestParam String amigo) {
+	public String cancelarPeticionAmistad(UUID sessionID,
+								UUID amigo) {
 		String error = "nulo";
-		UUID _amigo = Serializar.deserializar(amigo, UUID.class);
-		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID.toString());
 		if(usuarioID != null) {
-			error = UsuarioDAO.cancelarPeticion(usuarioID,_amigo); 
+			error = UsuarioDAO.cancelarPeticion(usuarioID, amigo); 
 		} else {
 			error = "SESION_EXPIRADA";
 		}
@@ -516,10 +508,10 @@ public class ApiRestController {
 	 * 					su contraseña.
 	 */
 	@PostMapping("/buscarAmigo")
-	public String buscarAmigo(@RequestParam String sesionID, 
-														@RequestParam String amigo) {
+	public ListaUsuarios buscarAmigo(UUID sessionID, 
+							String amigo) {
 			ListaUsuarios usuario = null;
-			UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
+			UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID.toString());
 			if(usuarioID != null) {
 				UsuarioVO user = UsuarioDAO.getUsuario(amigo);
 				usuario = new ListaUsuarios(false);
@@ -532,7 +524,7 @@ public class ApiRestController {
 			} else {
 				usuario = new ListaUsuarios(true);
 			}
-			return Serializar.serializar(usuario);
+			return usuario;
 	}
 	
 	
@@ -553,13 +545,10 @@ public class ApiRestController {
 	 * 							null si no ha sido posible crear la sala
 	 */
 	@PostMapping("/crearSala")
-	public RespuestaSala crearSala(@RequestParam String sesionID, @RequestParam String configuracion){		
-		
-		ConfigSala _configuracion = Serializar.deserializar(configuracion, ConfigSala.class);
-		
-		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
+	public RespuestaSala crearSala(UUID sessionID, ConfigSala configuracion){
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID.toString());
 		if(usuarioID != null) {
-			return new RespuestaSala(true, "", GestorSalas.nuevaSala(_configuracion));
+			return new RespuestaSala(true, "", GestorSalas.nuevaSala(configuracion));
 		} else {
 			return new RespuestaSala(false, "La sesión ha caducado", null);
 		}
@@ -577,26 +566,26 @@ public class ApiRestController {
 	 * 							encontrado ninguna.
 	 */
 	@PostMapping("/buscarSalaID")
-	public String buscarSalaID(@RequestParam String sesionID, @RequestParam String salaID){		
-		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
+	public Sala buscarSalaID(UUID sessionID, String salaID){		
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID.toString());
 		UUID _salaID;
 		try {
-			_salaID = Serializar.deserializar(salaID, UUID.class);
+			_salaID = UUID.fromString(salaID);
 		} catch (IllegalArgumentException e) {
 			System.out.println("Ha llegado un UUID inválido");
-			return Serializar.serializar(new Sala("No se ha encontrado la sala"));
+			return new Sala("No se ha encontrado la sala");
 		}
 		if(usuarioID != null) {
 			Sala salaADevolver = GestorSalas.buscarSalaID(_salaID);
 			if (salaADevolver == null) {
-				return Serializar.serializar(new Sala("No se ha encontrado la sala"));
+				return new Sala("No se ha encontrado la sala");
 			} else if (!salaADevolver.puedeUnirse()){
-				return Serializar.serializar(new Sala("La sala no es pública"));
+				return new Sala("La sala no es pública");
 			}else{
-				return Serializar.serializar(salaADevolver);
+				return salaADevolver;
 			}
 		} else {
-			return Serializar.serializar(new Sala("Sesión expirada"));
+			return new Sala("Sesión expirada");
 		}
     }
 	
@@ -617,14 +606,13 @@ public class ApiRestController {
 	 * 							del usuario.
 	 */
 	@PostMapping("/filtrarSalas")
-	public String filtrarSalas(@RequestParam String sesionID, 
-											@RequestParam String configuracion){		
-		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
+	public RespuestaSalas filtrarSalas(UUID sessionID, 
+							ConfigSala configuracion){		
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID.toString());
 		if(usuarioID != null) {
-			ConfigSala _configuracion = Serializar.deserializar(configuracion, ConfigSala.class);
-			return Serializar.serializar(new RespuestaSalas(GestorSalas.buscarSalas(_configuracion)).getRespuestaAEnviar());
+			return new RespuestaSalas(GestorSalas.buscarSalas(configuracion)).getRespuestaAEnviar();
 		} else {
-			return Serializar.serializar(new RespuestaSalas());
+			return new RespuestaSalas();
 		}
     }
 	
@@ -637,18 +625,18 @@ public class ApiRestController {
 	 * 							si no la hay
 	 */
 	@PostMapping("/comprobarPartidaPausada")
-	public String comprobarPartidaPausada(@RequestParam String sesionID){		
-		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
+	public Sala comprobarPartidaPausada(UUID sessionID){		
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID.toString());
 		if(usuarioID != null) {
 			Sala salaPausada = GestorSalas.getSalaPausada(usuarioID);
 			if (salaPausada != null) {
-				return Serializar.serializar(salaPausada.getSalaAEnviar()); 
+				return salaPausada.getSalaAEnviar(); 
 			} else {
-				return Serializar.serializar(new Sala("No hay ninguna sala pausada").getSalaAEnviar());
+				return new Sala("No hay ninguna sala pausada").getSalaAEnviar();
 			}
 
 		} else {
-			return Serializar.serializar(new Sala("No hay ninguna sala pausada").getSalaAEnviar());
+			return new Sala("No hay ninguna sala pausada").getSalaAEnviar();
 		}
     }
 	
@@ -661,16 +649,16 @@ public class ApiRestController {
 	 * 							sala, y false en caso contrario
 	 */
 	@PostMapping("/comprobarUnirseSala")
-	public String comprobarUnirseSala(@RequestParam String sesionID, @RequestParam String salaID){
-		Sala sala = GestorSalas.obtenerSala(Serializar.deserializar(salaID, UUID.class));
-		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
+	public boolean comprobarUnirseSala(UUID sessionID, UUID salaID){
+		Sala sala = GestorSalas.obtenerSala(salaID);
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID.toString());
 		if (usuarioID == null 
 				|| sala == null
 				|| sala.isEnPartida() 
 				|| (sala.isEnPausa() && !sala.hayParticipante(usuarioID))) {
-			return Serializar.serializar(false);
+			return false;
 		} else {
-			return Serializar.serializar(true);
+			return true;
 		}
 		
     }
@@ -684,15 +672,15 @@ public class ApiRestController {
 	 * 							contrario
 	 */
 	@PostMapping("/ack")
-	public String ack(@RequestParam String sesionID, @RequestParam String salaID){
+	public boolean ack(UUID sessionID, UUID salaID){
 		System.out.println("ACK recibido");
-		Sala sala = GestorSalas.obtenerSala(Serializar.deserializar(salaID, UUID.class));
-		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
+		Sala sala = GestorSalas.obtenerSala(salaID);
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID.toString());
 		if (sala != null && usuarioID != null) {
 			sala.ack(usuarioID);
-			return Serializar.serializar(true);
+			return true;
 		} else {
-			return Serializar.serializar(false);
+			return false;
 		}
     }
 	
@@ -703,8 +691,8 @@ public class ApiRestController {
 	 * @param clave
 	 * @return
 	 */
-	@GetMapping("/close")
-	public String closeConnections(@RequestParam String clave){
+	//@GetMapping("/close")
+	public String closeConnections(String clave){
 		if (clave.equals("unoforall")) {
 			GestorPoolConexionesBD.close();
 			return "OK, reinicia el servidor";
