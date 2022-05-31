@@ -24,6 +24,11 @@ import me.i2000c.web_utils.controllers.DisconnectReason;
 @RestController("/app")
 @WebsocketController("/topic")
 public class SocketController extends Controller{	
+    
+    @Override
+    public void onConnect(UUID sessionID){
+        System.out.println(sessionID + " has been connected");
+    }
 	
 	private final static int DELAY_TURNO_IA = 2*1000;  // 2 segundos
 	private final static int DELAY_TURNO_IA_CORTO = 500;  // medio segundo
@@ -36,7 +41,7 @@ public class SocketController extends Controller{
 	 * @return				el id de sesión si ha habido éxito, y null en caso contrario
 	 * @throws Exception
 	 */
-	@PostMapping("/conectarse/{claveInicio}")
+	/*@PostMapping("/conectarse/{claveInicio}")
 	public void login(UUID claveInicio, 
 							UUID sessionID) throws Exception {
 				
@@ -49,7 +54,7 @@ public class SocketController extends Controller{
 			super.sendTo("/topic/conectarse/" + claveInicio, null);
 			return;
 		}
-	}
+	}*/
 		
 	
 	/**************************************************************************/

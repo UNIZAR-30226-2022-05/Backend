@@ -44,8 +44,7 @@ public class ApiRestController extends Controller{
 	 * 							RespuestaLogin.errorInfo especifica el motivo del error
 	 */
 	@PostMapping("/login")
-	public RespuestaLogin login(String correo, 
-									String contrasenna){
+	public RespuestaLogin login(UUID sessionID, String correo, String contrasenna){
 		
 		UsuarioVO usuario = UsuarioDAO.getUsuario(correo);
 		
@@ -54,12 +53,18 @@ public class ApiRestController extends Controller{
 		} else if (!usuario.getContrasenna().equals(contrasenna))  {
 			return new RespuestaLogin(false, "Contraseña incorrecta", null, null);
 		} else {
-			UUID claveInicio = GestorSesiones.nuevaClaveInicio(usuario.getId());
+                    if(GestorSesiones.estaLogueado(sessionID)){
+                        return new RespuestaLogin(false, "El usuario ya tiene una sesión iniciada", null, null);
+                    }else{
+                        System.out.println("Nueva sesión: " + sessionID);
+                        return new RespuestaLogin(true, "", null, usuario.getId());
+                    }
+			/*UUID claveInicio = GestorSesiones.nuevaClaveInicio(usuario.getId());
 			if (claveInicio == null) {
 				return new RespuestaLogin(false, "El usuario ya tiene una sesión iniciada, o ya está iniciando una", null, null);
 			} else {
 				return new RespuestaLogin(true, "", claveInicio, usuario.getId());
-			}
+			}*/
 			
 		}
     }
