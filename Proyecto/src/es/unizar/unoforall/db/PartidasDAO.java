@@ -100,7 +100,7 @@ public class PartidasDAO {
 	 * 						haya.
 	 */
 	public static String insertarPartidaAcabada(PartidaJugada partida) { 
-		String error = "nulo";
+		String error = null;
 		Connection conn = null;
 		
 		try {

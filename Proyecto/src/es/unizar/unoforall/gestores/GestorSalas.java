@@ -324,7 +324,7 @@ public class GestorSalas {
 	
 //	private static String actualizarPuntosJugador(int usuariosDebajo, UUID jugadorID) {
 //		synchronized (LOCK) {
-//			String error = "nulo";
+//			String error = null;
 //			switch(usuariosDebajo) {
 //				case 1://5
 //					error = UsuarioDAO.actualizarPuntos(5, jugadorID);

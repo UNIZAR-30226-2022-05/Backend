@@ -10,7 +10,7 @@ import java.util.ArrayList;
  */
 public class ListaPartidas {
 	private boolean expirado;
-	private String error = "nulo";
+	private String error = null;
 	private ArrayList<PartidaJugada> partidas = null;
 	
 	public ListaPartidas(boolean expirado) {

@@ -53,10 +53,11 @@ public class ApiRestController extends Controller{
 		} else if (!usuario.getContrasenna().equals(contrasenna))  {
 			return new RespuestaLogin(false, "Contraseña incorrecta", null, null);
 		} else {
-                    if(GestorSesiones.estaLogueado(sessionID)){
+                    if(GestorSesiones.estaLogueado(usuario.getId())){
                         return new RespuestaLogin(false, "El usuario ya tiene una sesión iniciada", null, null);
                     }else{
                         System.out.println("Nueva sesión: " + sessionID);
+                        GestorSesiones.loguearUsuario(sessionID, usuario.getId());
                         return new RespuestaLogin(true, "", null, usuario.getId());
                     }
 			/*UUID claveInicio = GestorSesiones.nuevaClaveInicio(usuario.getId());
@@ -81,7 +82,7 @@ public class ApiRestController extends Controller{
 	@PostMapping("/registerStepOne")
 	public String registerStepOne(String correo, 
 				String contrasenna, String nombre){
-		String error = "nulo";
+		String error = null;
 		if (!CaracteresInvalidos.hayCaracteresInvalidos(correo)
 				&& !CaracteresInvalidos.hayCaracteresInvalidos(contrasenna)
 				&& !CaracteresInvalidos.hayCaracteresInvalidos(nombre)) {
@@ -141,7 +142,7 @@ public class ApiRestController extends Controller{
 	 */
 	@PostMapping("/reestablecerContrasennaStepOne")
 	public String reestablecercontrasennaStepOne(String correo){
-		String error = "nulo";
+		String error = null;
 		if (!CaracteresInvalidos.hayCaracteresInvalidos(correo)) { //Esto cuando esté definida la clase CaracteresInvalidos
 			UsuarioVO user = UsuarioDAO.getUsuario(correo);
 			
@@ -187,7 +188,7 @@ public class ApiRestController extends Controller{
 	public String reestablecercontrasennaStepThree(String correo,
 												 String contrasenna){		
 		UsuarioVO user = UsuarioDAO.getUsuario(correo);
-		String error = "nulo";
+		String error = null;
 		if (user!=null) {
 			error = UsuarioDAO.cambiarContrasenna(user.getId(), contrasenna);
 		} else {
@@ -287,7 +288,7 @@ public class ApiRestController extends Controller{
 	public String actualizarCuentaStepOne(UUID sessionID,
 			String correoNuevo, String nombre, 
 			String contrasenna){
-		String error = "nulo";
+		String error = null;
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 		if(usuarioID != null) {
 			if (!CaracteresInvalidos.hayCaracteresInvalidos(correoNuevo) &&
@@ -328,7 +329,7 @@ public class ApiRestController extends Controller{
 	@PostMapping("/actualizarCuentaStepTwo")
 	public String actualizarCuentaStepTwo(UUID sessionID,
 												 Integer codigo){		
-		String error = "nulo";
+		String error = null;
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 		if(usuarioID != null) {
 			error = GestorActualizaCuentas.confirmarCodigo(usuarioID, codigo);
@@ -349,7 +350,7 @@ public class ApiRestController extends Controller{
 	 */
 	@PostMapping("/actualizarCancel")
 	public String actualizarCancel(UUID sessionID){
-		String error = "nulo";
+		String error = null;
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 		if(usuarioID != null) {
 			error = GestorActualizaCuentas.cancelarActualizacion(usuarioID);
@@ -377,7 +378,7 @@ public class ApiRestController extends Controller{
 											Integer aspectoFondo){
 		
 		
-		String error = "nulo";
+		String error = null;
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 		if(usuarioID != null) {
 			error = UsuarioDAO.cambiarAvatar(usuarioID, avatar, aspectoCartas, aspectoFondo);
@@ -470,7 +471,7 @@ public class ApiRestController extends Controller{
 	@PostMapping("/aceptarPeticionAmistad")
 	public String aceptarPeticionAmistad(UUID sessionID,
 								UUID amigo) {
-		String error = "nulo";
+		String error = null;
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 		if(usuarioID != null) {
 			error = UsuarioDAO.mandarPeticion(usuarioID, amigo); //Acepta porque ya existe la petición.		
@@ -492,7 +493,7 @@ public class ApiRestController extends Controller{
 	@PostMapping("/cancelarPeticionAmistad")
 	public String cancelarPeticionAmistad(UUID sessionID,
 								UUID amigo) {
-		String error = "nulo";
+		String error = null;
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 		if(usuarioID != null) {
 			error = UsuarioDAO.cancelarPeticion(usuarioID, amigo); 

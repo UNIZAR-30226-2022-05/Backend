@@ -424,6 +424,7 @@ public class Sala {
 	}
 	
 	public void initAckTimers() {
+            if(0==0)return;
 		synchronized (LOCK) {
 			for (UUID usuarioID : participantesAck.keySet()) {
 //				if(isEnPartida() && new Random().nextBoolean()) {

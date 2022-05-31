@@ -613,14 +613,14 @@ public class SocketController extends Controller{
 	
 	public static void desconectarUsuario(String sessionID) {
 		SessionHandler.logout(sessionID);
-	}
+	}*/
 	
 	public static void desconectarUsuario(UUID usuarioID) {
-		String sessionID = GestorSesiones.obtenerSesionID(usuarioID);
+		UUID sessionID = GestorSesiones.obtenerSesionID(usuarioID);
 		if (sessionID != null) {
 			desconectarUsuario(sessionID);
 		}
-	}*/
+	}
 
     
 }

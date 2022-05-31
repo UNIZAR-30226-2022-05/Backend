@@ -21,12 +21,14 @@ public class GestorSesiones {
 	
 	//private static final Object LOCK;
 	
-	static {
+	public static void inicializar() {
 		sesiones = new ConcurrentHashMap<>();
 		//clavesInicio = new HashMap<>();
 		//LOCK = new Object();
+                
 		apiInterna = new WebsocketClient("http://localhost");
                 apiInterna.openConnection("/topic");
+                System.out.println("API interna iniciada con id de sesión: " + apiInterna.getSessionID());
 	}
 	
 	/*public static UUID nuevaClaveInicio(UUID usuarioID) {
@@ -41,8 +43,12 @@ public class GestorSesiones {
 		}
 	}*/
         
-        public static boolean estaLogueado(UUID sessionID){
-            return sesiones.containsKey(sessionID);
+        public static boolean estaLogueado(UUID usuarioID){
+            return sesiones.containsValue(usuarioID);
+        }
+        
+        public static void loguearUsuario(UUID sessionID, UUID usuarioID){
+            sesiones.put(sessionID, usuarioID);
         }
 	
 	/*public static boolean iniciarSesion(UUID claveInicio, UUID sesionID) {
