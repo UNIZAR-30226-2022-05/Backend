@@ -207,7 +207,7 @@ public class ApiRestController extends Controller{
 	 */
 	@PostMapping("/sacarUsuarioVO")
 	public UsuarioVO sacarUsuarioVO(UUID sessionID){
-		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID.toString());
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 		
 		if (usuarioID == null) {
 			return new UsuarioVO();
@@ -230,7 +230,7 @@ public class ApiRestController extends Controller{
 	public ListaPartidas sacarPartidasJugadas(UUID sessionID,
 										UUID usuarioID){
 		ListaPartidas lp = null;
-		UUID usuarioEmisorID = GestorSesiones.obtenerUsuarioID(sessionID.toString());
+		UUID usuarioEmisorID = GestorSesiones.obtenerUsuarioID(sessionID);
 		if(usuarioEmisorID != null) {
 			lp = PartidasDAO.getPartidas(usuarioID);
 		} else {
@@ -251,13 +251,13 @@ public class ApiRestController extends Controller{
 	@PostMapping("/borrarCuenta")
 	public String borrarCuenta(UUID sessionID) {
 		String resultado = "BORRADA";
-		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID.toString());
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 		if(usuarioID != null) {
 			boolean exito = UsuarioDAO.eliminarUsuario(new UsuarioVO(usuarioID,null,null,null,0,0,0,0,0,0));
 			if (!exito) {
 				resultado = "Ha surgido un problema al intentar borrar la cuenta.";
 			} else {
-				GestorSesiones.eliminarSesion(sessionID.toString());
+				GestorSesiones.eliminarSesion(sessionID);
 			}
 		} else {
 			resultado = "SESION_EXPIRADA";
@@ -283,7 +283,7 @@ public class ApiRestController extends Controller{
 			String correoNuevo, String nombre, 
 			String contrasenna){
 		String error = "nulo";
-		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID.toString());
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 		if(usuarioID != null) {
 			if (!CaracteresInvalidos.hayCaracteresInvalidos(correoNuevo) &&
 						!CaracteresInvalidos.hayCaracteresInvalidos(nombre) &&
@@ -324,7 +324,7 @@ public class ApiRestController extends Controller{
 	public String actualizarCuentaStepTwo(UUID sessionID,
 												 Integer codigo){		
 		String error = "nulo";
-		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID.toString());
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 		if(usuarioID != null) {
 			error = GestorActualizaCuentas.confirmarCodigo(usuarioID, codigo);
 		} else {
@@ -345,7 +345,7 @@ public class ApiRestController extends Controller{
 	@PostMapping("/actualizarCancel")
 	public String actualizarCancel(UUID sessionID){
 		String error = "nulo";
-		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID.toString());
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 		if(usuarioID != null) {
 			error = GestorActualizaCuentas.cancelarActualizacion(usuarioID);
 		} else {
@@ -373,7 +373,7 @@ public class ApiRestController extends Controller{
 		
 		
 		String error = "nulo";
-		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID.toString());
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 		if(usuarioID != null) {
 			error = UsuarioDAO.cambiarAvatar(usuarioID, avatar, aspectoCartas, aspectoFondo);
 		} else {
@@ -402,7 +402,7 @@ public class ApiRestController extends Controller{
 	public ListaUsuarios sacarPeticionesEnviadas(UUID sessionID) {
 		ListaUsuarios lu = null;
 		
-		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID.toString());
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 		if(usuarioID != null) {
 			lu = UsuarioDAO.sacarPeticionesEnviadas(usuarioID);		
 		} else {
@@ -423,7 +423,7 @@ public class ApiRestController extends Controller{
 	@PostMapping("/sacarPeticionesRecibidas")
 	public ListaUsuarios sacarPeticionesRecibidas(UUID sessionID) {
 		ListaUsuarios lu = null;
-		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID.toString());
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 		if(usuarioID != null) {
 			lu = UsuarioDAO.sacarPeticionesRecibidas(usuarioID);		
 		} else {
@@ -443,7 +443,7 @@ public class ApiRestController extends Controller{
 	@PostMapping("/sacarAmigos")
 	public ListaUsuarios sacarAmigos(UUID sessionID) {
 		ListaUsuarios lu = null;
-		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID.toString());
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 		if(usuarioID != null) {
 			lu = UsuarioDAO.sacarAmigos(usuarioID);		
 		} else {
@@ -466,7 +466,7 @@ public class ApiRestController extends Controller{
 	public String aceptarPeticionAmistad(UUID sessionID,
 								UUID amigo) {
 		String error = "nulo";
-		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID.toString());
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 		if(usuarioID != null) {
 			error = UsuarioDAO.mandarPeticion(usuarioID, amigo); //Acepta porque ya existe la petición.		
 		} else {
@@ -488,7 +488,7 @@ public class ApiRestController extends Controller{
 	public String cancelarPeticionAmistad(UUID sessionID,
 								UUID amigo) {
 		String error = "nulo";
-		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID.toString());
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 		if(usuarioID != null) {
 			error = UsuarioDAO.cancelarPeticion(usuarioID, amigo); 
 		} else {
@@ -511,7 +511,7 @@ public class ApiRestController extends Controller{
 	public ListaUsuarios buscarAmigo(UUID sessionID, 
 							String amigo) {
 			ListaUsuarios usuario = null;
-			UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID.toString());
+			UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 			if(usuarioID != null) {
 				UsuarioVO user = UsuarioDAO.getUsuario(amigo);
 				usuario = new ListaUsuarios(false);
@@ -546,7 +546,7 @@ public class ApiRestController extends Controller{
 	 */
 	@PostMapping("/crearSala")
 	public RespuestaSala crearSala(UUID sessionID, ConfigSala configuracion){
-		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID.toString());
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 		if(usuarioID != null) {
 			return new RespuestaSala(true, "", GestorSalas.nuevaSala(configuracion));
 		} else {
@@ -567,7 +567,7 @@ public class ApiRestController extends Controller{
 	 */
 	@PostMapping("/buscarSalaID")
 	public Sala buscarSalaID(UUID sessionID, String salaID){		
-		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID.toString());
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 		UUID _salaID;
 		try {
 			_salaID = UUID.fromString(salaID);
@@ -608,7 +608,7 @@ public class ApiRestController extends Controller{
 	@PostMapping("/filtrarSalas")
 	public RespuestaSalas filtrarSalas(UUID sessionID, 
 							ConfigSala configuracion){		
-		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID.toString());
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 		if(usuarioID != null) {
 			return new RespuestaSalas(GestorSalas.buscarSalas(configuracion)).getRespuestaAEnviar();
 		} else {
@@ -626,7 +626,7 @@ public class ApiRestController extends Controller{
 	 */
 	@PostMapping("/comprobarPartidaPausada")
 	public Sala comprobarPartidaPausada(UUID sessionID){		
-		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID.toString());
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 		if(usuarioID != null) {
 			Sala salaPausada = GestorSalas.getSalaPausada(usuarioID);
 			if (salaPausada != null) {
@@ -651,7 +651,7 @@ public class ApiRestController extends Controller{
 	@PostMapping("/comprobarUnirseSala")
 	public boolean comprobarUnirseSala(UUID sessionID, UUID salaID){
 		Sala sala = GestorSalas.obtenerSala(salaID);
-		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID.toString());
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 		if (usuarioID == null 
 				|| sala == null
 				|| sala.isEnPartida() 
@@ -675,7 +675,7 @@ public class ApiRestController extends Controller{
 	public boolean ack(UUID sessionID, UUID salaID){
 		System.out.println("ACK recibido");
 		Sala sala = GestorSalas.obtenerSala(salaID);
-		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID.toString());
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 		if (sala != null && usuarioID != null) {
 			sala.ack(usuarioID);
 			return true;

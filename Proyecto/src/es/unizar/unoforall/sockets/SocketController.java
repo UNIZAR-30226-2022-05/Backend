@@ -3,14 +3,6 @@ package es.unizar.unoforall.sockets;
 import java.util.Timer;
 import java.util.UUID;
 
-import org.springframework.context.event.EventListener;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
-import org.springframework.messaging.handler.annotation.Header;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.socket.messaging.SessionDisconnectEvent;
-
 import es.unizar.unoforall.db.UsuarioDAO;
 import es.unizar.unoforall.gestores.AlarmaTurnoIA;
 import es.unizar.unoforall.gestores.GestorSalas;
@@ -22,10 +14,14 @@ import es.unizar.unoforall.model.partidas.Partida;
 import es.unizar.unoforall.model.partidas.RespuestaVotacionPausa;
 import es.unizar.unoforall.model.salas.NotificacionSala;
 import es.unizar.unoforall.model.salas.Sala;
-import es.unizar.unoforall.api.*;
+import me.i2000c.web_utils.annotations.PostMapping;
+import me.i2000c.web_utils.annotations.WebsocketController;
+import me.i2000c.web_utils.client.RestClient;
+import me.i2000c.web_utils.controllers.Controller;
+import me.i2000c.web_utils.controllers.DisconnectReason;
 
-@Controller
-public class SocketController {	
+@WebsocketController("/topic")
+public class SocketController extends Controller{	
 	
 	private final static int DELAY_TURNO_IA = 2*1000;  // 2 segundos
 	private final static int DELAY_TURNO_IA_CORTO = 500;  // medio segundo
@@ -33,23 +29,23 @@ public class SocketController {
 	/**
 	 * Método para iniciar sesión
 	 * @param usrID			En la URL: clave para iniciar sesión obtenida en el login
-	 * @param sesionID		Automático
+	 * @param sessionID		Automático
 	 * @param vacio			Cualquier objeto no nulo
 	 * @return				el id de sesión si ha habido éxito, y null en caso contrario
 	 * @throws Exception
 	 */
-	@MessageMapping("/conectarse/{claveInicio}")
-	@SendTo("/topic/conectarse/{claveInicio}")
-	public String login(@DestinationVariable UUID claveInicio, 
-							@Header("simpSessionId") String sesionID, 
-							Object vacio) throws Exception {
+	@PostMapping("/conectarse/{claveInicio}")
+	public void login(UUID claveInicio, 
+							UUID sessionID) throws Exception {
 				
-		boolean exito = GestorSesiones.iniciarSesion(claveInicio, sesionID); 
+		boolean exito = GestorSesiones.iniciarSesion(claveInicio, sessionID); 
 		if (exito) {
-			System.out.println("Nueva sesión: " + sesionID);
-			return sesionID;
+			System.out.println("Nueva sesión: " + sessionID);
+                        super.sendTo("/topic/conectarse/" + claveInicio, sessionID);
+			return;
 		} else {
-			return "nulo";
+			super.sendTo("/topic/conectarse/" + claveInicio, null);
+			return;
 		}
 	}
 		
@@ -63,27 +59,28 @@ public class SocketController {
 	 * 'usrDestino' si este está susscrito al canal de destino. También
 	 * registra la solicitud en la base de datos.
 	 * @param usrDestino	En la URL: id del usuario de destino
-	 * @param sesionID		Automático
+	 * @param sessionID		Automático
 	 * @param vacio			Cualquier objeto no nulo
 	 * @return				(Clase UsuarioVO) El usuario de destino recibirá el VO del emisor
 	 * 						o null si la petición se la envía a sí mismo
 	 * @throws Exception
 	 */
-	@MessageMapping("/notifAmistad/{usrDestino}")
-	@SendTo("/topic/notifAmistad/{usrDestino}")
-	public String enviarNotifAmistad(@DestinationVariable UUID usrDestino, 
-							@Header("simpSessionId") String sesionID, 
-							Object vacio) throws Exception {
-		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
+	@PostMapping("/notifAmistad/{usrDestino}")
+	public void enviarNotifAmistad(UUID usrDestino, 
+							UUID sessionID) throws Exception {
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 		if (usuarioID.equals(usrDestino)) {
-			return "nulo";
+                    super.sendTo("/topic/notifAmistad/" + usrDestino, null);
+                    return;
 		} else {
 			String error = UsuarioDAO.mandarPeticion(usuarioID,usrDestino);	
 			System.err.println(error);
 			if (error.equals("nulo")) {
-				return Serializar.serializar(UsuarioDAO.getUsuario(usuarioID));
+                            super.sendTo("/topic/notifAmistad/" + usrDestino, UsuarioDAO.getUsuario(usuarioID));
+                            return;
 			} else {
-				return "nulo";
+                            super.sendTo("/topic/notifAmistad/" + usrDestino, null);
+                            return;
 			}
 		}
 	}
@@ -92,20 +89,19 @@ public class SocketController {
 	 * Método para enviar una notificación de invitación a partida al usuario 
 	 * con id 'usrDestino' si este está susscrito al canal de destino
 	 * @param usrDestino	En la URL: id del usuario de destino
-	 * @param sesionID		Automático
+	 * @param sessionID		Automático
 	 * @param salaID		ID de la sala a invitar
 	 * @return				(Clase NotificacionSala) El usuario de destino recibirá la NotificacionSala 
 	 * 						con el id de la sala, y se podrá conectar a esta
 	 * 						en /salas/unirse/{salaID}
 	 * @throws Exception
 	 */
-	@MessageMapping("/notifSala/{usrDestino}")
-	@SendTo("/topic/notifSala/{usrDestino}")
-	public String enviarNotifSala(@DestinationVariable UUID usrDestino, 
-							@Header("simpSessionId") String sesionID, 
+	@PostMapping("/notifSala/{usrDestino}")
+	public void enviarNotifSala(UUID usrDestino, 
+							UUID sessionID, 
 							UUID salaID) throws Exception {
-		return Serializar.serializar(new NotificacionSala(salaID, 
-				UsuarioDAO.getUsuario(GestorSesiones.obtenerUsuarioID(sesionID))));
+            super.sendTo("/topic/notifSala/" + usrDestino,
+                    new NotificacionSala(salaID, UsuarioDAO.getUsuario(GestorSesiones.obtenerUsuarioID(sessionID))));
 	}
 	
 	
@@ -117,54 +113,52 @@ public class SocketController {
 	/**
 	 * Método para unirse a una sala
 	 * @param salaID		En la URL: id de la sala
-	 * @param sesionID		Automático
+	 * @param sessionID		Automático
 	 * @param vacio			Cualquier objeto no nulo
 	 * @return				(Clase Sala) La sala a la que se ha unido el usuario
 	 * 						Sala con 'noExiste' = true si la sala no existe o 
 	 * 						el usuario no está logueado
 	 * @throws Exception
 	 */
-	@MessageMapping("/salas/unirse/{salaID}")
-	@SendTo("/topic/salas/{salaID}")
-	public String unirseSala(@DestinationVariable UUID salaID, 
-							@Header("simpSessionId") String sesionID, 
-							Object vacio) throws Exception {
+	@PostMapping("/salas/unirse/{salaID}")
+	public void unirseSala(UUID salaID, 
+							UUID sessionID) throws Exception {
 		
 		Sala sala = GestorSalas.obtenerSala(salaID);
 		if (sala == null) {
-			return Serializar.serializar(new Sala("La sala ya no existe"));
+                    super.sendTo("/topic/salas/" + salaID, new Sala("La sala ya no existe"));
+                    return;
 		}
 		
-		System.out.println(sesionID + " se une a la sala " + salaID);
+		System.out.println(sessionID + " se une a la sala " + salaID);
 		
-		sala.nuevoParticipante(UsuarioDAO.getUsuario(GestorSesiones.obtenerUsuarioID(sesionID)));
+		sala.nuevoParticipante(UsuarioDAO.getUsuario(GestorSesiones.obtenerUsuarioID(sessionID)));
 		
 		sala.initAckTimers();
-		return Serializar.serializar(sala.getSalaAEnviar());
+                super.sendTo("/topic/salas/" + salaID, sala.getSalaAEnviar());
 	} 
 	
 	/**
 	 * Método para indicar que el usuario está listo para jugar
 	 * @param salaID		En la URL: id de la sala
-	 * @param sesionID		Automático
+	 * @param sessionID		Automático
 	 * @param vacio			Cualquier objeto no nulo
 	 * @return				(Clase Sala) La sala actualizada
 	 * 						Sala con 'noExiste' = true si la sala no existe o 
 	 * 						el usuario no está logueado
 	 * @throws Exception
 	 */
-	@MessageMapping("/salas/listo/{salaID}")
-	@SendTo("/topic/salas/{salaID}")
-	public String listoSala(@DestinationVariable UUID salaID, 
-							@Header("simpSessionId") String sesionID, 
-							Object vacio) throws Exception {
+	@PostMapping("/salas/listo/{salaID}")
+	public void listoSala(UUID salaID, 
+							UUID sessionID) throws Exception {
 		
 		if (GestorSalas.obtenerSala(salaID) == null) {
-			return Serializar.serializar(new Sala("La sala ya no existe"));
+                    super.sendTo("/topic/salas/" + salaID, new Sala("La sala ya no existe"));
+                    return;
 		}
 		
 		Sala sala = GestorSalas.obtenerSala(salaID);
-		sala.nuevoParticipanteListo(GestorSesiones.obtenerUsuarioID(sesionID));
+		sala.nuevoParticipanteListo(GestorSesiones.obtenerUsuarioID(sessionID));
 		if(sala.isEnPartida()) {
 			GestorSalas.restartTimer(salaID);
 			
@@ -176,34 +170,34 @@ public class SocketController {
 		}
 		sala.initAckTimers();		
 		
-		return Serializar.serializar(sala.getSalaAEnviar());
+		super.sendTo("/topic/salas/" + salaID, sala.getSalaAEnviar());
 	}
 	
 	/**
 	 * Método para salirse de una sala
 	 * @param salaID		En la URL: id de la sala
-	 * @param sesionID		Automático
+	 * @param sessionID		Automático
 	 * @param vacio			Cualquier objeto no nulo
 	 * @return				(Clase Sala) La sala actualizada
 	 * 						Sala con 'noExiste' = true si la sala no existe o 
 	 * 						ha sido eliminada
 	 * @throws Exception
 	 */
-	@MessageMapping("/salas/salir/{salaID}")
-	@SendTo("/topic/salas/{salaID}")
-	public String salirseSala(@DestinationVariable UUID salaID, 
-							@Header("simpSessionId") String sesionID, 
-							Object vacio) throws Exception {
+	@PostMapping("/salas/salir/{salaID}")
+	public void salirseSala(UUID salaID, 
+							UUID sessionID) throws Exception {
 		
 		if (GestorSalas.obtenerSala(salaID) == null) {
-			return Serializar.serializar(new Sala("La sala ya no existe"));
+                    super.sendTo("/topic/salas/" + salaID, new Sala("La sala ya no existe"));
+                    return;
 		}
 		
 		Sala s = GestorSalas.eliminarParticipanteSalaExterno(salaID, 
-				GestorSesiones.obtenerUsuarioID(sesionID));
+				GestorSesiones.obtenerUsuarioID(sessionID));
 		
 		if (s == null) {
-			return Serializar.serializar(new Sala("La sala se ha eliminado"));
+                    super.sendTo("/topic/salas/" + salaID, new Sala("La sala se ha eliminado"));
+                    return;
 		} else {
 			if (s.isEnPartida() && s.getPartida().turnoDeIA()) {
 				System.out.println("- - - Preparando turno de la IA");
@@ -217,7 +211,7 @@ public class SocketController {
 			}
 			
 			s.initAckTimers();
-			return Serializar.serializar(s.getSalaAEnviar());
+			super.sendTo("/topic/salas/" + salaID, s.getSalaAEnviar());
 		}
 	}
 	
@@ -226,33 +220,33 @@ public class SocketController {
 	 * Método para salirse de una sala en pausa definitivamente (si no, se seguirá
 	 * perteneciendo a la partida pausada)
 	 * @param salaID		En la URL: id de la sala
-	 * @param sesionID		Automático
+	 * @param sessionID		Automático
 	 * @param vacio			Cualquier objeto no nulo
 	 * @return				(Clase Sala) La sala actualizada
 	 * 						Sala con 'noExiste' = true si la sala no existe o 
 	 * 						ha sido eliminada
 	 * @throws Exception
 	 */
-	@MessageMapping("/salas/salirDefinitivo/{salaID}")
-	@SendTo("/topic/salas/{salaID}")
-	public String salirseSalaDefinitivo(@DestinationVariable UUID salaID, 
-							@Header("simpSessionId") String sesionID, 
-							Object vacio) throws Exception {
+	@PostMapping("/salas/salirDefinitivo/{salaID}")
+	public void salirseSalaDefinitivo(UUID salaID, 
+							UUID sessionID) throws Exception {
 		
 		if (GestorSalas.obtenerSala(salaID) == null) {
-			return Serializar.serializar(new Sala("La sala ya no existe"));
+                    super.sendTo("/topic/salas/" + salaID, new Sala("La sala ya no existe"));
+                    return;
 		}	
 		
 		Sala s = GestorSalas.obtenerSala(salaID);
-		s.eliminarParticipanteDefinitivamente(GestorSesiones.obtenerUsuarioID(sesionID));
+		s.eliminarParticipanteDefinitivamente(GestorSesiones.obtenerUsuarioID(sessionID));
 		
 		if(s.numParticipantes() == 0) {
 			System.out.println("Eliminando sala " + salaID);
 			GestorSalas.eliminarSala(salaID);
-			return Serializar.serializar(new Sala("La sala se ha eliminado"));
+			super.sendTo("/topic/salas/" + salaID, new Sala("La sala se ha eliminado"));
+                        return;
 		}
 		s.initAckTimers();		
-		return Serializar.serializar(s.getSalaAEnviar());
+		super.sendTo("/topic/salas/" + salaID, s.getSalaAEnviar());
 	}
 	
 	
@@ -264,14 +258,13 @@ public class SocketController {
 	 * @return				(Clase Sala) La sala actualizada
 	 * @throws Exception
 	 */
-	@MessageMapping("/salas/actualizar/{salaID}")
-	@SendTo("/topic/salas/{salaID}")
-	public String actualizarSala(@DestinationVariable UUID salaID,  
-							Object vacio) throws Exception {
+	@PostMapping("/salas/actualizar/{salaID}")
+	public void actualizarSala(UUID salaID) throws Exception {
 		Sala s = GestorSalas.obtenerSala(salaID);
 		
 		if (s == null) {
-			return Serializar.serializar(new Sala("La sala se ha eliminado"));
+                    super.sendTo("/topic/salas/" + salaID, new Sala("La sala se ha eliminado"));
+                    return;
 		} else {
 			if(s.isEnPartida()) {
 				GestorSalas.restartTimer(salaID);
@@ -279,7 +272,7 @@ public class SocketController {
 			}
 			
 			s.initAckTimers();
-			return Serializar.serializar(s.getSalaAEnviar());
+			super.sendTo("/topic/salas/" + salaID, s.getSalaAEnviar());
 		}
 	}
 	
@@ -292,40 +285,44 @@ public class SocketController {
 	/**
 	 * Método para realizar una jugada en una partida
 	 * @param salaID		En la URL: id de la sala
-	 * @param sesionID		Automático
+	 * @param sessionID		Automático
 	 * @param jugada		Jugada realizada
 	 * @return				(Clase Sala) La partida actualizada tras cada turno
 	 * 						Partida con 'error' = true si la sala no existe o 
 	 * 						el usuario no está logueado
 	 * @throws Exception
 	 */
-	@MessageMapping("/partidas/turnos/{salaID}")
-	@SendTo("/topic/salas/{salaID}")
-	public String turnoPartida(@DestinationVariable UUID salaID, 
-							@Header("simpSessionId") String sesionID, 
+	@PostMapping("/partidas/turnos/{salaID}")
+	public void turnoPartida(UUID salaID, 
+							UUID sessionID, 
 							Jugada jugada) throws Exception {		
 		
 		if (GestorSalas.obtenerSala(salaID) == null) {
-			return Serializar.serializar(new Sala("La sala de la partida ya no existe"));
+                    super.sendTo("/topic/salas/" + salaID, new Sala("La sala de la partida ya no existe"));
+                    return;
 		} else if (!GestorSalas.obtenerSala(salaID).isEnPartida()) {
-			return Serializar.serializar(new Sala("La partida todavía no ha comenzado"));
+                    super.sendTo("/topic/salas/" + salaID, new Sala("La partida todavía no ha comenzado"));
+                    return;
 		}  else if (GestorSalas.obtenerSala(salaID).isEnPausa()) {
-			return Serializar.serializar(new Sala("La partida está en pausa"));
+                    super.sendTo("/topic/salas/" + salaID, new Sala("La partida está en pausa"));
+                    return;
 		}
-		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 		if (usuarioID == null) {
-			return Serializar.serializar(new Sala("La sesión ha caducado. Vuelva a iniciar sesión"));
+                    super.sendTo("/topic/salas/" + salaID, new Sala("La sesión ha caducado. Vuelva a iniciar sesión"));
+                    return;
 		}
 		
 		
-		System.out.println("- - - " + sesionID + " envia un turno a la sala " + salaID);
+		System.out.println("- - - " + sessionID + " envia un turno a la sala " + salaID);
 		
 		Sala sala = GestorSalas.obtenerSala(salaID);
 		Partida partida = sala.getPartida();
 		
 		if (partida.turnoDeIA()) {
 			System.out.println("- - - Jugada en turno incorrecto");
-			return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
+                        super.sendTo("/topic/salas/" + salaID, GestorSalas.obtenerSala(salaID).getSalaAEnviar());
+                        return;
 		}
 		
 		int turnoAnterior = partida.getTurno();
@@ -333,7 +330,8 @@ public class SocketController {
 		
 		if (!jugadaValida) {
 			System.out.println("- - - Jugada inválida");
-			return Serializar.serializar(GestorSalas.obtenerSala(salaID).getSalaAEnviar());
+                        super.sendTo("/topic/salas/" + salaID, GestorSalas.obtenerSala(salaID).getSalaAEnviar());
+                        return;
 		} else {
 			System.out.println("- - - Jugada: " + jugada);
 		}
@@ -359,7 +357,7 @@ public class SocketController {
 			}
 		}
 		sala.initAckTimers();
-		return Serializar.serializar(sala.getSalaAEnviar());
+                super.sendTo("/topic/salas/" + salaID, sala.getSalaAEnviar());
 	}
 	
 	/**
@@ -370,15 +368,15 @@ public class SocketController {
 	 * 						Partida con 'error' = true si la sala no existe
 	 * @throws Exception
 	 */
-	@MessageMapping("/partidas/turnosIA/{salaID}")
-	@SendTo("/topic/salas/{salaID}")
-	public String turnoPartidaIA(@DestinationVariable UUID salaID, 
-							Object vacio) throws Exception {
+	@PostMapping("/partidas/turnosIA/{salaID}")
+	public void turnoPartidaIA(UUID salaID) throws Exception {
 		
 		if (GestorSalas.obtenerSala(salaID) == null) {
-			return Serializar.serializar(new Sala("La sala de la partida ya no existe"));
+                    super.sendTo("/topic/salas/" + salaID, new Sala("La sala de la partida ya no existe"));
+                    return;
 		} else if (GestorSalas.obtenerSala(salaID).isEnPausa()) {
-			return Serializar.serializar(new Sala("La partida está pausada"));
+                    super.sendTo("/topic/salas/" + salaID, new Sala("La partida está pausada"));
+                    return;
 		}
 		
 		Sala sala = GestorSalas.obtenerSala(salaID);
@@ -392,7 +390,10 @@ public class SocketController {
 			&& ultimaJugada.getCartas() != null
 			&& ultimaJugada.getCartas().size() == 1
 			&& ultimaJugada.getCartas().get(0).esDelTipo(Carta.Tipo.mas4)) {
-			GestorSesiones.getApiInterna().sendObject("/app/partidas/emojiPartida/" + salaID, new EnvioEmoji(0,turnoAnterior,true));
+                    RestClient client = GestorSesiones.getApiInterna().getRestClient();
+                    client.addParameter("emoji", new EnvioEmoji(0,turnoAnterior,true));
+                    client.openConnection("/app/partidas/emojiPartida/" + salaID);
+                    client.receiveObject(String.class, null);
 		}
 		
 		if(partida.estaTerminada()) {
@@ -420,7 +421,7 @@ public class SocketController {
 			}
 		}
 		sala.initAckTimers();
-		return Serializar.serializar(sala.getSalaAEnviar());
+                super.sendTo("/topic/salas/" + salaID, sala.getSalaAEnviar());
 	}
 	
 	
@@ -432,15 +433,15 @@ public class SocketController {
 	 * 						Partida con 'error' = true si la sala no existe
 	 * @throws Exception
 	 */
-	@MessageMapping("/partidas/saltarTurno/{salaID}")
-	@SendTo("/topic/salas/{salaID}")
-	public String saltarTurno(@DestinationVariable UUID salaID, 
-							Object vacio) throws Exception {
+	@PostMapping("/partidas/saltarTurno/{salaID}")
+	public void saltarTurno(UUID salaID) throws Exception {
 		
 		if (GestorSalas.obtenerSala(salaID) == null) {
-			return Serializar.serializar(new Sala("La sala de la partida ya no existe"));
+                    super.sendTo("/topic/salas/" + salaID, new Sala("La sala de la partida ya no existe"));
+                    return;
 		}  else if (GestorSalas.obtenerSala(salaID).isEnPausa()) {
-			return Serializar.serializar(new Sala("La partida está en pausa ..."));
+                    super.sendTo("/topic/salas/" + salaID, new Sala("La partida está en pausa..."));
+                    return;
 		}
 		
 		Sala sala = GestorSalas.obtenerSala(salaID);
@@ -460,14 +461,14 @@ public class SocketController {
 		
 		GestorSalas.restartTimer(salaID);
 		sala.initAckTimers();
-		return Serializar.serializar(sala.getSalaAEnviar());
+                super.sendTo("/topic/salas/" + salaID, sala.getSalaAEnviar());
 	}
 	
 		
 	/**
 	 * Método para pulsar el botón de UNO en una partida
 	 * @param salaID		En la URL: id de la sala
-	 * @param sesionID		Automático
+	 * @param sessionID		Automático
 	 * @param vacio			Cualquier objeto no nulo
 	 * @return				(Clase Sala) La partida actualizada después de que
 	 * 						un jugador presione el botón UNO
@@ -475,20 +476,21 @@ public class SocketController {
 	 * 						el usuario no está logueado
 	 * @throws Exception
 	 */
-	@MessageMapping("/partidas/botonUNO/{salaID}")
-	@SendTo("/topic/salas/{salaID}")
-	public String botonUNOPartida(@DestinationVariable UUID salaID, 
-							@Header("simpSessionId") String sesionID, 
-							Object vacio) throws Exception {		
+	@PostMapping("/partidas/botonUNO/{salaID}")
+	public void botonUNOPartida(UUID salaID, 
+							UUID sessionID) throws Exception {		
 		
 		if (GestorSalas.obtenerSala(salaID) == null) {
-			return Serializar.serializar(new Sala("La sala de la partida ya no existe"));
+                    super.sendTo("/topic/salas/" + salaID, new Sala("La sala de la partida ya no existe"));
+                    return;
 		} else if (!GestorSalas.obtenerSala(salaID).isEnPartida()) {
-			return Serializar.serializar(new Sala("La partida todavía no ha comenzado"));
+                    super.sendTo("/topic/salas/" + salaID, new Sala("La partida todavía no ha comenzado"));
+                    return;
 		}
-		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 		if (usuarioID == null) {
-			return Serializar.serializar(new Sala("La sesión ha caducado. Vuelva a iniciar sesión"));
+                    super.sendTo("/topic/salas/" + salaID, new Sala("La sesión ha caducado. Vuelva a iniciar sesión"));
+                    return;
 		}
 		
 		System.out.println("El usuario " + usuarioID + " ha pulsado el botón UNO");
@@ -498,64 +500,64 @@ public class SocketController {
 		partida.pulsarBotonUNO(usuarioID);
 		
 		sala.initAckTimers();
-		return Serializar.serializar(sala.getSalaAEnviar());
+                super.sendTo("/topic/salas/" + salaID, sala.getSalaAEnviar());
 	}
 	
 	
 	/**
 	 * Método para enviar un emoji en una partida
 	 * @param salaID		En la URL: id de la sala
-	 * @param sesionID		Automático
+	 * @param sessionID		Automático
 	 * @param emoji			Entero identificador del emoji
 	 * @param esIA			falso (solo true cuando lo llame el backend)
 	 * @return				(Clase EnvioEmoji) El identificador del emoji y el emisor
 	 * @throws Exception
 	 */
-	@MessageMapping("/partidas/emojiPartida/{salaID}")
-	@SendTo("/topic/salas/{salaID}/emojis")
-	public String emojiPartida(@DestinationVariable UUID salaID, 
-							@Header("simpSessionId") String sesionID, 
-							EnvioEmoji emoji) throws Exception {		
-		return Serializar.serializar(emoji);
+	@PostMapping("/partidas/emojiPartida/{salaID}")
+	public void emojiPartida(UUID salaID, 
+							UUID sessionID, 
+							EnvioEmoji emoji) throws Exception {
+            super.sendTo("/topic/salas/" + salaID + "/emojis", emoji);
 	}
 	
 	
 	/**
 	 * Método para votar el pausado de una partida
 	 * @param salaID		En la URL: id de la sala
-	 * @param sesionID		Automático
+	 * @param sessionID		Automático
 	 * @param vacio			Cualquier objeto no nulo
 	 * @return				Clase RespuestaVotacionPausa
 	 * 						nulo si la sala no existe, no está en partida, o el
 	 * 						emisor no tiene una sesión iniciada
 	 * @throws Exception
 	 */
-	@MessageMapping("/partidas/votaciones/{salaID}")
-	@SendTo("/topic/salas/{salaID}/votaciones")
-	public String votacionPartida(@DestinationVariable UUID salaID, 
-							@Header("simpSessionId") String sesionID, 
-							Object vacio) throws Exception {	
+	@PostMapping("/partidas/votaciones/{salaID}")
+	public void votacionPartida(UUID salaID, 
+							UUID sessionID) throws Exception {	
 		
 		if (GestorSalas.obtenerSala(salaID) == null) {
-			return "nulo";
+                    super.sendTo("/topic/salas/" + salaID + "/votaciones", null);
+                    return;
 		} else if (!GestorSalas.obtenerSala(salaID).isEnPartida()) {
-			return "nulo";
+                    super.sendTo("/topic/salas/" + salaID + "/votaciones", null);
+                    return;
 		}
-		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sesionID);
+		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);
 		if (usuarioID == null) {
-			return "nulo";
+                    super.sendTo("/topic/salas/" + salaID + "/votaciones", null);
+                    return;
 		}
 		
 		RespuestaVotacionPausa resp = GestorSalas.obtenerSala(salaID)
 										.setParticipantesVotoAbandono(usuarioID);
 		
 		if (resp.getNumVotos() == resp.getNumVotantes()) {
-			GestorSesiones.getApiInterna()
-				.sendObject("/app/salas/actualizar/" + salaID, "VACIO");
+                    RestClient client = GestorSesiones.getApiInterna().getRestClient();
+                    client.openConnection("/app/salas/actualizar/" + salaID);
+                    client.receiveObject(String.class, null);
 		}
 		
-		return Serializar.serializar(resp);
-		
+		super.sendTo("/topic/salas/" + salaID + "/votaciones", resp);
 	}
 	
 	
@@ -568,42 +570,50 @@ public class SocketController {
 	 * 						emisor no tiene una sesión iniciada
 	 * @throws Exception
 	 */
-	@MessageMapping("/partidas/votacionesInternas/{salaID}")
-	@SendTo("/topic/salas/{salaID}/votaciones")
-	public String votacionPartidaInterna(@DestinationVariable UUID salaID, 
-							Object vacio) throws Exception {	
+	@PostMapping("/partidas/votacionesInternas/{salaID}")
+	public void votacionPartidaInterna(UUID salaID) throws Exception {	
 		Sala sala = GestorSalas.obtenerSala(salaID);
 		if (sala == null) {
-			return "nulo";
+                    super.sendTo("/topic/salas/" + salaID + "/votaciones", null);
+                    return;
 		} else if (!sala.isEnPartida()) {
-			return "nulo";
+                    super.sendTo("/topic/salas/" + salaID + "/votaciones", null);
+                    return;
 		}
 		
-		return Serializar.serializar(sala.getParticipantesVotoAbandonoExterno());
-		
+		super.sendTo("/topic/salas/" + salaID + "/votaciones", sala.getParticipantesVotoAbandonoExterno());
 	}
 	
+	@Override
+        public void onDisconnect(UUID sessionID, DisconnectReason reason) {
+            //SessionHandler.logout(sessionID);
+            GestorSalas.eliminarParticipanteSalas(GestorSesiones.obtenerUsuarioID(sessionID));
+            GestorSesiones.eliminarSesion(sessionID);	
+
+            System.out.println("Client disconnected with session id: " + sessionID + "; Reason: " + reason);
+        }
 	
-	
-	@EventListener
+	/*@EventListener
 	public void onDisconnectEvent(SessionDisconnectEvent event) throws Exception {
-		String sesionID = event.getSessionId();
+		String sessionID = event.getSessionId();
 		
-		SessionHandler.logout(sesionID);
-		GestorSalas.eliminarParticipanteSalas(GestorSesiones.obtenerUsuarioID(sesionID));
-		GestorSesiones.eliminarSesion(sesionID);	
+		SessionHandler.logout(sessionID);
+		GestorSalas.eliminarParticipanteSalas(GestorSesiones.obtenerUsuarioID(sessionID));
+		GestorSesiones.eliminarSesion(sessionID);	
 		
-		System.out.println("Client disconnected with session id: " + sesionID);
+		System.out.println("Client disconnected with session id: " + sessionID);
 	}
 	
-	public static void desconectarUsuario(String sesionID) {
-		SessionHandler.logout(sesionID);
+	public static void desconectarUsuario(String sessionID) {
+		SessionHandler.logout(sessionID);
 	}
 	
 	public static void desconectarUsuario(UUID usuarioID) {
-		String sesionID = GestorSesiones.obtenerSesionID(usuarioID);
-		if (sesionID != null) {
-			desconectarUsuario(sesionID);
+		String sessionID = GestorSesiones.obtenerSesionID(usuarioID);
+		if (sessionID != null) {
+			desconectarUsuario(sessionID);
 		}
-	}
+	}*/
+
+    
 }

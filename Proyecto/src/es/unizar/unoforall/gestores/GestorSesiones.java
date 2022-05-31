@@ -9,7 +9,7 @@ import me.i2000c.web_utils.client.WebsocketClient;
 public class GestorSesiones {
 	
 	// Relación  sesionID (websockets) - usuarioID
-	private static HashMap<String, UUID> sesiones;
+	private static HashMap<UUID, UUID> sesiones;
 	
 	// Relación   clave inicio sesión - usuarioID
 	private static HashMap<UUID, UUID> clavesInicio;
@@ -40,7 +40,7 @@ public class GestorSesiones {
 		}
 	}
 	
-	public static boolean iniciarSesion(UUID claveInicio, String sesionID) {
+	public static boolean iniciarSesion(UUID claveInicio, UUID sesionID) {
 		synchronized (LOCK) {
 			if (clavesInicio.containsKey(claveInicio)) {
 				sesiones.put(sesionID, clavesInicio.get(claveInicio));
@@ -52,15 +52,15 @@ public class GestorSesiones {
 		}
 	}
 	
-	public static UUID obtenerUsuarioID(String sesionID) {
+	public static UUID obtenerUsuarioID(UUID sesionID) {
 		synchronized (LOCK) {
 			return sesiones.get(sesionID);
 		}
 	}
 	
-	public static String obtenerSesionID(UUID usuarioID) {
+	public static UUID obtenerSesionID(UUID usuarioID) {
 		synchronized (LOCK) {
-			for (Entry<String, UUID> sesion : sesiones.entrySet()) {
+			for (Entry<UUID, UUID> sesion : sesiones.entrySet()) {
 		        if (sesion.getValue().equals(usuarioID)) {
 		            return sesion.getKey();
 		        }
@@ -69,7 +69,7 @@ public class GestorSesiones {
 		}
 	}
 	
-	public static void eliminarSesion(String sesionID) {
+	public static void eliminarSesion(UUID sesionID) {
 		synchronized (LOCK) {
 			sesiones.remove(sesionID);
 		}
