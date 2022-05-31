@@ -1,68 +1,50 @@
 package es.unizar.unoforall.db;
 
 import java.sql.Connection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 public class GestorPoolConexionesBD {
-	private static Object LOCK;
-	private static Map<Connection, Boolean> conexiones;
-	private static final int MAX_CONEXIONES = 20;
+        private static final int MAX_CONEXIONES = 20;
+        
+        private static BlockingQueue<Connection> conexiones;
 
 	public static void inicializarPool(){
-	    LOCK = new Object();
-
-	    conexiones = new HashMap<>();
+            System.out.println("Inicializando pool de conexiones de PostgreSQL...");
+	    conexiones = new ArrayBlockingQueue(MAX_CONEXIONES);
 	    for(int i=0;i<MAX_CONEXIONES;i++){
 	        try{
 	            Connection conexion = GestorConexionesBD.getConnection();
-	            conexiones.put(conexion, true);
+	            conexiones.add(conexion);
 	        }catch(Exception ex){
 	            System.err.println("Error al inicializar el PoolConnectionManager - Sugerencia: sudo service postgresql start");
+                    System.exit(1);
+                    break;
 	            //ex.printStackTrace();
 	        }
 	    }
+            System.out.println("Pool de conexiones inicializado");
 	}
 
 	public static Connection getConnection(){
-	    synchronized(LOCK){
-	        Connection result = null;
-	        while(result == null){
-	            for(Map.Entry<Connection, Boolean> entry : conexiones.entrySet()){
-	                Connection conexion = entry.getKey();
-	                boolean disponible = entry.getValue();
-	                if(disponible){
-	                    result = conexion;
-	                    conexiones.put(conexion, false);
-	                    break;
-	                }
-	            }
-
-	            if(result == null){
-	                try{
-	                    LOCK.wait();
-	                }catch(Exception ex){}
-	            }
-	        }
-
-	        return result;
-	    }
+            Connection conexion = null;
+            
+            // Se bloquea hasta que consigue una conexión
+            while(conexion == null){
+                try{
+                    conexion = conexiones.take();
+                }catch(InterruptedException ex){}
+            }
+            
+            return conexion;
 	}
 
 	public static void releaseConnection(Connection conexion){
-	    synchronized(LOCK){
-	        if(conexiones.containsKey(conexion)){
-	            conexiones.put(conexion, true);
-	            try{
-	                LOCK.notify();
-	            }catch(Exception ex){}
-	        }
-	    }
+            conexiones.add(conexion);
 	}
 
 	public static void close(){
-	    synchronized(LOCK){
-	        conexiones.forEach((conexion, disponible) -> GestorConexionesBD.releaseConnection(conexion));
-	    }
+            conexiones.forEach(conexion -> GestorConexionesBD.releaseConnection(conexion));
+            conexiones.clear();
 	}
 }
