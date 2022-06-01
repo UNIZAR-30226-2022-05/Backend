@@ -51,13 +51,16 @@
     </target>
 
     <target name="run" depends="build">
-        <java classpath="${buildDir}; ${libDir}/WebUtils.jar; ${libDir}/mailx.jar; ${libDir}/activation.jar; ${libDir}/postgresql.jar" classname="${mainClassPackage}.${mainClassName}"/>
+        <java classpath="${buildDir}; ${libDir}/WebUtils.jar; ${libDir}/mailx.jar; ${libDir}/activation.jar; ${libDir}/postgresql.jar" classname="${mainClassPackage}.${mainClassName}">
+            <jvmarg value="-Dfile.encoding=UTF-8"/>
+        </java>
     </target>
 
     <target name="debug" depends="build">
         <java classpath="${buildDir}; ${libDir}/WebUtils.jar; ${libDir}/mailx.jar; ${libDir}/activation.jar; ${libDir}/postgresql.jar" classname="${mainClassPackage}.${mainClassName}">
             <jvmarg value="-Xdebug"/>
             <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5432"/>
+            <jvmarg value="-Dfile.encoding=UTF-8"/>
         </java>
     </target>
 

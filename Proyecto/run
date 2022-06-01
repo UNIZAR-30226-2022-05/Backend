@@ -1,0 +1,12 @@
+#!/bin/bash
+# File generated with BuildXMLCreator
+
+jarFile=dist/Backend_with_dependencies.jar
+
+if [ -f "$jarFile" ]
+then
+    java -Dfile.encoding="UTF-8" -jar "$jarFile"
+else
+    echo "File $jarFile doesn't exist. Have you executed the compile script? 2>&1"
+    exit 1
+fi

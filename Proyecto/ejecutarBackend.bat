@@ -1,6 +1,6 @@
 @echo off
 
 cd dist
-java -jar Backend_with_dependencies.jar
+java -Dfile.encoding="UTF-8" -jar Backend_with_dependencies.jar
 
 pause
