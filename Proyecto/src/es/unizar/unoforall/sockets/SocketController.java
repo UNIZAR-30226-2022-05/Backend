@@ -27,6 +27,9 @@ public class SocketController extends Controller{
     	
 	private final static int DELAY_TURNO_IA = 2*1000;  // 2 segundos
 	private final static int DELAY_TURNO_IA_CORTO = 500;  // medio segundo
+
+        
+        
 	
 	/**
 	 * Método para iniciar sesión

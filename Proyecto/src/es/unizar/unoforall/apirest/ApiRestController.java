@@ -20,9 +20,9 @@ import es.unizar.unoforall.model.salas.RespuestaSalas;
 import es.unizar.unoforall.model.salas.Sala;
 import es.unizar.unoforall.utils.CaracteresInvalidos;
 import es.unizar.unoforall.model.ListaUsuarios;
+import es.unizar.unoforall.sockets.SocketController;
 import me.i2000c.web_utils.annotations.PostMapping;
 import me.i2000c.web_utils.annotations.RestController;
-import me.i2000c.web_utils.controllers.Controller;
 
 
 /**
@@ -31,7 +31,13 @@ import me.i2000c.web_utils.controllers.Controller;
  *
  */
 @RestController("/api")
-public class ApiRestController extends Controller{
+public class ApiRestController{
+    
+        private final SocketController socketController;
+    
+        public ApiRestController(SocketController socketController){
+            this.socketController = socketController;
+        }
 	
 	/**
 	 * Método para loguear un usuario
@@ -49,11 +55,14 @@ public class ApiRestController extends Controller{
 		UsuarioVO usuario = UsuarioDAO.getUsuario(correo);
 		
 		if (usuario == null) {
+                        socketController.disconnectClient(sessionID);
 			return new RespuestaLogin(false, "Usuario no registrado", null, null);
 		} else if (!usuario.getContrasenna().equals(contrasenna))  {
+                        socketController.disconnectClient(sessionID);
 			return new RespuestaLogin(false, "Contraseña incorrecta", null, null);
 		} else {
                     if(GestorSesiones.estaLogueado(usuario.getId())){
+                        socketController.disconnectClient(sessionID);
                         return new RespuestaLogin(false, "El usuario ya tiene una sesión iniciada", null, null);
                     }else{
                         System.out.println("Nueva sesión: " + sessionID);
@@ -679,6 +688,8 @@ public class ApiRestController extends Controller{
 	 */
 	@PostMapping("/ack")
 	public boolean ack(UUID sessionID, UUID salaID){
+            if(0==0)return true;
+            
 		System.out.println("ACK recibido");
 		Sala sala = GestorSalas.obtenerSala(salaID);
 		UUID usuarioID = GestorSesiones.obtenerUsuarioID(sessionID);

@@ -10,8 +10,9 @@ import me.i2000c.web_utils.multicast_utils.MulticastServer;
 public class BackendApplication{
     public static void main(String[] args) {
         GestorPoolConexionesBD.inicializarPool();
-        HttpManager.getManager().register(new ApiRestController());
-        HttpManager.getManager().register(new SocketController());
+        SocketController socketController = new SocketController();
+        HttpManager.getManager().register(socketController);
+        HttpManager.getManager().register(new ApiRestController(socketController));        
         HttpManager.getManager().start();
         GestorSesiones.inicializar();
 

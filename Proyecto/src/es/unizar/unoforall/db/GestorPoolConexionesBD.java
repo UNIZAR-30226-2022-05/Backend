@@ -10,20 +10,20 @@ public class GestorPoolConexionesBD {
         private static BlockingQueue<Connection> conexiones;
 
 	public static void inicializarPool(){
-            System.out.println("Inicializando pool de conexiones de PostgreSQL...");
+            System.out.print("Inicializando pool de conexiones de PostgreSQL...\r");
 	    conexiones = new ArrayBlockingQueue(MAX_CONEXIONES);
 	    for(int i=0;i<MAX_CONEXIONES;i++){
 	        try{
 	            Connection conexion = GestorConexionesBD.getConnection();
 	            conexiones.add(conexion);
+                    System.out.printf("Inicializando pool de conexiones de PostgreSQL... %d %%\r", (int) ((i+1)*100.0/MAX_CONEXIONES));
 	        }catch(Exception ex){
-	            System.err.println("Error al inicializar el PoolConnectionManager - Sugerencia: sudo service postgresql start");
+	            System.err.println("\nError al inicializar el PoolConnectionManager - Sugerencia: sudo service postgresql start");
                     System.exit(1);
                     break;
-	            //ex.printStackTrace();
 	        }
 	    }
-            System.out.println("Pool de conexiones inicializado");
+            System.out.println("\nPool de conexiones inicializado");
 	}
 
 	public static Connection getConnection(){

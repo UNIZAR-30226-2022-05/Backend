@@ -1,28 +1,29 @@
 package es.unizar.unoforall.model.salas;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class RespuestaSalas {
 	private boolean exito;
-	private HashMap<UUID,Sala> salas;
+	private Map<UUID,Sala> salas;
 	
 	public RespuestaSalas() {
 		salas = new HashMap<>();
 		exito = false;
 	}
 	
-	public RespuestaSalas(HashMap<UUID,Sala> salas) {
+	public RespuestaSalas(Map<UUID,Sala> salas) {
 		this();
-		this.setSalas(salas);
+		this.salas = salas;
 		this.exito = true;
 	}
 
-	public HashMap<UUID,Sala> getSalas() {
+	public Map<UUID,Sala> getSalas() {
 		return salas;
 	}
 
-	public void setSalas(HashMap<UUID,Sala> salas) {
+	public void setSalas(Map<UUID,Sala> salas) {
 		this.salas = salas;
 	}
 
