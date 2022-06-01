@@ -398,6 +398,8 @@ public class Sala {
 	}
 
 	public void ack(UUID usuarioID) {
+            if(0==0)return;
+            
 		Timer timerAck = (Timer) participantesAck.get(usuarioID);
 	
 		if(timerAck != null) {

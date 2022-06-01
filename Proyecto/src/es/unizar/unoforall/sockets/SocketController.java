@@ -24,12 +24,7 @@ import me.i2000c.web_utils.controllers.DisconnectReason;
 @RestController("/app")
 @WebsocketController("/topic")
 public class SocketController extends Controller{	
-    
-    @Override
-    public void onConnect(UUID sessionID){
-        System.out.println(sessionID + " has been connected");
-    }
-	
+    	
 	private final static int DELAY_TURNO_IA = 2*1000;  // 2 segundos
 	private final static int DELAY_TURNO_IA_CORTO = 500;  // medio segundo
 	
@@ -82,7 +77,7 @@ public class SocketController extends Controller{
 		} else {
 			String error = UsuarioDAO.mandarPeticion(usuarioID,usrDestino);	
 			System.err.println(error);
-			if (error.equals("nulo")) {
+			if (error == null) {
                             super.sendTo("/topic/notifAmistad/" + usrDestino, UsuarioDAO.getUsuario(usuarioID));
                             return;
 			} else {
@@ -143,7 +138,9 @@ public class SocketController extends Controller{
 		
 		sala.initAckTimers();
                 super.sendTo("/topic/salas/" + salaID, sala.getSalaAEnviar());
-	} 
+	}
+        
+        
 	
 	/**
 	 * Método para indicar que el usuario está listo para jugar
@@ -345,7 +342,7 @@ public class SocketController extends Controller{
 		
 		if(partida.estaTerminada()) {
 			String error = GestorSalas.insertarPartidaEnBd(salaID);
-			if (!error.equals("nulo")) {
+			if (error != null) {
 				System.err.println("Error al insertar la partida en la BD");
 			}	
 			GestorSalas.cancelTimer(salaID);
@@ -405,7 +402,7 @@ public class SocketController extends Controller{
 		
 		if(partida.estaTerminada()) {
 			String error = GestorSalas.insertarPartidaEnBd(salaID);
-			if (!error.equals("nulo")) {
+			if (error != null) {
 				System.err.println("Error al insertar la partida en la BD");
 			}	
 			GestorSalas.cancelTimer(salaID);
