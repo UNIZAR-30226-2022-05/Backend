@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### External libraries (except WebUtils)
+/lib/*.jar
+!/lib/WebUtils.jar
